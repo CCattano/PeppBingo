@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Pepp.Web.Apps.Bingo.Adapters;
+using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 
 namespace Pepp.Web.Apps.Bingo.WebService
 {
@@ -19,18 +21,37 @@ namespace Pepp.Web.Apps.Bingo.WebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region FRAMEWORK
+            services.AddHttpContextAccessor();
             services.AddControllers();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
+            #endregion
 
+            #region ADAPTERS
+            services.AddScoped<ITwitchAdapter, TwitchAdapter>();
+            #endregion
+
+            #region FACADES
+            #endregion
+
+            #region SERVICES
+            #endregion
+
+            #region CLIENTS
+            services.AddTwitchClient();
+            #endregion
+
+            #region MISC
             services.AddOpenApiDocument(cfg =>
             {
                 cfg.SchemaType = NJsonSchema.SchemaType.OpenApi3;
                 cfg.Title = "Tandem.Web.Apps.Trivia";
             });
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -78,7 +99,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 if (env.IsDevelopment())
                 {
                     //spa.UseAngularCliServer(npmScript: "start");
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
         }
