@@ -2,12 +2,10 @@
 
 	<PropertyGroup>
 		<TargetFramework>net5.0</TargetFramework>
-		<RootNamespace>Pepp.Web.Apps.Bingo.Facades</RootNamespace>
+		<RootNamespace>Pepp.Web.Apps.Bingo.BusinessEntities</RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\BusinessEntities\Bingo.BusinessEntities\Bingo.BusinessEntities.csproj" />
-	  <ProjectReference Include="..\..\Data\Bingo.Data\Bingo.Data.csproj" />
 	  <ProjectReference Include="..\..\Infrastructure\Bingo.Infrastructure\Bingo.Infrastructure.csproj" />
 	</ItemGroup>
 

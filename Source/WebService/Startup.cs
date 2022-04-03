@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
+using Pepp.Web.Apps.Bingo.Facades.Translators;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
@@ -50,7 +51,11 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddTwitchClient();
             #endregion
 
-            #region MISC
+            #region EXTERNAL
+            services.AddAutoMapper(
+                typeof(Entity_BusinessEntity)
+            );
+
             services.AddOpenApiDocument(cfg =>
             {
                 cfg.SchemaType = NJsonSchema.SchemaType.OpenApi3;

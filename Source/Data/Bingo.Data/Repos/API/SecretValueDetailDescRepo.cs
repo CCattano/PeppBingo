@@ -19,7 +19,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        Task<List<ValueDetailDesc>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum;
+        Task<List<ValueDetailDescEntity>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum;
     }
 
     /// <inheritdoc cref="ISecretValueDetailDescRepo"/>
@@ -29,13 +29,13 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
         {
         }
 
-        public async Task<List<ValueDetailDesc>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum
+        public async Task<List<ValueDetailDescEntity>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum
         {
             List<SqlParameter> parameters = new()
             {
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(ValueDetailDesc.Source)}",
+                    ParameterName = $"@{nameof(ValueDetailDescEntity.Source)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = Enum.GetName(typeof(TEnum), source)
                 }
@@ -47,16 +47,16 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
             if (queryData.Rows.Count == 0)
                 return null;
 
-            List<ValueDetailDesc> valueDetailDescriptions = new();
+            List<ValueDetailDescEntity> valueDetailDescriptions = new();
 
             foreach (DataRow row in queryData.Rows)
             {
-                ValueDetailDesc entity = new()
+                ValueDetailDescEntity entity = new()
                 {
-                    Source = row.Field<string>(nameof(ValueDetailDesc.Source)),
-                    Type = row.Field<string>(nameof(ValueDetailDesc.Type)),
-                    Value = row.Field<string>(nameof(ValueDetailDesc.Value)),
-                    Description = row.Field<string>(nameof(ValueDetailDesc.Description))
+                    Source = row.Field<string>(nameof(ValueDetailDescEntity.Source)),
+                    Type = row.Field<string>(nameof(ValueDetailDescEntity.Type)),
+                    Value = row.Field<string>(nameof(ValueDetailDescEntity.Value)),
+                    Description = row.Field<string>(nameof(ValueDetailDescEntity.Description))
                 };
                 valueDetailDescriptions.Add(entity);
             }

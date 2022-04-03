@@ -1,6 +1,8 @@
-﻿using Pepp.Web.Apps.Bingo.Facades;
+﻿using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
+using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
@@ -45,7 +47,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
 
         public async Task DbFetchTest()
         {
-            await _twitchFacade.GetTwitchAPISecrets();
+            List<ApiSecretValueDetailDescBE> apiSecrets = await _twitchFacade.GetTwitchAPISecrets();
         }
     }
 }

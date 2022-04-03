@@ -1,6 +1,9 @@
-﻿using Pepp.Web.Apps.Bingo.Data;
+﻿using AutoMapper;
+using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
+using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Data.Entities.Common;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ApiSecretSources =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
@@ -19,22 +22,30 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// TwitchClient to make request to the Twitch API
         /// </summary>
         /// <returns></returns>
-        Task GetTwitchAPISecrets();
+        Task<List<ApiSecretValueDetailDescBE>> GetTwitchAPISecrets();
     }
 
     /// <inheritdoc cref="ITwitchFacade"/>
     public class TwitchFacade : ITwitchFacade
     {
+        private readonly IMapper _mapper;
         private readonly IBingoDataService _dataSvc;
 
-        public TwitchFacade(IBingoDataService dataSvc) => _dataSvc = dataSvc;
-
-        public async Task GetTwitchAPISecrets()
+        public TwitchFacade(IMapper mapper, IBingoDataService dataSvc)
         {
-            // TODO make BE
-            // TODO Automapper
-            List<ValueDetailDesc> valueDetailDescriptions = 
+            _mapper = mapper;
+            _dataSvc = dataSvc;
+        }
+
+        public async Task<List<ApiSecretValueDetailDescBE>> GetTwitchAPISecrets()
+        {
+            List<ValueDetailDescEntity> valueDetailDescriptions = 
                 await _dataSvc.Api.SecretValueDetailDescRepo.GetValueDetailDescriptions(ApiSecretSources.Twitch);
+
+            List<ApiSecretValueDetailDescBE> apiSecrets =
+                valueDetailDescriptions.Select(vdd => _mapper.Map<ApiSecretValueDetailDescBE>(vdd)).ToList();
+
+            return apiSecrets;
         }
     }
 }
