@@ -30,5 +30,16 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             TwitchAccessToken accessToken = await _adapter.GetAccessToken(code);
             return accessToken;
         }
+
+        /// <summary>
+        /// Temporary
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<ActionResult> DbFetchTest()
+        {
+            await _adapter.DbFetchTest();
+            return Ok();
+        }
     }
 }

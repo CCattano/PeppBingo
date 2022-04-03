@@ -5,8 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pepp.Web.Apps.Bingo.Adapters;
+using Pepp.Web.Apps.Bingo.Data;
+using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
-
+using ConnStrings =
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
 namespace Pepp.Web.Apps.Bingo.WebService
 {
     public class Startup
@@ -36,9 +39,11 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #endregion
 
             #region FACADES
+            services.AddScoped<ITwitchFacade, TwitchFacade>();
             #endregion
 
             #region SERVICES
+            services.AddPracticeAPIDataService(Configuration.GetConnectionString(ConnStrings.PeppBingo));
             #endregion
 
             #region CLIENTS
@@ -59,7 +64,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
         {
             app.MapWhen(
                 // When request path is /status/isalive.
-                path => path.Request.Path.Value?.ToLower() == "/status/isalive", 
+                path => path.Request.Path.Value?.ToLower() == "/status/isalive",
                 // Return this message.
                 builder => builder.Run(async context => await context.Response.WriteAsync($"Trivia SPA server is currently running."))
             );

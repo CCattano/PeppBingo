@@ -1,4 +1,5 @@
-﻿using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
+﻿using Pepp.Web.Apps.Bingo.Facades;
+using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
 using System.Threading.Tasks;
 
@@ -15,14 +16,21 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="accessCode"></param>
         /// <returns></returns>
         Task<TwitchAccessToken> GetAccessToken(string accessCode);
+        /// <summary>
+        /// Temporary
+        /// </summary>
+        /// <returns></returns>
+        Task DbFetchTest();
     }
 
     public class TwitchAdapter : ITwitchAdapter
     {
+        private readonly ITwitchFacade _twitchFacade;
         private readonly ITwitchClient _twitchClient;
 
-        public TwitchAdapter(ITwitchClient twitchClient)
+        public TwitchAdapter(ITwitchFacade twitchFacade, ITwitchClient twitchClient)
         {
+            _twitchFacade = twitchFacade;
             _twitchClient = twitchClient;
         }
 
@@ -33,6 +41,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             // that would be added to the response header for the front end to grab
             TwitchAccessToken accessToken = await _twitchClient.GetAccessToken(accessCode);
             return accessToken;
+        }
+
+        public async Task DbFetchTest()
+        {
+            await _twitchFacade.GetTwitchAPISecrets();
         }
     }
 }

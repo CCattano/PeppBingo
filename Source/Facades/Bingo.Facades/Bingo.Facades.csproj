@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net5.0</TargetFramework>
+		<RootNamespace>Pepp.Web.Apps.Bingo.Facades</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\..\Data\Bingo.Data\Bingo.Data.csproj" />
+	</ItemGroup>
+
+</Project>
