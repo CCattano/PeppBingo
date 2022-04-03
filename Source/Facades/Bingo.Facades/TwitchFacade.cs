@@ -1,13 +1,16 @@
-﻿using AutoMapper;
-using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
-using Pepp.Web.Apps.Bingo.Data;
+﻿using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Data.Entities.Common;
+using Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApiSecretSources =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
     .ValueDetails.Api.ApiSecrets.Sources;
+using TwitchTypes =
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
+    .ValueDetails.Api.ApiSecrets.Types.Twitch.Types;
 
 namespace Pepp.Web.Apps.Bingo.Facades
 {
@@ -18,34 +21,43 @@ namespace Pepp.Web.Apps.Bingo.Facades
     public interface ITwitchFacade
     {
         /// <summary>
-        /// Fetches the API secrets required by the
-        /// TwitchClient to make request to the Twitch API
+        /// Ensures the in-memory cache has been hydrated with the Twitch API Secrets
         /// </summary>
         /// <returns></returns>
-        Task<List<ApiSecretValueDetailDescBE>> GetTwitchAPISecrets();
+        Task VerifyTwitchAPISecretsCache();
     }
 
     /// <inheritdoc cref="ITwitchFacade"/>
     public class TwitchFacade : ITwitchFacade
     {
-        private readonly IMapper _mapper;
+        private readonly ITwitchCacheManager _cacheManager;
         private readonly IBingoDataService _dataSvc;
 
-        public TwitchFacade(IMapper mapper, IBingoDataService dataSvc)
+        public TwitchFacade(
+            ITwitchCacheManager cacheManager,
+            IBingoDataService dataSvc
+        )
         {
-            _mapper = mapper;
+            _cacheManager = cacheManager;
             _dataSvc = dataSvc;
         }
 
-        public async Task<List<ApiSecretValueDetailDescBE>> GetTwitchAPISecrets()
+        public async Task VerifyTwitchAPISecretsCache()
         {
-            List<ValueDetailDescEntity> valueDetailDescriptions = 
-                await _dataSvc.Api.SecretValueDetailDescRepo.GetValueDetailDescriptions(ApiSecretSources.Twitch);
+            string clientID = _cacheManager.GetApiSecret(TwitchTypes.ClientID);
+            string clientSecret = _cacheManager.GetApiSecret(TwitchTypes.ClientSecret);
 
-            List<ApiSecretValueDetailDescBE> apiSecrets =
-                valueDetailDescriptions.Select(vdd => _mapper.Map<ApiSecretValueDetailDescBE>(vdd)).ToList();
+            if (!string.IsNullOrWhiteSpace(clientID) && !string.IsNullOrWhiteSpace(clientSecret))
+                return;
 
-            return apiSecrets;
+            List<ValueDetailDescEntity> valueDetailDescriptions =
+               await _dataSvc.Api.SecretValueDetailDescRepo.GetValueDetailDescriptions(ApiSecretSources.Twitch);
+
+            Dictionary<TwitchTypes, string> apiSecretsByType = 
+                valueDetailDescriptions.ToDictionary(key => Enum.Parse<TwitchTypes>(key.Type), value => value.Value);
+            
+            _cacheManager.SetApiSecret(TwitchTypes.ClientID, apiSecretsByType[TwitchTypes.ClientID]);
+            _cacheManager.SetApiSecret(TwitchTypes.ClientSecret, apiSecretsByType[TwitchTypes.ClientSecret]);
         }
     }
 }

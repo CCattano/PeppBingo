@@ -25,20 +25,10 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<TwitchAccessToken>> AccessCode([FromQuery] string code)
+        public async Task<ActionResult> AccessCode([FromQuery] string code)
         {
-            TwitchAccessToken accessToken = await _adapter.GetAccessToken(code);
-            return accessToken;
-        }
-
-        /// <summary>
-        /// Temporary
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        public async Task<ActionResult> DbFetchTest()
-        {
-            await _adapter.DbFetchTest();
+            // TODO: Long term stick JWT in header and return redirect
+            await _adapter.ProcessReceivedAccessCode(code);
             return Ok();
         }
     }

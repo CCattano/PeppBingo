@@ -9,6 +9,7 @@ using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
+using Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
 namespace Pepp.Web.Apps.Bingo.WebService
@@ -27,6 +28,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
         {
             #region FRAMEWORK
             services.AddHttpContextAccessor();
+            services.AddMemoryCache();
             services.AddControllers();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -41,6 +43,10 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region FACADES
             services.AddScoped<ITwitchFacade, TwitchFacade>();
+            #endregion
+
+            #region MANAGERS
+            services.AddScoped<ITwitchCacheManager, TwitchCacheManager>();
             #endregion
 
             #region SERVICES

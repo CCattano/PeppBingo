@@ -1,8 +1,6 @@
-﻿using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
-using Pepp.Web.Apps.Bingo.Facades;
+﻿using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
@@ -17,12 +15,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <param name="accessCode"></param>
         /// <returns></returns>
-        Task<TwitchAccessToken> GetAccessToken(string accessCode);
-        /// <summary>
-        /// Temporary
-        /// </summary>
-        /// <returns></returns>
-        Task DbFetchTest();
+        Task ProcessReceivedAccessCode(string accessCode);
     }
 
     public class TwitchAdapter : ITwitchAdapter
@@ -36,18 +29,15 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             _twitchClient = twitchClient;
         }
 
-        public async Task<TwitchAccessToken> GetAccessToken(string accessCode)
+        public async Task ProcessReceivedAccessCode(string accessCode)
         {
-            // Make this async Task<string> and store the access token in the Db
-            // Use the token string to create a JWT to return to the controller
-            // that would be added to the response header for the front end to grab
+            // TODO store token data
+            // TODO store user data
+            // TODO implement JWT management
+            // TODO return Task<string> w/ JWT to be written to headers
+            await _twitchFacade.VerifyTwitchAPISecretsCache();
             TwitchAccessToken accessToken = await _twitchClient.GetAccessToken(accessCode);
-            return accessToken;
-        }
-
-        public async Task DbFetchTest()
-        {
-            List<ApiSecretValueDetailDescBE> apiSecrets = await _twitchFacade.GetTwitchAPISecrets();
+            TwitchUser user = await _twitchClient.GetUser(accessToken.AccessToken);
         }
     }
 }
