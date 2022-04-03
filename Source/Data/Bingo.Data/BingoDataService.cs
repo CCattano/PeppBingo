@@ -11,18 +11,23 @@ namespace Pepp.Web.Apps.Bingo.Data
     {
         /// <inheritdoc cref="IApiSchema"/>
         IApiSchema Api { get; }
+
+        /// <inheritdoc cref="ITwitchSchema"/>
+        ITwitchSchema Twitch { get; }
     }
 
     /// <inheritdoc cref="IBingoDataService"/>
     public class BingoDataService : BaseDataService, IBingoDataService
     {
         private IApiSchema _apiSchema;
+        private ITwitchSchema _twitchSchema;
 
         public BingoDataService(string connStr) : base(connStr)
         {
         }
 
         public IApiSchema Api { get => _apiSchema ??= new ApiSchema(this); }
+        public ITwitchSchema Twitch { get => _twitchSchema ??= new TwitchSchema(this); }
     }
 
     public static class BingoDataServiceExtensions

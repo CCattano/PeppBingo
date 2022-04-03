@@ -3,8 +3,8 @@ CREATE TABLE twitch.AccessTokens(
 	-- Loose FK with membership.Users
 	-- Col limit long enough to support GUIDs w/ hyphens
 	UserID varchar(36) NOT NULL PRIMARY KEY,
-	-- Token provided by Twitch
-	AccessToken varchar(50) NOT NULL,
+	-- Access Token provided by Twitch
+	Token varchar(50) NOT NULL,
 	-- Token provided by Twitch
 	RefreshToken varchar(50) NOT NULL,
 )
