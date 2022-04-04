@@ -12,14 +12,15 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
     }
 
     /// <inheritdoc cref="ITwitchSchema"/>
-    public class TwitchSchema : ITwitchSchema
+    public class TwitchSchema : BaseSchema, ITwitchSchema
     {
-        private readonly BaseDataService _dataSvc;
         private IAccessTokenRepo _accessTokenRepo;
 
-        public TwitchSchema(BaseDataService dataSvc) => _dataSvc = dataSvc;
+        public TwitchSchema(BaseDataService dataSvc) : base(dataSvc)
+        {
+        }
 
-        public IAccessTokenRepo AccessTokenRepo { get => _accessTokenRepo ??= new AccessTokenRepo(_dataSvc); }
+        public IAccessTokenRepo AccessTokenRepo { get => _accessTokenRepo ??= new AccessTokenRepo(base.DataSvc); }
 
     }
 }

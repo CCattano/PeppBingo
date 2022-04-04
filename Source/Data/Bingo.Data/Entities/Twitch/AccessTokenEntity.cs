@@ -3,7 +3,7 @@
     /// <summary>
     /// Access Token information provided via the Twitch API
     /// </summary>
-    public class AccessToken
+    public class AccessTokenEntity
     {
         /// <summary>
         /// Twitch-provided unique UserID

@@ -53,9 +53,9 @@ namespace Pepp.Web.Apps.Bingo.Facades
             List<ValueDetailDescEntity> valueDetailDescriptions =
                await _dataSvc.Api.SecretValueDetailDescRepo.GetValueDetailDescriptions(ApiSecretSources.Twitch);
 
-            Dictionary<TwitchTypes, string> apiSecretsByType = 
+            Dictionary<TwitchTypes, string> apiSecretsByType =
                 valueDetailDescriptions.ToDictionary(key => Enum.Parse<TwitchTypes>(key.Type), value => value.Value);
-            
+
             _cacheManager.SetApiSecret(TwitchTypes.ClientID, apiSecretsByType[TwitchTypes.ClientID]);
             _cacheManager.SetApiSecret(TwitchTypes.ClientSecret, apiSecretsByType[TwitchTypes.ClientSecret]);
         }

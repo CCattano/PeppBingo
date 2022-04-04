@@ -16,7 +16,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
         /// </summary>
         /// <param name="accessToken"></param>
         /// <returns></returns>
-        Task InsertTwitchAccessToken(AccessToken accessToken);
+        Task InsertTwitchAccessToken(AccessTokenEntity accessToken);
     }
 
     /// <inheritdoc cref="IAccessTokenRepo"/>
@@ -26,25 +26,25 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
         {
         }
 
-        public async Task InsertTwitchAccessToken(AccessToken accessToken)
+        public async Task InsertTwitchAccessToken(AccessTokenEntity accessToken)
         {
             List<SqlParameter> parameters = new()
             {
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(AccessToken.UserID)}",
+                    ParameterName = $"@{nameof(AccessTokenEntity.UserID)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = accessToken.UserID
                 },
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(AccessToken.Token)}",
+                    ParameterName = $"@{nameof(AccessTokenEntity.Token)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = accessToken.Token
                 },
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(AccessToken.RefreshToken)}",
+                    ParameterName = $"@{nameof(AccessTokenEntity.RefreshToken)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = accessToken.RefreshToken
                 }
