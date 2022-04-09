@@ -22,12 +22,12 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Twitch
             if (valueDetailDescSource != ApiSources.Twitch)
                 throw new InvalidCastException("Cannot convert a non-Twitch ValueDetail to a Twitch-specific ValueDetail");
 
-            ApiSecretValueDetailDescBE result = destination ?? new ApiSecretValueDetailDescBE();
-            result.Source = valueDetailDescSource;
-            result.Type = Enum.Parse<TwitchTypes>(source.Type);
-            result.Value = source.Value;
-            result.Description = source.Description;
-            return result;
+            destination ??= new ApiSecretValueDetailDescBE();
+            destination.Source = valueDetailDescSource;
+            destination.Type = Enum.Parse<TwitchTypes>(source.Type);
+            destination.Value = source.Value;
+            destination.Description = source.Description;
+            return destination;
         }
 
         public ValueDetailDescEntity Convert(ApiSecretValueDetailDescBE source, ValueDetailDescEntity destination, ResolutionContext context)

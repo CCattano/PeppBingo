@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pepp.Web.Apps.Bingo.Adapters;
+using Pepp.Web.Apps.Bingo.Adapters.Translators;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
@@ -59,6 +60,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region EXTERNAL
             services.AddAutoMapper(
+                typeof(BusinessEntity_TwitchClient),
                 typeof(Entity_BusinessEntity)
             );
 

@@ -32,9 +32,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
             {
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(AccessTokenEntity.UserID)}",
+                    ParameterName = $"@{nameof(AccessTokenEntity.TwitchUserID)}",
                     SqlDbType = SqlDbType.VarChar,
-                    Value = accessToken.UserID
+                    Value = accessToken.TwitchUserID
                 },
                 new SqlParameter()
                 {

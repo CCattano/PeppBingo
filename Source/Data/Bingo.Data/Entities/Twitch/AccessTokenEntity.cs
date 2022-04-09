@@ -8,7 +8,7 @@
         /// <summary>
         /// Twitch-provided unique UserID
         /// </summary>
-        public string UserID;
+        public string TwitchUserID;
         /// <summary>
         /// Twitch provided Access Token
         /// </summary>

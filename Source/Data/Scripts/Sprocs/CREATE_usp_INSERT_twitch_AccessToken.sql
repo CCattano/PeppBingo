@@ -8,7 +8,7 @@ GO
 -- Description:	Inserts Twitch Access Token data into the twitch.AccessTokens table
 -- =============================================
 CREATE PROCEDURE usp_INSERT_twitch_AccessToken
-	@UserID varchar(36),
+	@TwitchUserID varchar(36),
 	@Token varchar(50),
 	@RefreshToken varchar(50)
 AS
@@ -18,9 +18,9 @@ BEGIN
 
 		INSERT INTO
 			twitch.AccessTokens
-			(UserID, Token, RefreshToken)
+			(TwitchUserID, Token, RefreshToken)
 		VALUES
-			(@UserID, @Token, @RefreshToken)
+			(@TwitchUserID, @Token, @RefreshToken)
 
 		COMMIT TRANSACTION
 	END TRY

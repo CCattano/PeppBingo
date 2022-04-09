@@ -1,4 +1,7 @@
-﻿using Pepp.Web.Apps.Bingo.Facades;
+﻿using AutoMapper;
+using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
+using Pepp.Web.Apps.Bingo.BusinessEntities.User;
+using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
 using System.Threading.Tasks;
@@ -20,11 +23,17 @@ namespace Pepp.Web.Apps.Bingo.Adapters
 
     public class TwitchAdapter : ITwitchAdapter
     {
+        private readonly IMapper _mapper;
         private readonly ITwitchFacade _twitchFacade;
         private readonly ITwitchClient _twitchClient;
 
-        public TwitchAdapter(ITwitchFacade twitchFacade, ITwitchClient twitchClient)
+        public TwitchAdapter(
+            IMapper mapper,
+            ITwitchFacade twitchFacade,
+            ITwitchClient twitchClient
+        )
         {
+            _mapper = mapper;
             _twitchFacade = twitchFacade;
             _twitchClient = twitchClient;
         }
@@ -37,7 +46,10 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             // TODO return Task<string> w/ JWT to be written to headers
             await _twitchFacade.VerifyTwitchAPISecretsCache();
             TwitchAccessToken accessToken = await _twitchClient.GetAccessToken(accessCode);
-            TwitchUser user = await _twitchClient.GetUser(accessToken.AccessToken);
+            TwitchUser twitchUser = await _twitchClient.GetUser(accessToken.AccessToken);
+            UserBE userBE = _mapper.Map<UserBE>(twitchUser);
+            AccessTokenBE accessTokenBE = 
+                _mapper.Map(accessToken, new AccessTokenBE(userBE.TwitchUserID));
         }
     }
 }
