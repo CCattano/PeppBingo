@@ -7,7 +7,7 @@ GO
 -- Create date: 04/03/2022
 -- Description:	Inserts Twitch Access Token data into the twitch.AccessTokens table
 -- =============================================
-CREATE PROCEDURE usp_INSERT_twitch_AccessToken
+CREATE PROCEDURE twitch.usp_INSERT_AccessToken
 	@TwitchUserID varchar(36),
 	@Token varchar(50),
 	@RefreshToken varchar(50)

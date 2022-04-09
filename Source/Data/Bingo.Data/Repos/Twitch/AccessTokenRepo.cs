@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
@@ -16,7 +18,19 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
         /// </summary>
         /// <param name="accessToken"></param>
         /// <returns></returns>
-        Task InsertTwitchAccessToken(AccessTokenEntity accessToken);
+        Task InsertAccessToken(AccessTokenEntity accessToken);
+        /// <summary>
+        /// Fetches Twitch-provided access token information from the table
+        /// </summary>
+        /// <param name="twitchUserID"></param>
+        /// <returns></returns>
+        Task<AccessTokenEntity> GetAccessToken(string twitchUserID);
+        /// <summary>
+        /// Updates Twitch-provided access token information in the table
+        /// </summary>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
+        Task UpdateAccessToken(AccessTokenEntity accessToken);
     }
 
     /// <inheritdoc cref="IAccessTokenRepo"/>
@@ -26,9 +40,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
         {
         }
 
-        public async Task InsertTwitchAccessToken(AccessTokenEntity accessToken)
+        public async Task InsertAccessToken(AccessTokenEntity accessToken)
         {
-            List<SqlParameter> parameters = new()
+            List<SqlParameter> @params = new()
             {
                 new SqlParameter()
                 {
@@ -50,12 +64,59 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Twitch
                 }
             };
 
-            await base.Create(StoredProcedures.InsertAccessToken, parameters);
+            await base.Create(Sprocs.InsertAccessToken, @params);
         }
 
-        private struct StoredProcedures
+        public async Task<AccessTokenEntity> GetAccessToken(string twitchUserID)
         {
-            public const string InsertAccessToken = "usp_INSERT_twitch_AccessToken";
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(AccessTokenEntity.TwitchUserID)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = twitchUserID
+                }
+            };
+
+            List<AccessTokenEntity> queryData = 
+                await base.Read<AccessTokenEntity>(Sprocs.GetAccessTokenByUserID, @params);
+
+            return queryData?.SingleOrDefault();
+        }
+
+        public async Task UpdateAccessToken(AccessTokenEntity accessToken)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(AccessTokenEntity.TwitchUserID)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = accessToken.TwitchUserID
+                },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(AccessTokenEntity.Token)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = accessToken.Token
+                },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(AccessTokenEntity.RefreshToken)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = accessToken.RefreshToken
+                }
+            };
+
+            await base.Update(Sprocs.UpdateAccessToken, @params);
+        }
+
+        private struct Sprocs
+        {
+            public const string InsertAccessToken = "twitch.usp_INSERT_AccessToken";
+            public const string GetAccessTokenByUserID = "twitch.usp_SELECT_AccessToken_ByTwitchUserID";
+            public const string UpdateAccessToken = "twitch.usp_UPDATE_AccessToken";
         }
     }
 }

@@ -7,8 +7,8 @@ GO
 -- Create date: 04/04/2022
 -- Description:	Insert a user into the users.User table
 -- =============================================
-CREATE PROCEDURE usp_INSERT_user_User
-	@UserID [int],
+CREATE PROCEDURE [user].usp_INSERT_User
+	@UserID [int] OUTPUT,
 	@TwitchUserID [varchar](36),
 	@DisplayName [varchar](25),
 	@ProfileImageUri [varchar](1000)
@@ -19,11 +19,13 @@ BEGIN
 
 		INSERT INTO
 			[user].[Users]
-			(UserID, TwitchUserID, DisplayName, ProfileImageUri)
+			(TwitchUserID, DisplayName, ProfileImageUri)
 		VALUES
-			(@UserID, @TwitchUserID, @DisplayName, @ProfileImageUri)
+			(@TwitchUserID, @DisplayName, @ProfileImageUri)
 
 		COMMIT TRANSACTION
+
+		SET @UserID = SCOPE_IDENTITY();
 	END TRY
 	BEGIN CATCH
 		IF XACT_STATE() <> 0

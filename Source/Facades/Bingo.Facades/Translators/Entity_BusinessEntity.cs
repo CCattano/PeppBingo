@@ -1,8 +1,12 @@
 ﻿using AutoMapper;
+using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
+using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Data.Entities.Common;
+using Pepp.Web.Apps.Bingo.Data.Entities.Twitch;
+using Pepp.Web.Apps.Bingo.Data.Entities.User;
+using Pepp.Web.Apps.Bingo.Facades.Translators.Twitch;
+using Pepp.Web.Apps.Bingo.Facades.Translators.User;
 using Pepp.Web.Apps.Bingo.Infrastructure;
-using TwitchBE = Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
-using TwitchTranslators = Pepp.Web.Apps.Bingo.Facades.Translators.Twitch;
 
 namespace Pepp.Web.Apps.Bingo.Facades.Translators
 {
@@ -10,7 +14,14 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators
     {
         public Entity_BusinessEntity()
         {
-            this.RegisterTranslator<ValueDetailDescEntity, TwitchBE.ApiSecretValueDetailDescBE, TwitchTranslators.ValueDetailDescEntity_ApiSecretValueDetailDescBE>();
+            #region Twitch Translators
+            this.RegisterTranslator<ValueDetailDescEntity, ApiSecretValueDetailDescBE, ValueDetailDescEntity_ApiSecretValueDetailDescBE>();
+            this.RegisterTranslator<AccessTokenEntity, AccessTokenBE, AccessTokenEntity_AccessTokenBE>();
+            #endregion
+
+            #region User Translators
+            this.RegisterTranslator<UserEntity, UserBE, UserEntity_UserBE>();
+            #endregion
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
 
         public async Task<List<ValueDetailDescEntity>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum
         {
-            List<SqlParameter> parameters = new()
+            List<SqlParameter> @params = new()
             {
                 new SqlParameter()
                 {
@@ -41,32 +41,15 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
                 }
             };
 
-            DataTable queryData =
-                await base.Read(StoredProcedures.GetValueDetailDescriptionsBySource, parameters);
-
-            if (queryData.Rows.Count == 0)
-                return null;
-
-            List<ValueDetailDescEntity> valueDetailDescriptions = new();
-
-            foreach (DataRow row in queryData.Rows)
-            {
-                ValueDetailDescEntity entity = new()
-                {
-                    Source = row.Field<string>(nameof(ValueDetailDescEntity.Source)),
-                    Type = row.Field<string>(nameof(ValueDetailDescEntity.Type)),
-                    Value = row.Field<string>(nameof(ValueDetailDescEntity.Value)),
-                    Description = row.Field<string>(nameof(ValueDetailDescEntity.Description))
-                };
-                valueDetailDescriptions.Add(entity);
-            }
+            List<ValueDetailDescEntity> valueDetailDescriptions =
+                await base.Read<ValueDetailDescEntity>(Sprocs.GetValueDetailDescriptionsBySource, @params);
 
             return valueDetailDescriptions;
         }
 
-        private struct StoredProcedures
+        private struct Sprocs
         {
-            public const string GetValueDetailDescriptionsBySource = "usp_SELECT_ValueDetailDescription_BySource";
+            public const string GetValueDetailDescriptionsBySource = "api.usp_SELECT_ValueDetailDescription_BySource";
         }
     }
 }

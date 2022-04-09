@@ -44,6 +44,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region FACADES
             services.AddScoped<ITwitchFacade, TwitchFacade>();
+            services.AddScoped<IUserFacade, UserFacade>();
             #endregion
 
             #region MANAGERS
