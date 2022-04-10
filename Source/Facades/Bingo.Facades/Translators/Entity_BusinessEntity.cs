@@ -15,7 +15,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators
         public Entity_BusinessEntity()
         {
             #region Twitch Translators
-            this.RegisterTranslator<ValueDetailDescEntity, ApiSecretValueDetailDescBE, ValueDetailDescEntity_ApiSecretValueDetailDescBE>();
+            this.RegisterTranslator<SecretEntity, ApiSecretBE, SecretEntity_ApiSecretBE>();
             this.RegisterTranslator<AccessTokenEntity, AccessTokenBE, AccessTokenEntity_AccessTokenBE>();
             #endregion
 

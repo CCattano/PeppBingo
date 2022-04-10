@@ -11,6 +11,8 @@ CREATE PROCEDURE twitch.usp_SELECT_AccessToken_ByTwitchUserID
 	@TwitchUserID varchar(36)
 AS
 BEGIN
+	SET NOCOUNT ON;
+
 	SELECT
 		[TwitchUserID],
 		[Token],

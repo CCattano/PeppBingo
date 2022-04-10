@@ -9,11 +9,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApiSecretSources =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
-    .ValueDetails.Api.ApiSecrets.Sources;
-using TwitchTypes =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
-    .ValueDetails.Api.ApiSecrets.Types.Twitch.Types;
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.ApiSecrets.Sources;
+using TwitchSecretTypes =
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.ApiSecrets.Types.Twitch;
 
 namespace Pepp.Web.Apps.Bingo.Facades
 {
@@ -56,20 +54,20 @@ namespace Pepp.Web.Apps.Bingo.Facades
 
         public async Task VerifyTwitchAPISecretsCache()
         {
-            string clientID = _cacheManager.GetApiSecret(TwitchTypes.ClientID);
-            string clientSecret = _cacheManager.GetApiSecret(TwitchTypes.ClientSecret);
+            string clientID = _cacheManager.GetApiSecret(TwitchSecretTypes.ClientID);
+            string clientSecret = _cacheManager.GetApiSecret(TwitchSecretTypes.ClientSecret);
 
             if (!string.IsNullOrWhiteSpace(clientID) && !string.IsNullOrWhiteSpace(clientSecret))
                 return;
 
-            List<ValueDetailDescEntity> valueDetailDescriptions =
-               await _dataSvc.Api.SecretValueDetailDescRepo.GetValueDetailDescriptions(ApiSecretSources.Twitch);
+            List<SecretEntity> valueDetailDescriptions =
+               await _dataSvc.Api.SecretRepo.GetSecrets(ApiSecretSources.Twitch);
 
-            Dictionary<TwitchTypes, string> apiSecretsByType =
-                valueDetailDescriptions.ToDictionary(key => Enum.Parse<TwitchTypes>(key.Type), value => value.Value);
+            Dictionary<TwitchSecretTypes, string> apiSecretsByType =
+                valueDetailDescriptions.ToDictionary(key => Enum.Parse<TwitchSecretTypes>(key.Type), value => value.Value);
 
-            _cacheManager.SetApiSecret(TwitchTypes.ClientID, apiSecretsByType[TwitchTypes.ClientID]);
-            _cacheManager.SetApiSecret(TwitchTypes.ClientSecret, apiSecretsByType[TwitchTypes.ClientSecret]);
+            _cacheManager.SetApiSecret(TwitchSecretTypes.ClientID, apiSecretsByType[TwitchSecretTypes.ClientID]);
+            _cacheManager.SetApiSecret(TwitchSecretTypes.ClientSecret, apiSecretsByType[TwitchSecretTypes.ClientSecret]);
         }
 
         public async Task PersistAccessToken(AccessTokenBE tokenBE)

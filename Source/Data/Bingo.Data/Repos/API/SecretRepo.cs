@@ -10,7 +10,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
     /// <summary>
     /// Repo used to interface with data stored in the api.SecretValueDetailDescription table
     /// </summary>
-    public interface ISecretValueDetailDescRepo
+    public interface ISecretRepo
     {
         /// <summary>
         /// Given a Source value that must come from a strongly-typed Enum,
@@ -19,37 +19,37 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.API
         /// <typeparam name="TEnum"></typeparam>
         /// <param name="source"></param>
         /// <returns></returns>
-        Task<List<ValueDetailDescEntity>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum;
+        Task<List<SecretEntity>> GetSecrets<TEnum>(TEnum source) where TEnum : Enum;
     }
 
-    /// <inheritdoc cref="ISecretValueDetailDescRepo"/>
-    public class SecretValueDetailDescRepo : BaseRepo, ISecretValueDetailDescRepo
+    /// <inheritdoc cref="ISecretRepo"/>
+    public class SecretRepo : BaseRepo, ISecretRepo
     {
-        public SecretValueDetailDescRepo(BaseDataService dataSvc) : base(dataSvc)
+        public SecretRepo(BaseDataService dataSvc) : base(dataSvc)
         {
         }
 
-        public async Task<List<ValueDetailDescEntity>> GetValueDetailDescriptions<TEnum>(TEnum source) where TEnum : Enum
+        public async Task<List<SecretEntity>> GetSecrets<TEnum>(TEnum source) where TEnum : Enum
         {
             List<SqlParameter> @params = new()
             {
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(ValueDetailDescEntity.Source)}",
+                    ParameterName = $"@{nameof(SecretEntity.Source)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = Enum.GetName(typeof(TEnum), source)
                 }
             };
 
-            List<ValueDetailDescEntity> valueDetailDescriptions =
-                await base.Read<ValueDetailDescEntity>(Sprocs.GetValueDetailDescriptionsBySource, @params);
+            List<SecretEntity> valueDetailDescriptions =
+                await base.Read<SecretEntity>(Sprocs.GetAPISecretsBySource, @params);
 
             return valueDetailDescriptions;
         }
 
         private struct Sprocs
         {
-            public const string GetValueDetailDescriptionsBySource = "api.usp_SELECT_ValueDetailDescription_BySource";
+            public const string GetAPISecretsBySource = "api.usp_SELECT_Secrets_BySource";
         }
     }
 }

@@ -1,28 +1,22 @@
-﻿using ApiSources =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
-    .ValueDetails.Api.ApiSecrets.Sources;
-using TwitchTypes =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
-    .ValueDetails.Api.ApiSecrets.Types.Twitch.Types;
-
-namespace Pepp.Web.Apps.Bingo.BusinessEntities.Twitch
+﻿namespace Pepp.Web.Apps.Bingo.Data.Entities.Common
 {
     /// <summary>
-    /// A Twitch-specific ValueDetailDesc we are storing in the Db for security purposes
+    /// A generic ValueDetailDesc entity carrying information 
+    /// about a context-specific data point
     /// </summary>
-    public class ApiSecretValueDetailDescBE
+    public class SecretEntity
     {
         /// <summary>
         /// The source this value detail is associated with
         /// </summary>
-        public ApiSources Source;
+        public string Source;
         /// <summary>
         /// The type of value detail this is.
         /// </summary>
         /// <remarks>
         /// The value of this property is contextual to the source
         /// </remarks>
-        public TwitchTypes Type;
+        public string Type;
         /// <summary>
         /// The value of this value detail
         /// </summary>

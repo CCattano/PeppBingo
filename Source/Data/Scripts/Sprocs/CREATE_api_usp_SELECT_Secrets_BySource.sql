@@ -5,9 +5,9 @@ GO
 -- =============================================
 -- Author:		Cattano, Chris
 -- Create date: 04/02/2022
--- Description:	Fetch ValueDetailDescriptions for a given Source
+-- Description:	Fetch Secret details for a given Source
 -- =============================================
-CREATE PROCEDURE usp_SELECT_ValueDetailDescription_BySource
+ALTER PROCEDURE api.usp_SELECT_Secrets_BySource
 	@Source varchar(10)
 AS
 BEGIN

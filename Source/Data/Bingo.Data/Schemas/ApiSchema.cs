@@ -7,19 +7,19 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
     /// </summary>
     public interface IApiSchema
     {
-        /// <inheritdoc cref="ISecretValueDetailDescRepo"/>
-        ISecretValueDetailDescRepo SecretValueDetailDescRepo { get; }
+        /// <inheritdoc cref="ISecretRepo"/>
+        ISecretRepo SecretRepo { get; }
     }
 
     /// <inheritdoc cref="IApiSchema"/>
     internal class ApiSchema : BaseSchema, IApiSchema
     {
-        private ISecretValueDetailDescRepo _secretValueDetailDescRepo;
+        private ISecretRepo _secretRepo;
 
         public ApiSchema(BaseDataService dataSvc) : base(dataSvc)
         {
         }
 
-        public ISecretValueDetailDescRepo SecretValueDetailDescRepo { get => _secretValueDetailDescRepo ??= new SecretValueDetailDescRepo(base.DataSvc); }
+        public ISecretRepo SecretRepo { get => _secretRepo ??= new SecretRepo(base.DataSvc); }
     }
 }

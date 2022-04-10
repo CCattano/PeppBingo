@@ -9,9 +9,8 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TwitchTypes =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants
-    .ValueDetails.Api.ApiSecrets.Types.Twitch.Types;
+using Secrets =
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.ApiSecrets;
 
 namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
 {
@@ -58,8 +57,8 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
 
         public async Task<TwitchAccessToken> GetAccessToken(string accessCode)
         {
-            string clientID = _cacheManager.GetApiSecret(TwitchTypes.ClientID);
-            string clientSecret = _cacheManager.GetApiSecret(TwitchTypes.ClientSecret);
+            string clientID = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientID);
+            string clientSecret = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientSecret);
 
             string redirectUri =
                 $"{_httpCtx.HttpContext.Request.Scheme}://" +
@@ -88,7 +87,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
 
         public async Task<TwitchUser> GetUser(string accessToken)
         {
-            string clientID = _cacheManager.GetApiSecret(TwitchTypes.ClientID);
+            string clientID = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientID);
 
             _client.DefaultRequestHeaders.Add("Client-ID", clientID);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);

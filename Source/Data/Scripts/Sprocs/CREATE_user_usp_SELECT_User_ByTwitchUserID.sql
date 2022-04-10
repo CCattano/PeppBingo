@@ -11,6 +11,8 @@ CREATE PROCEDURE [user].[usp_SELECT_User_ByTwitchUserID]
 	@TwitchUserID varchar(36)
 AS
 BEGIN
+	SET NOCOUNT ON;
+
 	SELECT
 		[UserID],
 		[TwitchUserID],
