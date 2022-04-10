@@ -11,6 +11,7 @@ using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches;
+using Pepp.Web.Apps.Bingo.WebService.Middleware;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
 namespace Pepp.Web.Apps.Bingo.WebService
@@ -76,11 +77,12 @@ namespace Pepp.Web.Apps.Bingo.WebService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseExceptionHandlerMiddleware();
             app.MapWhen(
                 // When request path is /status/isalive.
                 path => path.Request.Path.Value?.ToLower() == "/status/isalive",
                 // Return this message.
-                builder => builder.Run(async context => await context.Response.WriteAsync($"Trivia SPA server is currently running."))
+                builder => builder.Run(async context => await context.Response.WriteAsync($"PeppBingo SPA server is currently running."))
             );
 
             if (env.IsDevelopment())
