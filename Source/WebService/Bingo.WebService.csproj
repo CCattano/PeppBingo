@@ -21,8 +21,12 @@
 
 	<ItemGroup>
 		<!-- Don't publish the SPA source files, but do show them in the project files list -->
+		<Compile Remove="ClientApp-Deprecated\**" />
 		<Content Remove="$(SpaRoot)**" />
+		<Content Remove="ClientApp-Deprecated\**" />
+		<EmbeddedResource Remove="ClientApp-Deprecated\**" />
 		<None Remove="$(SpaRoot)**" />
+		<None Remove="ClientApp-Deprecated\**" />
 		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
 	</ItemGroup>
 
