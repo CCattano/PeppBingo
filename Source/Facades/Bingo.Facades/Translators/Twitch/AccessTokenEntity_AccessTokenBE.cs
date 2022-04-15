@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
 using Pepp.Web.Apps.Bingo.Data.Entities.Twitch;
-using System;
 
 namespace Pepp.Web.Apps.Bingo.Facades.Translators.Twitch
 {
@@ -9,16 +8,19 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Twitch
     {
         public AccessTokenEntity Convert(AccessTokenBE source, AccessTokenEntity destination, ResolutionContext context)
         {
-            destination ??= new();
-            destination.TwitchUserID = source.TwitchUserID;
-            destination.Token = source.AccessToken;
-            destination.RefreshToken = source.RefreshToken;
-            return destination;
+            AccessTokenEntity result = destination ?? new();
+            result.TwitchUserID = source.TwitchUserID;
+            result.Token = source.AccessToken;
+            result.RefreshToken = source.RefreshToken;
+            return result;
         }
 
         public AccessTokenBE Convert(AccessTokenEntity source, AccessTokenBE destination, ResolutionContext context)
         {
-            throw new NotImplementedException();
+            AccessTokenBE result = new(source.TwitchUserID);
+            result.AccessToken = source.Token;
+            result.RefreshToken = source.RefreshToken;
+            return result;
         }
     }
 }

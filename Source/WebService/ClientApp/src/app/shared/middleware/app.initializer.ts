@@ -1,7 +1,9 @@
 import { Injectable, Injector } from '@angular/core';
 import { TokenService } from '../service/token.service';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class AppInitializer {
   private _tokenSvc: TokenService;
 
@@ -51,7 +53,7 @@ export class AppInitializer {
   private _tryGetTokenValueByName(tokenName: string): string {
     return document.cookie
       .split(';')
-      .find(row => row.startsWith(tokenName))
+      .find(row => row.trim().startsWith(tokenName))
       ?.split('=')
       .pop();
   }

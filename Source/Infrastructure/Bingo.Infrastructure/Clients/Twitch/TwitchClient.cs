@@ -23,6 +23,12 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
         /// <returns></returns>
         Task<TwitchAccessToken> GetAccessToken(string accessCode);
         /// <summary>
+        /// Uses the contents of an obsolete access token to retrieve new access token details
+        /// </summary>
+        /// <param name="tokenToRefresh"></param>
+        /// <returns></returns>
+        Task<TwitchAccessToken> RefreshAccessToken(TwitchAccessToken tokenToRefresh);
+        /// <summary>
         /// Fetches User info from Twitch using the access token generated
         /// by the user when they authorized us to pull their info
         /// </summary>
@@ -85,6 +91,30 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
             return accessToken;
         }
 
+        public async Task<TwitchAccessToken> RefreshAccessToken(TwitchAccessToken tokenToRefresh)
+        {
+            string clientID = _cache.GetApiSecret(Secrets.Types.Twitch.ClientID);
+            string clientSecret = _cache.GetApiSecret(Secrets.Types.Twitch.ClientSecret);
+
+            Dictionary<string, string> refreshRequestData = new()
+            {
+                { "client_id", clientID },
+                { "client_secret", clientSecret },
+                { "grant_type", "refresh_token" },
+                { "refresh_token", tokenToRefresh.RefreshToken }
+            };
+            FormUrlEncodedContent httpRequestContent = new(refreshRequestData);
+
+            const string baseUri = @"https://id.twitch.tv";
+            string request = $"{baseUri}/{TwitchRequests.GetAccessToken}";
+
+            using HttpResponseMessage response = await _client.PostAsync(request, httpRequestContent);
+            TwitchAccessToken accessToken = null;
+            if (response.IsSuccessStatusCode)
+                accessToken = await response.Content.ReadFromJsonAsync<TwitchAccessToken>();
+            return accessToken;
+        }
+
         public async Task<TwitchUser> GetUser(string accessToken)
         {
             string clientID = _cache.GetApiSecret(Secrets.Types.Twitch.ClientID);
@@ -113,6 +143,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
         private struct TwitchRequests
         {
             public const string GetAccessToken = "oauth2/token";
+            public const string RefreshAccessToken = "oauth2/token";
             public const string GetUserData = "helix/users";
         }
     }

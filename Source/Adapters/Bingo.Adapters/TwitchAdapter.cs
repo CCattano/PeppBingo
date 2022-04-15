@@ -5,8 +5,9 @@ using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
 using Pepp.Web.Apps.Bingo.Managers;
-using System;
+using System.Net;
 using System.Threading.Tasks;
+using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
 {
@@ -21,6 +22,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="accessCode"></param>
         /// <returns></returns>
         Task<string> ProcessReceivedAccessCode(string accessCode);
+        /// <summary>
+        /// Refreshes the access token of a user via the Twitch API
+        /// </summary>
+        /// <param name="obsoleteToken"></param>
+        /// <returns></returns>
+        Task<string> RefreshAccessTokenForUser(string obsoleteToken);
     }
 
     public class TwitchAdapter : ITwitchAdapter
@@ -51,11 +58,27 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             TwitchAccessToken accessToken = await _twitchClient.GetAccessToken(accessCode);
             TwitchUser twitchUser = await _twitchClient.GetUser(accessToken.AccessToken);
             UserBE userBE = _mapper.Map<UserBE>(twitchUser);
-            AccessTokenBE accessTokenBE = 
+            AccessTokenBE accessTokenBE =
                 _mapper.Map(accessToken, new AccessTokenBE(userBE.TwitchUserID));
             await _twitchFacade.PersistAccessToken(accessTokenBE);
             userBE = await _userFacade.PersistUser(userBE);
-            string token = _tokenManager.GenerateJWTForUser(userBE.UserID, DateTime.Now.AddDays(1));
+            string token = _tokenManager.GenerateJWTForUser(userBE.UserID);
+            return token;
+        }
+
+        public async Task<string> RefreshAccessTokenForUser(string obsoleteToken)
+        {
+            int userID = TokenManager.GetUserIDFromToken(obsoleteToken);
+            UserBE userBE = await _userFacade.GetUser(userID);
+            AccessTokenBE obsoleteAccessTokenBE = await _twitchFacade.GetAccessToken(userBE.TwitchUserID);
+            TwitchAccessToken obsoleteTwitchAccessToken = _mapper.Map<TwitchAccessToken>(obsoleteAccessTokenBE);
+            TwitchAccessToken newTwitchAccessToken = await _twitchClient.RefreshAccessToken(obsoleteTwitchAccessToken);
+            if (newTwitchAccessToken == null)
+                throw new WebException(HttpStatusCode.Forbidden, "Twitch Verification failed");
+            AccessTokenBE accessTokenBE =
+                _mapper.Map(newTwitchAccessToken, new AccessTokenBE(userBE.TwitchUserID));
+            await _twitchFacade.PersistAccessToken(accessTokenBE);
+            string token = _tokenManager.GenerateJWTForUser(userBE.UserID);
             return token;
         }
     }

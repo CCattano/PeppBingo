@@ -8,25 +8,25 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.User
     {
         public UserEntity Convert(UserBE source, UserEntity destination, ResolutionContext context)
         {
-            destination ??= new();
+            UserEntity result = destination ?? new();
             // If a userID exists on an instance of UserEntity provided
             // to this translator then we will keep that UserID
-            if (destination.UserID == default)
-                destination.UserID = source.UserID;
-            destination.TwitchUserID = source.TwitchUserID;
-            destination.DisplayName = source.DisplayName;
-            destination.ProfileImageUri = source.ProfileImageUri;
-            return destination;
+            if (result.UserID == default)
+                result.UserID = source.UserID;
+            result.TwitchUserID = source.TwitchUserID;
+            result.DisplayName = source.DisplayName;
+            result.ProfileImageUri = source.ProfileImageUri;
+            return result;
         }
 
         public UserBE Convert(UserEntity source, UserBE destination, ResolutionContext context)
         {
-            destination ??= new();
-            destination.UserID = source.UserID;
-            destination.TwitchUserID = source.TwitchUserID;
-            destination.DisplayName = source.DisplayName;
-            destination.ProfileImageUri = source.ProfileImageUri;
-            return destination;
+            UserBE result = destination ?? new();
+            result.UserID = source.UserID;
+            result.TwitchUserID = source.TwitchUserID;
+            result.DisplayName = source.DisplayName;
+            result.ProfileImageUri = source.ProfileImageUri;
+            return result;
         }
     }
 }

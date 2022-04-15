@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
+using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
@@ -24,8 +25,18 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         public async Task<ActionResult> AccessCode([FromQuery] string code)
         {
             string token = await base.Adapter.ProcessReceivedAccessCode(code);
-            base.SetJWTCookieHeader(token);
-            return RedirectPermanentPreserveMethod(base.BaseUri);
+            base.SetAuthJWTCookieHeader(token);
+            return Redirect(base.BaseUri);
+        }
+
+        [TokenRequired]
+        [HttpPost]
+        public async Task<ActionResult> RefreshToken()
+        {
+            string obsoleteToken = base.TryGetAccessTokenFromRequestHeader();
+            string token = await base.Adapter.RefreshAccessTokenForUser(obsoleteToken);
+            base.SetAuthJWTCookieHeader(token);
+            return Ok();
         }
     }
 }

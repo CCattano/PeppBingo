@@ -8,11 +8,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters.Translators.Twitch
     {
         public UserBE Convert(TwitchUser source, UserBE destination, ResolutionContext context)
         {
-            destination ??= new UserBE();
-            destination.TwitchUserID = source.UserID;
-            destination.DisplayName = source.DisplayName;
-            destination.ProfileImageUri = source.ProfileImageUri;
-            return destination;
+            UserBE result = destination ?? new UserBE();
+            result.TwitchUserID = source.UserID;
+            result.DisplayName = source.DisplayName;
+            result.ProfileImageUri = source.ProfileImageUri;
+            return result;
         }
 
         public TwitchUser Convert(UserBE source, TwitchUser destination, ResolutionContext context)

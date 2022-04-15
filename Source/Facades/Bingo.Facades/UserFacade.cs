@@ -19,6 +19,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <param name="userBE"></param>
         /// <returns></returns>
         Task<UserBE> PersistUser(UserBE userBE);
+        /// <summary>
+        /// Fetches a User for the <paramref name="userID"/> provided
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        Task<UserBE> GetUser(int userID);
     }
 
     /// <inheritdoc cref="IUserFacade"/>
@@ -31,6 +37,13 @@ namespace Pepp.Web.Apps.Bingo.Facades
         {
             _mapper = mapper;
             _dataSvc = dataSvc;
+        }
+
+        public async Task<UserBE> GetUser(int userID)
+        {
+            UserEntity userEntity = await _dataSvc.User.UserRepo.GetUser(userID);
+            UserBE userBE = userEntity != null ? _mapper.Map<UserBE>(userEntity) : null;
+            return userBE;
         }
 
         public async Task<UserBE> PersistUser(UserBE userBE)

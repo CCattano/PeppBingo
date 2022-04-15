@@ -13,6 +13,7 @@ using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
+using Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
 namespace Pepp.Web.Apps.Bingo.WebService
@@ -78,19 +79,50 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 cfg.Title = "Tandem.Web.Apps.Trivia";
             });
             #endregion
+
+            #region MISC
+            services.SetTokenValidationPathsToExclude();
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseCacheHydrationMiddleware();
-            app.UseExceptionHandlerMiddleware();
             app.MapWhen(
                 // When request path is /status/isalive.
                 path => path.Request.Path.Value?.ToLower() == "/status/isalive",
                 // Return this message.
                 builder => builder.Run(async context => await context.Response.WriteAsync($"PeppBingo SPA server is currently running."))
             );
+
+            /*
+             * Order of operations is very important here
+             * The request comes in and flows through these middleware in the order they're registered in
+             * 
+             * We want the request to go into our token validator MW first
+             *      This will ensure our request contains a valid JWT if required
+             *      That way we shut down the request ASAP
+             * Then we flow into our cache hydration MW
+             *      This will ensure our cache is current for whatever work we're about to do
+             * Then we flow into our exception handler MW
+             *      This invokes our Controller logic inside a try catch
+             *      
+             * When an exception occurs or a response is returned
+             * That response, whether an error or data bubbles back up our MW stack
+             * So w/ an exception our exception MW gets the error first and sets our response
+             * 
+             * When the request is coming in it's critical that we flow in the following order
+             *      Token Validation
+             *      Cache Hydration
+             *      Exception Handler
+             * 
+             * This is the optimal input flow, and guarantees our exception handler
+             * which writes our response in the event of an exception, receives any thrown exception
+             * before any other middleware in the application
+             */
+            app.UseTokenValidationMiddleware();
+            app.UseCacheHydrationMiddleware();
+            app.UseExceptionHandlerMiddleware();
 
             if (env.IsDevelopment())
             {

@@ -1,3 +1,4 @@
+import { Token } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -66,6 +67,14 @@ export class TokenService {
   }
 
   /**
+   * Removes all cookies managed by this service
+   */
+  public clearAllCookies(): void {
+    this.removeToken(true);
+    this.removeToken(false);
+  }
+
+  /**
    * Remove the JWT from cookie storage
    */
   public removeToken(removeAuthToken: boolean): void {
@@ -80,18 +89,13 @@ export class TokenService {
   }
 
   private _writeToCookie(tokenName: string, expireImmediately: boolean = false) {
-    const maxAge: number = expireImmediately
-      ? 0
-      : 60 * 60 * 24; // 1 day worth of seconds
-    const cookieParts: string[] = [
-      // Cookie name
-      `${tokenName}=${this._token}`,
-      // Max age of cookie
-      `max-age=${maxAge}`,
-      // Path for coookie
-      'path=/'
-    ];
-    const cookie: string = cookieParts.join(';');
+    // 8 days worth of seconds.
+    // Internal TTL will lapse before this
+    // But we only play bingo on Mondays
+    // So I want this cookie to still be here 7 days from the last bingo night
+    // That way I can refresh the existing token rather than make the user reclick the login button
+    const maxAge: number = expireImmediately ? 0 : (60 * 60 * 24 * 8);
+    const cookie: string = `${tokenName}=${this._token};max-age=${maxAge};path=/`;
     document.cookie = cookie;
   }
 
@@ -101,8 +105,8 @@ export class TokenService {
     const encodedTokenBody: string = encodedToken.split('.')[1];
     const decodedTokenBody: string = this._base64UrlDecode(encodedTokenBody);
 
-    const tokenObj: { UserID: number, ExpirationDateTime: Date } = JSON.parse(decodedTokenBody);
-
+    const tokenObj: { UserID: number, ExpirationDateTime: Date; } = JSON.parse(decodedTokenBody);
+    console.log(tokenObj);
     this._userID = tokenObj.UserID;
     this._tokenTTL = new Date(tokenObj.ExpirationDateTime);
   }
@@ -124,5 +128,11 @@ export class TokenService {
 
     const decodedToken: string = atob(token);
     return decodedToken;
+  }
+
+  private _calculateTTLInSeconds(): number {
+    const ttlInSeconds: number = Math.round(Math.abs(new Date().getTime() - this._tokenTTL.getTime()) / 1000);
+    console.log(`Setting Max-Age as ${ttlInSeconds}`);
+    return ttlInSeconds;
   }
 }

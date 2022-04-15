@@ -22,6 +22,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
     public interface ITwitchFacade
     {
         /// <summary>
+        /// Fetches an Access Token for the <paramref name="twitchUserID"/> provided
+        /// </summary>
+        /// <param name="twitchUserID"></param>
+        /// <returns></returns>
+        Task<AccessTokenBE> GetAccessToken(string twitchUserID);
+        /// <summary>
         /// Updates an existing token if it exists otherwise inserts it
         /// </summary>
         /// <param name="tokenBE"></param>
@@ -40,6 +46,15 @@ namespace Pepp.Web.Apps.Bingo.Facades
         {
             _mapper = mapper;
             _dataSvc = dataSvc;
+        }
+
+        public async Task<AccessTokenBE> GetAccessToken(string twitchUserID)
+        {
+            AccessTokenEntity tokenEntity = await _dataSvc.Twitch.AccessTokenRepo.GetAccessToken(twitchUserID);
+            AccessTokenBE tokenBE = tokenEntity != null
+                ? _mapper.Map<AccessTokenBE>(tokenEntity)
+                : null;
+            return tokenBE;
         }
 
         public async Task PersistAccessToken(AccessTokenBE tokenBE)

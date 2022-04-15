@@ -20,12 +20,12 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Twitch
             if (valueDetailDescSource != ApiSecretSources.Twitch)
                 throw new InvalidCastException("Cannot convert a non-Twitch Secret to a Twitch-specific Secret");
 
-            destination ??= new();
-            destination.Source = valueDetailDescSource;
-            destination.Type = Enum.Parse<TwitchSecretTypes>(source.Type);
-            destination.Value = source.Value;
-            destination.Description = source.Description;
-            return destination;
+            ApiSecretBE result = destination ?? new();
+            result.Source = valueDetailDescSource;
+            result.Type = Enum.Parse<TwitchSecretTypes>(source.Type);
+            result.Value = source.Value;
+            result.Description = source.Description;
+            return result;
         }
 
         public SecretEntity Convert(ApiSecretBE source, SecretEntity destination, ResolutionContext context)

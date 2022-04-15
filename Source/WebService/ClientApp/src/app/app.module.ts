@@ -1,4 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule, Provider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
@@ -7,8 +7,11 @@ import { LoginComponent } from './components/login/login.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { AppInitializer } from './shared/middleware/app.initializer';
+import { TokenInterceptor } from './shared/middleware/token.interceptor';
 
-
+const httpInterceptors: Provider = [
+  { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
+];
 export function RunInitialization(appInitilaizer: AppInitializer): () => void {
   return () => appInitilaizer.initialize();
 }
@@ -34,8 +37,11 @@ const appInitializers: Provider = [
     HttpClientModule
   ],
   providers: [
+    //#region Interceptors
+    httpInterceptors,
+    //#endregion
+
     //#region Initializers
-    AppInitializer,
     appInitializers
     //#endregion
   ],

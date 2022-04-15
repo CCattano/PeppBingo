@@ -18,6 +18,7 @@ export class CommonAuthGuard implements CanActivate {
     //Check if token exists
     if (this._tokenSvc.haveToken) {
       if (new Date() > this._tokenSvc.tokenTTL) {
+        console.log('refreshing');
         await this._twitchApi.refreshToken();
       } else {
         return true;

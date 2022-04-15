@@ -99,22 +99,20 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
 
         public async Task<UserEntity> GetUser(int userID)
         {
-            throw new System.NotImplementedException();
-            // TODO: Impl the sproc+facade for this once necessary
-            //List<SqlParameter> @params = new()
-            //{
-            //    new SqlParameter()
-            //    {
-            //        ParameterName = $"@{nameof(UserEntity.UserID)}",
-            //        SqlDbType = SqlDbType.Int,
-            //        Value = userID
-            //    }
-            //};
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(UserEntity.UserID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = userID
+                }
+            };
 
-            //List<UserEntity> queryData =
-            //    await base.Read<UserEntity>(Sprocs.GetUserByUserID, @params);
+            List<UserEntity> queryData =
+                await base.Read<UserEntity>(Sprocs.GetUserByUserID, @params);
 
-            //return queryData?.SingleOrDefault();
+            return queryData?.SingleOrDefault();
         }
 
         public async Task UpdateUser(UserEntity user)

@@ -20,7 +20,7 @@ namespace Pepp.Web.Apps.Bingo.Managers
         /// <param name="userID"></param>
         /// <param name="tokenTTL"></param>
         /// <returns></returns>
-        string GenerateJWTForUser(int userID, DateTime tokenTTL);
+        string GenerateJWTForUser(int userID);
         /// <summary>
         /// Validates that a JWT is valid
         /// </summary>
@@ -35,7 +35,10 @@ namespace Pepp.Web.Apps.Bingo.Managers
 
         public TokenManager(ITokenCache cache) => _cache = cache;
 
-        public string GenerateJWTForUser(int userID, DateTime tokenTTL)
+        public static readonly string AuthJWTCookieName = "PeppAuthToken";
+        public static readonly string AccessJWTCookieName = "PeppBingoToken";
+
+        public string GenerateJWTForUser(int userID)
         {
             //Setup Header
             TokenHeader header = new();
@@ -44,7 +47,7 @@ namespace Pepp.Web.Apps.Bingo.Managers
             string encodedHeader = Base64UrlEncoder.Encode(headerBytes);
 
             //Setup data body
-            TokenBody body = new(userID, tokenTTL);
+            TokenBody body = new(userID, DateTime.UtcNow.AddDays(1));
             string jwtBody = JsonSerializer.Serialize(body);
             byte[] bodyBytes = Encoding.UTF8.GetBytes(jwtBody);
             string encodedBody = Base64UrlEncoder.Encode(bodyBytes);
@@ -59,12 +62,23 @@ namespace Pepp.Web.Apps.Bingo.Managers
             return Base64UrlEncoder.Encode(signedJWT);
         }
 
-        public bool TokenIsValid(string jwtToken)
+        public static int GetUserIDFromToken(string jwt)
         {
             //Token anatomy is "encodedHeader.encodedBody.encodedSignature"
-            string[] tokenParts = jwtToken.Split('.');
-            string encodedToken = $"{tokenParts[0]}.{tokenParts[1]}";
-            string encodedSignature = tokenParts[2];
+            string decodedJWT = Base64UrlEncoder.Decode(jwt);
+            string encodedBody = decodedJWT.Split('.')[1];
+            string decodedBody = Base64UrlEncoder.Decode(encodedBody);
+            TokenBody tokenBody = JsonSerializer.Deserialize<TokenBody>(decodedBody);
+            return tokenBody.UserID;
+        }
+
+        public bool TokenIsValid(string jwt)
+        {
+            //Token anatomy is "encodedHeader.encodedBody.encodedSignature"
+            string decodedJWT = Base64UrlEncoder.Decode(jwt);
+            string[] encodedTokenParts = decodedJWT.Split('.');
+            string encodedToken = $"{encodedTokenParts[0]}.{encodedTokenParts[1]}";
+            string encodedSignature = encodedTokenParts[2];
 
             string decodedSignature = Base64UrlEncoder.Decode(encodedSignature);
 
@@ -75,11 +89,11 @@ namespace Pepp.Web.Apps.Bingo.Managers
             return validToken;
         }
 
-        public static bool TokenIsExpired(string jwtToken)
+        public static bool TokenIsExpired(string jwt)
         {
             //Token anatomy is "encodedHeader.encodedBody.encodedSignature"
-            string[] tokenParts = jwtToken.Split('.');
-            string encodedTokenBody = tokenParts[1];
+            string decodedJWT = Base64UrlEncoder.Decode(jwt);
+            string encodedTokenBody = decodedJWT.Split('.')[1];
 
             string decodedTokenBody = Base64UrlEncoder.Decode(encodedTokenBody);
             TokenBody jwtTokenBody = JsonSerializer.Deserialize<TokenBody>(decodedTokenBody);

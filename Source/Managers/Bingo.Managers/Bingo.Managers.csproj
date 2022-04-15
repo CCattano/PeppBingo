@@ -6,10 +6,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.17.0" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <ProjectReference Include="..\..\BusinessEntities\Bingo.BusinessEntities\Bingo.BusinessEntities.csproj" />
 	  <ProjectReference Include="..\..\Infrastructure\Bingo.Infrastructure\Bingo.Infrastructure.csproj" />
 	</ItemGroup>
