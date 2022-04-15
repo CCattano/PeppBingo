@@ -1,14 +1,14 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 
-namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches
+namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
-    public abstract class BaseCacheManager
+    public abstract class BaseCache
     {
         private readonly IMemoryCache _cache;
         protected abstract TimeSpan CacheEntryTTL { get; }
 
-        public BaseCacheManager(IMemoryCache cache) => _cache = cache;
+        public BaseCache(IMemoryCache cache) => _cache = cache;
 
         protected string GetCacheValue<TKey>(TKey cacheKey) where TKey : Enum =>
             _cache.TryGetValue<string>(Enum.GetName(typeof(TKey), cacheKey), out string result)

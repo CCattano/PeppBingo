@@ -1,18 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
-using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 {
     [Route("[controller]/[action]")]
-    public class TwitchController : Controller
+    public class TwitchController : BaseController<ITwitchAdapter>
     {
-        private readonly ITwitchAdapter _adapter;
-
-        public TwitchController(ITwitchAdapter adapter)
+        public TwitchController(ITwitchAdapter adapter) : base(adapter)
         {
-            _adapter = adapter;
         }
 
         /// <summary>
@@ -27,9 +23,9 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpGet]
         public async Task<ActionResult> AccessCode([FromQuery] string code)
         {
-            // TODO: Long term stick JWT in header and return redirect
-            await _adapter.ProcessReceivedAccessCode(code);
-            return Ok();
+            string token = await base.Adapter.ProcessReceivedAccessCode(code);
+            base.SetJWTCookieHeader(token);
+            return RedirectPermanentPreserveMethod(base.BaseUri);
         }
     }
 }

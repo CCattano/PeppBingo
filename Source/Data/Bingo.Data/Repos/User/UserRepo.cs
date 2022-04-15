@@ -147,7 +147,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
                 },
             };
 
-            await base.Update(Sprocs.InsertUser, @params);
+            await base.Update(Sprocs.UpdateUser, @params);
         }
 
     

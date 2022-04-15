@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 
-namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches
+namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
     /// <summary>
-    /// Cache manager responsible for holding Twitch API secrets in memory to reduce Db I/O
+    /// Cache responsible for holding Twitch API secrets in memory to reduce Db I/O
     /// </summary>
-    public interface ITwitchCacheManager
+    public interface ITwitchCache
     {
         /// <summary>
         /// Get the Twitch API secrets out of the in-memory 
@@ -29,10 +29,10 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches
         void SetApiSecret<TKey>(TKey cacheKey, string cacheValue) where TKey : Enum;
     }
 
-    public class TwitchCacheManager : BaseCacheManager, ITwitchCacheManager
+    public class TwitchCache : BaseCache, ITwitchCache
     {
         protected override TimeSpan CacheEntryTTL => TimeSpan.FromHours(1);
-        public TwitchCacheManager(IMemoryCache cache) : base(cache)
+        public TwitchCache(IMemoryCache cache) : base(cache)
         {
         }
 

@@ -41,6 +41,54 @@
         }
 
         /// <summary>
+        /// Constants for the TokenSecrets Value Details
+        /// </summary>
+        public struct TokenSecrets
+        {
+            /// <summary>
+            /// Available Sources For the TokenSecrets Value Details
+            /// </summary>
+            public enum Sources
+            {
+                JWT
+            }
+
+            /// <summary>
+            /// The ValueDetail Types availble
+            /// </summary>
+            /// <remarks>
+            /// Organized by Type Source
+            /// </remarks>
+            public struct Types
+            {
+                /// <summary>
+                /// The TokenSecret Types available for JWT
+                /// </summary>
+                public enum JWT
+                {
+                    /// <summary>
+                    /// The ValueDetail contains the SHA256Key
+                    /// </summary>
+                    SHA256Key,
+                    /// <summary>
+                    /// The ValueDetail contains the SigningSecret
+                    /// </summary>
+                    SigningSecret
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constant values related to response 
+        /// header data set by the server
+        /// </summary>
+        public struct Headers
+        {
+            public const string SetCookie = "set-cookie";
+            public const string JWTCookieName = "PeppBingoToken";
+        }
+
+        /// <summary>
         /// Constants related to data found in
         /// the AppSettings configuration file
         /// </summary>

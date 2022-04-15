@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
-using Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,25 +40,25 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
 
     public class TwitchClient : ITwitchClient
     {
-        private readonly ITwitchCacheManager _cacheManager;
+        private readonly ITwitchCache _cache;
         private readonly HttpClient _client;
         private readonly IHttpContextAccessor _httpCtx;
 
         public TwitchClient(
-            ITwitchCacheManager cacheManager,
+            ITwitchCache cache,
             HttpClient client, 
             IHttpContextAccessor httpCtx
         )
         {
-            _cacheManager = cacheManager;
+            _cache = cache;
             _client = client;
             _httpCtx = httpCtx;
         }
 
         public async Task<TwitchAccessToken> GetAccessToken(string accessCode)
         {
-            string clientID = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientID);
-            string clientSecret = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientSecret);
+            string clientID = _cache.GetApiSecret(Secrets.Types.Twitch.ClientID);
+            string clientSecret = _cache.GetApiSecret(Secrets.Types.Twitch.ClientSecret);
 
             string redirectUri =
                 $"{_httpCtx.HttpContext.Request.Scheme}://" +
@@ -87,7 +87,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
 
         public async Task<TwitchUser> GetUser(string accessToken)
         {
-            string clientID = _cacheManager.GetApiSecret(Secrets.Types.Twitch.ClientID);
+            string clientID = _cache.GetApiSecret(Secrets.Types.Twitch.ClientID);
 
             _client.DefaultRequestHeaders.Add("Client-ID", clientID);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);

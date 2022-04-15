@@ -9,8 +9,9 @@ using Pepp.Web.Apps.Bingo.Adapters.Translators;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
+using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
-using Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches;
+using Pepp.Web.Apps.Bingo.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
@@ -43,13 +44,18 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddScoped<ITwitchAdapter, TwitchAdapter>();
             #endregion
 
+            #region MANAGERS
+            services.AddScoped<ITokenManager, TokenManager>();
+            #endregion
+
             #region FACADES
             services.AddScoped<ITwitchFacade, TwitchFacade>();
             services.AddScoped<IUserFacade, UserFacade>();
             #endregion
 
-            #region MANAGERS
-            services.AddScoped<ITwitchCacheManager, TwitchCacheManager>();
+            #region CACHES
+            services.AddScoped<ITwitchCache, TwitchCache>();
+            services.AddScoped<ITokenCache, TokenCache>();
             #endregion
 
             #region SERVICES
@@ -77,6 +83,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseCacheHydrationMiddleware();
             app.UseExceptionHandlerMiddleware();
             app.MapWhen(
                 // When request path is /status/isalive.

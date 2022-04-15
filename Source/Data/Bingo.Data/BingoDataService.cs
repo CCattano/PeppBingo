@@ -17,6 +17,8 @@ namespace Pepp.Web.Apps.Bingo.Data
 
         /// <inheritdoc cref="IUserSchema"/>
         IUserSchema User { get; }
+        /// <inheritdoc cref="ITokenSchema"/>
+        ITokenSchema Token { get; }
     }
 
     /// <inheritdoc cref="IBingoDataService"/>
@@ -25,6 +27,7 @@ namespace Pepp.Web.Apps.Bingo.Data
         private IApiSchema _apiSchema;
         private ITwitchSchema _twitchSchema;
         private IUserSchema _userSchema;
+        private ITokenSchema _tokenSchema;
 
         public BingoDataService(string connStr) : base(connStr)
         {
@@ -33,6 +36,8 @@ namespace Pepp.Web.Apps.Bingo.Data
         public IApiSchema Api { get => _apiSchema ??= new ApiSchema(this); }
         public ITwitchSchema Twitch { get => _twitchSchema ??= new TwitchSchema(this); }
         public IUserSchema User { get => _userSchema ??= new UserSchema(this); }
+        public ITokenSchema Token { get => _tokenSchema ??= new TokenSchema(this); }
+
     }
 
     public static class BingoDataServiceExtensions

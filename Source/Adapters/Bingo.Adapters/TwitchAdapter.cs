@@ -4,6 +4,8 @@ using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch.Models;
+using Pepp.Web.Apps.Bingo.Managers;
+using System;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
@@ -18,7 +20,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <param name="accessCode"></param>
         /// <returns></returns>
-        Task ProcessReceivedAccessCode(string accessCode);
+        Task<string> ProcessReceivedAccessCode(string accessCode);
     }
 
     public class TwitchAdapter : ITwitchAdapter
@@ -27,23 +29,25 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         private readonly IUserFacade _userFacade;
         private readonly ITwitchFacade _twitchFacade;
         private readonly ITwitchClient _twitchClient;
+        private readonly ITokenManager _tokenManager;
 
         public TwitchAdapter(
             IMapper mapper,
             IUserFacade userFacade,
             ITwitchFacade twitchFacade,
-            ITwitchClient twitchClient
+            ITwitchClient twitchClient,
+            ITokenManager tokenManager
         )
         {
             _mapper = mapper;
             _userFacade = userFacade;
             _twitchFacade = twitchFacade;
             _twitchClient = twitchClient;
+            _tokenManager = tokenManager;
         }
 
-        public async Task ProcessReceivedAccessCode(string accessCode)
+        public async Task<string> ProcessReceivedAccessCode(string accessCode)
         {
-            await _twitchFacade.VerifyTwitchAPISecretsCache();
             TwitchAccessToken accessToken = await _twitchClient.GetAccessToken(accessCode);
             TwitchUser twitchUser = await _twitchClient.GetUser(accessToken.AccessToken);
             UserBE userBE = _mapper.Map<UserBE>(twitchUser);
@@ -51,8 +55,8 @@ namespace Pepp.Web.Apps.Bingo.Adapters
                 _mapper.Map(accessToken, new AccessTokenBE(userBE.TwitchUserID));
             await _twitchFacade.PersistAccessToken(accessTokenBE);
             userBE = await _userFacade.PersistUser(userBE);
-            // TODO set up JWT management logic
-            // TODO return redirect response w/ JWT to be written to headers
+            string token = _tokenManager.GenerateJWTForUser(userBE.UserID, DateTime.Now.AddDays(1));
+            return token;
         }
     }
 }

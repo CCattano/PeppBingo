@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using System;
 
-namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches
+namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
     /// <summary>
-    /// Cache manager responsible for holding JWT signing secrets in memory to reduce Db I/O
+    /// Cache responsible for holding JWT signing secrets in memory to reduce Db I/O
     /// </summary>
-    public interface ITokenCacheManager
+    public interface ITokenCache
     {
         /// <summary>
         /// Get the Token signing secrets out of the in-memory 
@@ -28,11 +28,11 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers.Caches
         void SetTokenSecret<TKey>(TKey cacheKey, string cacheValue) where TKey : Enum;
     }
 
-    /// <<inheritdoc cref="ITokenCacheManager"/>
-    public class TokenCacheManager : BaseCacheManager, ITokenCacheManager
+    /// <<inheritdoc cref="ITokenCache"/>
+    public class TokenCache : BaseCache, ITokenCache
     {
         protected override TimeSpan CacheEntryTTL => TimeSpan.FromDays(1);
-        public TokenCacheManager(IMemoryCache cache) : base(cache)
+        public TokenCache(IMemoryCache cache) : base(cache)
         {
         }
 

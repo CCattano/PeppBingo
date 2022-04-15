@@ -2,7 +2,7 @@ USE [PeppBingo]
 GO
 
 INSERT INTO
-	[api].[SecretValueDetailDescription]
+	[api].[Secrets]
 	([Source], [Type], [Value], [Description])
 VALUES
 	('Twitch', 'ClientID', '[REDACTED_FOR_VC_COMMIT]', 'Provided by Twitch. Passed to authorization endpoints to identify the Pepp Bingo application'),
