@@ -85,7 +85,7 @@
         public struct Headers
         {
             public const string SetCookie = "set-cookie";
-            public const string JWTCookieName = "PeppBingoToken";
+            public const string JWTCookieName = "PeppAuthToken";
         }
 
         /// <summary>

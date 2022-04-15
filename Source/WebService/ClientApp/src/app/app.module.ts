@@ -1,10 +1,18 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule, Provider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
+import { AppInitializer } from './shared/middleware/app.initializer';
 
+
+export function RunInitialization(appInitilaizer: AppInitializer): () => void {
+  return () => appInitilaizer.initialize();
+}
+const appInitializers: Provider = [
+  { provide: APP_INITIALIZER, useFactory: RunInitialization, deps: [AppInitializer], multi: true }
+];
 
 @NgModule({
   declarations: [
@@ -21,7 +29,12 @@ import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.componen
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [
+    //#region Initializers
+    AppInitializer,
+    appInitializers
+    //#endregion
+  ],
   bootstrap: [LayoutComponent]
 })
 export class AppModule { }
