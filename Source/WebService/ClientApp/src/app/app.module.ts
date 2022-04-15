@@ -1,7 +1,9 @@
+import { HttpClientModule } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule, Provider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { LoginComponent } from './components/login/login.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { AppInitializer } from './shared/middleware/app.initializer';
@@ -17,6 +19,7 @@ const appInitializers: Provider = [
 @NgModule({
   declarations: [
     //#region PAGE COMPONENTS
+    LoginComponent,
     DashboardComponent,
     //#endregion
 
@@ -27,7 +30,8 @@ const appInitializers: Provider = [
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    AppRoutingModule,
+    HttpClientModule
   ],
   providers: [
     //#region Initializers
