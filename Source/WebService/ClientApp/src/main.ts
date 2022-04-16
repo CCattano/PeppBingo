@@ -8,5 +8,7 @@ if (environment.production) {
   enableProdMode();
 }
 
+document.body.classList.add('bg-dark', 'text-light');
+
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));

@@ -1,1 +1,37 @@
-<h1>Nav Bar</h1>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">Pepp Bingo</a>
+    <ng-container *ngIf="_user">
+      <button class="navbar-toggler"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-controls="navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="mobileUserDetails d-flex justify-content-evenly align-items-center d-md-none py-3 my-3">
+          <img [src]="_user.profileImageUri" alt="Profile Image" class="profileImage" height="50" width="50" />
+          <label>Hey there, {{_user.displayName}}!</label>
+        </div>
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Leaderboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link disabled">Admin</a>
+          </li>
+        </ul>
+      </div>
+      <div class="d-none d-md-flex justify-content-evenly align-items-center">
+        <label class="me-3">Hey there, {{_user.displayName}}!</label>
+        <img [src]="_user.profileImageUri" alt="Profile Image" class="profileImage" height="50" width="50" />
+      </div>
+    </ng-container>
+  </div>
+</nav>

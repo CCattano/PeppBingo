@@ -1,0 +1,16 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+.navBorder {
+  border-bottom: 1px solid $light
+}
+
+.profileImage {
+  border-radius: 100%;
+  border: .125rem solid $light;
+}
+
+.mobileUserDetails {
+  border-top: .125rem solid $light;
+  border-bottom: .125rem solid $light;
+}
