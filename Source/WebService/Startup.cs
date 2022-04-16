@@ -12,6 +12,7 @@ using Pepp.Web.Apps.Bingo.Facades.Translators;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Managers;
+using Pepp.Web.Apps.Bingo.WebService.Controllers.Translators;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
 using Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation;
 using ConnStrings =
@@ -43,6 +44,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region ADAPTERS
             services.AddScoped<ITwitchAdapter, TwitchAdapter>();
+            services.AddScoped<IUserAdapter, UserAdapter>();
             #endregion
 
             #region MANAGERS
@@ -70,7 +72,8 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #region EXTERNAL
             services.AddAutoMapper(
                 typeof(BusinessEntity_TwitchClient),
-                typeof(Entity_BusinessEntity)
+                typeof(Entity_BusinessEntity),
+                typeof(BusinessModels_BusinessEntities)
             );
 
             services.AddOpenApiDocument(cfg =>

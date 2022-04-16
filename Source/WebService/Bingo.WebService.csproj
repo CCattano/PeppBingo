@@ -32,6 +32,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Adapters\Bingo.Adapters\Bingo.Adapters.csproj" />
+	  <ProjectReference Include="..\BusinessModels\Bingo.BusinessModels\Bingo.BusinessModels.csproj" />
 	</ItemGroup>
 
 	<Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

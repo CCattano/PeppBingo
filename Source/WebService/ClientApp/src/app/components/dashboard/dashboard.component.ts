@@ -1,4 +1,6 @@
 import { Component, OnInit } from "@angular/core";
+import { UserApi } from '../../shared/api/user.api';
+import { UserDto } from '../../shared/dtos/user.dto';
 import { TokenService } from '../../shared/service/token.service';
 
 @Component({
@@ -8,20 +10,15 @@ import { TokenService } from '../../shared/service/token.service';
 export class DashboardComponent implements OnInit {
 
   /** Temp for testing */
-  public diagnostic: Object;
+  public user: UserDto;
 
-  constructor(private _tokenService: TokenService) {
+  constructor(private _userApi: UserApi) {
   }
 
   /**
    * @inheritdoc
    */
-  public ngOnInit(): void {
-    this.diagnostic = {
-      haveToken: this._tokenService.haveToken,
-      token: this._tokenService.token,
-      tokenTTL: this._tokenService.tokenTTL,
-      userID: this._tokenService.userID
-    };
+  public async ngOnInit(): Promise<void> {
+    this.user = await this._userApi.getUser();
   }
 }

@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bingo.BusinessEntities", "S
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{AC03B48C-FF59-47F5-AA16-AC71E2F6EAD5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bingo.Managers", "Source\Managers\Bingo.Managers\Bingo.Managers.csproj", "{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bingo.Managers", "Source\Managers\Bingo.Managers\Bingo.Managers.csproj", "{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bingo.BusinessModels", "Source\BusinessModels\Bingo.BusinessModels\Bingo.BusinessModels.csproj", "{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -75,6 +81,7 @@ Global
 		{15DD6B57-CC1A-4FB9-A550-A7D1ED28D3F2} = {395DD20B-4C3A-4D73-A496-7C818DEE65C5}
 		{36438388-65B9-4E11-9231-5718978D75E9} = {C552064E-7D76-4D0B-A374-44E00146B2AC}
 		{A607D1FE-E671-4BDA-9B1C-999CC06C93FC} = {AC03B48C-FF59-47F5-AA16-AC71E2F6EAD5}
+		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25} = {4B149AE0-0E76-4D48-9FBE-384440C86B8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95A3D0AD-DA0E-4EDC-8507-63A9C4CAE31E}

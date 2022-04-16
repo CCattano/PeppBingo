@@ -3,3 +3,10 @@ Dashboard
 <br />
 <br />
 <pre>{{diagnostic | json}}</pre>
+<br />
+<br />
+<br />
+<ng-container *ngIf="user">
+  <img [src]="user.profileImageUri" />
+  Display Name: {{user.displayName}}
+</ng-container>
