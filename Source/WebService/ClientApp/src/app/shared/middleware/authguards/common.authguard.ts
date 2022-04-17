@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { TwitchApi } from '../api/twitch.api';
-import { TokenService } from '../service/token.service';
+import { TwitchApi } from '../../api/twitch.api';
+import { TokenService } from '../../service/token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,18 +17,15 @@ export class CommonAuthGuard implements CanActivate {
   public async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
     //Check if token exists
     if (this._tokenSvc.haveToken) {
-      if (new Date() > this._tokenSvc.tokenTTL) {
-        console.log('refreshing');
+      if (this._tokenSvc.tokenIsExpired)
         await this._twitchApi.refreshToken();
-      } else {
+      else
         return true;
-      }
     } else {
-      if (state.url == '/login') {
+      if (state.url == '/login')
         return true;
-      } else {
+      else
         this._router.navigateByUrl('login');
-      }
     }
     return false;
   }

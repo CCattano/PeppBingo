@@ -136,6 +136,7 @@ namespace Pepp.Web.Apps.Bingo.Facades
             new() { DisplayName = "Curtis Elliott", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Marc James", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Jon Dawson", ProfileImageUri = TestProfileImageUri },
+            new() { DisplayName = "Jonathan Bojonson", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Shane Goodman", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Brent Pham", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Chris Cross", ProfileImageUri = TestProfileImageUri },
@@ -184,14 +185,13 @@ namespace Pepp.Web.Apps.Bingo.Facades
             //    await _dataSvc.User.UserRepo.GetUsers(displayName);
             //List<UserBE> userBEs =
             //    userEntities?.Select(user => _mapper.Map<UserBE>(user)).ToList();
-            Regex namePattern = new($"({displayName})");
-            ConcurrentBag<UserBE> userBag = new();
-            ParallelQuery<UserBE> query =
-                from user in TestUsers.AsParallel()
-                where namePattern.IsMatch(user.DisplayName)
-                select user;
-            query.ForAll(user => userBag.Add(user));
-            List<UserBE> userBEs = userBag.OrderBy(user => user.DisplayName).ToList();
+            Regex namePattern = new($"({displayName})", RegexOptions.IgnoreCase);
+            List<UserBE> userBEs =
+                TestUsers
+                    .Where(user => namePattern.IsMatch(user.DisplayName))
+                    .OrderBy(user => user.DisplayName)
+                    .Take(10)
+                    .ToList();
             return await Task.FromResult(userBEs);
         }
 
@@ -208,7 +208,23 @@ namespace Pepp.Web.Apps.Bingo.Facades
                 UserBE newUser = _mapper.Map<UserBE>(userEntity);
                 return newUser;
             }
-            // Map BE values onto Entity from Db to update entity contents
+            /*
+             * Map BE values onto Entity from Db to update entity contents
+             *
+             * In any other case we want to assume the state of the userBE
+             * is asbsolute due to a process that occurred in the UI
+             *
+             * But in this outlying edge case our UserBE has IsAdmin set
+             * to false due to translating from a TwitchUser to a UserBE
+             *
+             * And in this one case we do NOT want to apply that
+             * IsAdmin=False to our UserEntity when updating it
+             * So we're taking the server's value and putting it on the BE
+             *
+             * This way when the BE maps to the DE, the BE will
+             * be placing the server's own value onto the DE
+             */
+            userBE.IsAdmin = userEntity.IsAdmin;
             userEntity = _mapper.Map(userBE, userEntity);
             // Post latest contents to Db
             await _dataSvc.User.UserRepo.UpdateUser(userEntity);

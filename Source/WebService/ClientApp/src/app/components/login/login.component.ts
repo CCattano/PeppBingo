@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { faTwitch, IconDefinition } from '@fortawesome/free-brands-svg-icons'
 @Component({
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
@@ -11,7 +11,7 @@ export class LoginComponent {
     `&redirect_uri=${window.location.protocol}//${window.location.host}/Twitch/AccessCode` +
     '&response_type=code' +
     '&scope=user_read';
-
+  public readonly _faTwitch: IconDefinition = faTwitch;
   constructor() {
   }
 }

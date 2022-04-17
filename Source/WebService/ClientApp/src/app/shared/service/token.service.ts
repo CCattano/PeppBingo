@@ -1,4 +1,3 @@
-import { Token } from '@angular/compiler';
 import { Injectable } from '@angular/core';
 
 @Injectable({
@@ -31,6 +30,12 @@ export class TokenService {
    */
   public get tokenTTL(): Date {
     return this._tokenTTL;
+  }
+  /**
+   * Indicates if the token has expired or not
+   */
+  public get tokenIsExpired(): boolean {
+    return new Date() > this._tokenTTL;
   }
   /**
    * The token provided in the JWT
@@ -92,8 +97,8 @@ export class TokenService {
     // 8 days worth of seconds.
     // Internal TTL will lapse before this
     // But we only play bingo on Mondays
-    // So I want this cookie to still be here 7 days from the last bingo night
-    // That way I can refresh the existing token rather than make the user reclick the login button
+    // So we want this cookie to still be here 7 days from the last bingo night
+    // That way we can refresh the existing token rather than make the user reclick the login button
     const maxAge: number = expireImmediately ? 0 : (60 * 60 * 24 * 8);
     const cookie: string = `${tokenName}=${this._token};max-age=${maxAge};path=/`;
     document.cookie = cookie;
@@ -106,7 +111,7 @@ export class TokenService {
     const decodedTokenBody: string = this._base64UrlDecode(encodedTokenBody);
 
     const tokenObj: { UserID: number, ExpirationDateTime: Date; } = JSON.parse(decodedTokenBody);
-    console.log(tokenObj);
+
     this._userID = tokenObj.UserID;
     this._tokenTTL = new Date(tokenObj.ExpirationDateTime);
   }
@@ -128,11 +133,5 @@ export class TokenService {
 
     const decodedToken: string = atob(token);
     return decodedToken;
-  }
-
-  private _calculateTTLInSeconds(): number {
-    const ttlInSeconds: number = Math.round(Math.abs(new Date().getTime() - this._tokenTTL.getTime()) / 1000);
-    console.log(`Setting Max-Age as ${ttlInSeconds}`);
-    return ttlInSeconds;
   }
 }

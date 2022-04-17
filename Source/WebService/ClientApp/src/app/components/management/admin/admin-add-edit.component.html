@@ -1,0 +1,76 @@
+<div class="d-flex flex-column justify-content-evenly mx-auto mb-5 userSearch">
+  <label for="userSearch" class="form-label">Goobie Search</label>
+  <input #userSearch
+         id="userSearch"
+         class="form-control"
+         placeholder="Pepp"
+         (input)="_onInput($event)"
+         (blur)="_onBlur($event)"
+         (keyup.esc)="_onBlur($event)" />
+  <!-- search results container -->
+  <div class="d-flex flex-column justify-content-evenly searchResultContainer bg-dark">
+    <ng-container *ngFor="let result of _searchResults; let searchResultIndex = index;">
+      <!-- search result line-item -->
+      <div class="searchResults d-flex flex-row align-items-center px-2 py-2"
+           (click)="_onAddAdminClick(searchResultIndex, confirmAddAdmin)">
+        <img class="profileImage me-3" [src]="result.profileImageUri" height="30" width="30" />
+        <label [innerHtml]="result.highlightedName | safeHtml"></label>
+      </div>
+    </ng-container>
+    <label *ngIf="_noSearchResults" class="noResults mt-2">No goobies found</label>
+  </div>
+</div>
+<!-- Current Moderators List -->
+<div class="moderatorContainer d-flex flex-column justify-content-evenly mx-auto">
+  <h1 class="sectionTitle ps-2">Moderators</h1>
+  <div class="row">
+    <div *ngFor="let admin of _admins; let adminIndex = index;" class="col-12 col-md-6">
+      <div class="d-flex flex-row justify-content-between px-2 py-2">
+        <div class="d-flex flex-row justify-content-around align-items-center">
+          <img class="profileImage me-3" [src]="admin.profileImageUri" height="50" width="50" />
+          <label [innerHtml]="admin.displayName"></label>
+        </div>
+        <div class="d-flex flex-row justify-content-end align-items-center">
+          <button class="btn"
+                  ngbTooltip="Remove Admin"
+                  (click)="_onRemoveAdminClick(adminIndex, confirmRemoveAdmin)">
+            <fa-icon [icon]="_faMinusCircle" class="text-danger fs-6"></fa-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add/Remove Confirmation Modals -->
+<ng-template #confirmRemoveAdmin let-modal>
+  <div class="modal-header bg-danger text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Remove Admin?</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>
+      Are you sure you want to remove
+      <strong><u>{{_userModalData?.displayName}}</u></strong>
+      as an Admin for this application?
+    </label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-danger" (click)="modal.close(true)">Remove</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.close(false)">Cancel</button>
+  </div>
+</ng-template>
+<ng-template #confirmAddAdmin let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Add Admin?</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>
+      Are you sure you want to make
+      <strong><u>{{_userModalData?.displayName}}</u></strong>
+      an Admin for this application?
+    </label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-success" (click)="modal.close(true)">Add</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.close(false)">Cancel</button>
+  </div>
+</ng-template>

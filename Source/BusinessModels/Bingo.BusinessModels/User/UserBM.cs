@@ -13,6 +13,6 @@
         /// <summary>
         /// The user is an application Administrator
         /// </summary>
-        public bool IsAdmin;
+        public bool IsAdmin { get; set; }
     }
 }

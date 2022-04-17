@@ -12,3 +12,6 @@ document.body.classList.add('bg-dark', 'text-light');
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => console.error(err));
+
+// If needed later
+// "@fortawesome/free-regular-svg-icons": "^5.15.3"

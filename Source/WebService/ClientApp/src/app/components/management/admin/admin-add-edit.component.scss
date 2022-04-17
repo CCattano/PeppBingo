@@ -1,0 +1,62 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+.userSearch {
+  position: relative;
+  max-width: 25rem;
+}
+
+.searchResultContainer {
+  position: absolute;
+  top: 100%;
+  width: 100%;
+  max-height: 80vh;
+  z-index: 1;
+}
+
+.searchResults {
+  border: .0625rem solid white;
+  border-top: none;
+  cursor: pointer;
+
+  & * {
+    cursor: pointer;
+  }
+
+  &:first-child {
+    border: .0625rem solid white;
+  }
+}
+
+.noResults {
+  padding-left: .75rem;
+}
+
+.profileImage {
+  border-radius: 100%;
+  border: .125rem solid white;
+}
+
+.searchMatch {
+  background-color: #fed800;
+}
+
+.sectionTitle {
+  border-bottom: .0625rem solid white;
+}
+
+.moderatorContainer {
+  max-width: 48rem;
+}
+
+@media(max-width: 767px) {
+  .moderatorContainer {
+    max-width: 21.875rem;
+  }
+}
+
+@media(max-width: 349px) {
+  .moderatorContainer {
+    max-width: inherit;
+  }
+}

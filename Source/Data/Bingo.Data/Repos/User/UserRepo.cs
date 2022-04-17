@@ -78,7 +78,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
                     ParameterName = $"@{nameof(UserEntity.ProfileImageUri)}",
                     SqlDbType = SqlDbType.VarChar,
                     Value = user.ProfileImageUri
-                },
+                }
             };
 
             int newPrimaryKey = await base.CreateWithPrimaryKey(Sprocs.InsertUser, @params);
@@ -167,6 +167,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
                     SqlDbType = SqlDbType.VarChar,
                     Value = user.ProfileImageUri
                 },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(UserEntity.IsAdmin)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = user.IsAdmin
+                }
             };
 
             await base.Update(Sprocs.UpdateUser, @params);
