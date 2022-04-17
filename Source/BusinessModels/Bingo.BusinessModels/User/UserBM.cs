@@ -10,5 +10,9 @@
         /// Uri to fetch a User's Twitch profile image
         /// </summary>
         public string ProfileImageUri { get; set; }
+        /// <summary>
+        /// The user is an application Administrator
+        /// </summary>
+        public bool IsAdmin;
     }
 }

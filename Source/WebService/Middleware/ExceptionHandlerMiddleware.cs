@@ -26,8 +26,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Middleware
             {
                 // TODO: Write to Db
                 httpCtx.Response.StatusCode = (int)webEx.ResponseCode;
-                byte[] responseData = Encoding.UTF8.GetBytes(webEx.Message);
-                await httpCtx.Response.Body.WriteAsync(responseData.AsMemory(0, responseData.Length));
+                await httpCtx.Response.WriteAsync(webEx.Message);
             }
             catch
             {

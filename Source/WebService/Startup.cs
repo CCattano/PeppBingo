@@ -102,30 +102,31 @@ namespace Pepp.Web.Apps.Bingo.WebService
              * Order of operations is very important here
              * The request comes in and flows through these middleware in the order they're registered in
              * 
-             * We want the request to go into our token validator MW first
+             * We want the request to go into our exception handler MW first
+             *      This invokes all other logic inside a try catch
+             * Then we want the request to go into our token validator MW
              *      This will ensure our request contains a valid JWT if required
              *      That way we shut down the request ASAP
              * Then we flow into our cache hydration MW
              *      This will ensure our cache is current for whatever work we're about to do
-             * Then we flow into our exception handler MW
-             *      This invokes our Controller logic inside a try catch
+  
              *      
              * When an exception occurs or a response is returned
              * That response, whether an error or data bubbles back up our MW stack
-             * So w/ an exception our exception MW gets the error first and sets our response
+             * So w/ an exception our exception MW gets the error last and sets our response
              * 
              * When the request is coming in it's critical that we flow in the following order
+             *      Exception Handler
              *      Token Validation
              *      Cache Hydration
-             *      Exception Handler
              * 
              * This is the optimal input flow, and guarantees our exception handler
-             * which writes our response in the event of an exception, receives any thrown exception
-             * before any other middleware in the application
+             * which writes our response in the event of an exception, receives any 
+             * thrown exception before our response leaves this server
              */
+            app.UseExceptionHandlerMiddleware();
             app.UseTokenValidationMiddleware();
             app.UseCacheHydrationMiddleware();
-            app.UseExceptionHandlerMiddleware();
 
             if (env.IsDevelopment())
             {
@@ -162,7 +163,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 if (env.IsDevelopment())
                 {
                     //spa.UseAngularCliServer(npmScript: "start");
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
         }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Pepp.Web.Apps.Bingo.BusinessEntities.Twitch;
+using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Data.Entities.Common;
 using Pepp.Web.Apps.Bingo.Data.Entities.Twitch;

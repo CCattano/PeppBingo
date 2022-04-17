@@ -16,6 +16,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.User
             result.TwitchUserID = source.TwitchUserID;
             result.DisplayName = source.DisplayName;
             result.ProfileImageUri = source.ProfileImageUri;
+            result.IsAdmin = source.IsAdmin;
             return result;
         }
 
@@ -26,6 +27,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.User
             result.TwitchUserID = source.TwitchUserID;
             result.DisplayName = source.DisplayName;
             result.ProfileImageUri = source.ProfileImageUri;
+            result.IsAdmin = source.IsAdmin;
             return result;
         }
     }

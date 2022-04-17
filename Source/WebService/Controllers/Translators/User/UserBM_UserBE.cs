@@ -12,6 +12,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers.Translators.User
             UserBM result = destination ?? new();
             result.DisplayName = source.DisplayName;
             result.ProfileImageUri = source.ProfileImageUri;
+            result.IsAdmin = source.IsAdmin;
             return result;
         }
 

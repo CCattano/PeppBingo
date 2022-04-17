@@ -17,7 +17,8 @@ BEGIN
 		[UserID],
 		[TwitchUserID],
 		[DisplayName],
-		[ProfileImageUri]
+		[ProfileImageUri],
+		[IsAdmin]		
 	FROM
 		[user].Users
 	WHERE

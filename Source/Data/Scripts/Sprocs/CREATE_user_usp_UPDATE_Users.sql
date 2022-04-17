@@ -11,7 +11,8 @@ CREATE PROCEDURE [user].usp_UPDATE_User
 	@UserID int,
 	@TwitchUserID varchar(36),
 	@DisplayName varchar(25),
-	@ProfileImageUri varchar(1000)
+	@ProfileImageUri varchar(1000),
+	@IsAdmin bit
 AS
 BEGIN
 	BEGIN TRY
@@ -22,7 +23,8 @@ BEGIN
 		SET
 			TwitchUserID = @TwitchUserID,
 			DisplayName = @DisplayName,
-			ProfileImageUri = @ProfileImageUri
+			ProfileImageUri = @ProfileImageUri,
+			IsAdmin = @IsAdmin
 		WHERE
 			UserID = @UserID
 

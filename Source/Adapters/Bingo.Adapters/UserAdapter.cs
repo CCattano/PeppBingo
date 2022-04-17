@@ -1,6 +1,7 @@
 ﻿using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Managers;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
@@ -15,6 +16,28 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="userID"></param>
         /// <returns></returns>
         Task<UserBE> GetUser(string jwt);
+        /// <summary>
+        /// Fetches Users who's <see cref="UserBE.DisplayName"/> contains the <paramref name="displayName"/> provided
+        /// </summary>
+        /// <remarks>
+        ///     <para>
+        ///         The <paramref name="displayName"/> provided is treated as a substring and any users who's
+        ///         <see cref="UserBE.DisplayName"/> contains the <paramref name="displayName"/> will be returned
+        ///     </para>
+        ///     <para>
+        ///         Given a <paramref name="displayName"/> of "sti"
+        ///         Then users, "Christian", "Stirling", and "Dustin"
+        ///         could be returned as all contain, "sti"
+        ///     </para>
+        /// </remarks>
+        /// <example>
+        ///     Given a <paramref name="displayName"/> of "sti"
+        ///     Then users, "Christian", "Stirling", and "Dustin"
+        ///     could be returned as all contain, "sti"
+        /// </example>
+        /// <param name="displayName"></param>
+        /// <returns></returns>
+        Task<List<UserBE>> GetUsers(string displayName);
     }
 
     /// <inheritdoc cref="IUserAdapter"/>
@@ -31,6 +54,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             if (user == null)
                 throw new WebException(HttpStatusCode.NotFound, "User not found for ID provided");
             return user;
+        }
+
+        public async Task<List<UserBE>> GetUsers(string displayName)
+        {
+            List<UserBE> userBEs = await _facade.GetUsers(displayName);
+            return userBEs;
         }
     }
 }

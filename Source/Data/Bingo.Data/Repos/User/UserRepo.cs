@@ -31,6 +31,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
         /// <returns></returns>
         Task<UserEntity> GetUser(int userID);
         /// <summary>
+        /// Fetches User information from the table
+        /// </summary>
+        /// <param name="displayName"></param>
+        /// <returns></returns>
+        Task<List<UserEntity>> GetUsers(string displayName);
+        /// <summary>
         /// Updates User information in the table
         /// </summary>
         /// <param name="user"></param>
@@ -115,6 +121,24 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             return queryData?.SingleOrDefault();
         }
 
+        public async Task<List<UserEntity>> GetUsers(string displayName)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(UserEntity.DisplayName)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = displayName
+                }
+            };
+
+            List<UserEntity> queryData =
+                await base.Read<UserEntity>(Sprocs.GetUsersByDisplayName, @params);
+
+            return queryData;
+        }
+
         public async Task UpdateUser(UserEntity user)
         {
             List<SqlParameter> @params = new()
@@ -155,6 +179,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             public const string InsertUser = "user.usp_INSERT_User";
             public const string GetUserByTwitchUserID = "user.usp_SELECT_User_ByTwitchUserID";
             public const string GetUserByUserID = "user.usp_SELECT_User_ByUserID";
+            public const string GetUsersByDisplayName = "user.usp_SELECT_Users_ByDisplayName";
             public const string UpdateUser = "user.usp_UPDATE_User";
         }
     }
