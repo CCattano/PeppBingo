@@ -51,6 +51,11 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <param name="displayName"></param>
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(string displayName);
+        /// <summary>
+        /// Fetch all users with an IsAdmin value of 1
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserBE>> GetAdminUsers();
     }
 
     /// <inheritdoc cref="IUserFacade"/>
@@ -60,11 +65,11 @@ namespace Pepp.Web.Apps.Bingo.Facades
         private const string TestProfileImageUri = @"https://static-cdn.jtvnw.net/jtv_user_pictures/28589ef5-43c3-468d-a839-f5c6f8bb4421-profile_image-300x300.png";
         private static readonly List<UserBE> TestUsers = new()
         {
-            new() { DisplayName = "William Holt", ProfileImageUri = TestProfileImageUri },
-            new() { DisplayName = "Michael Booth", ProfileImageUri = TestProfileImageUri },
-            new() { DisplayName = "David Mcgrath", ProfileImageUri = TestProfileImageUri },
-            new() { DisplayName = "John Simpson", ProfileImageUri = TestProfileImageUri },
-            new() { DisplayName = "Brian Miles", ProfileImageUri = TestProfileImageUri },
+            new() { DisplayName = "William Holt", ProfileImageUri = TestProfileImageUri, IsAdmin = true },
+            new() { DisplayName = "Michael Booth", ProfileImageUri = TestProfileImageUri, IsAdmin = true },
+            new() { DisplayName = "David Mcgrath", ProfileImageUri = TestProfileImageUri, IsAdmin = true },
+            new() { DisplayName = "John Simpson", ProfileImageUri = TestProfileImageUri, IsAdmin = true },
+            new() { DisplayName = "Brian Miles", ProfileImageUri = TestProfileImageUri, IsAdmin = true },
             new() { DisplayName = "James Todd", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Robert King", ProfileImageUri = TestProfileImageUri },
             new() { DisplayName = "Christopher Lee", ProfileImageUri = TestProfileImageUri },
@@ -191,6 +196,19 @@ namespace Pepp.Web.Apps.Bingo.Facades
                     .Where(user => namePattern.IsMatch(user.DisplayName))
                     .OrderBy(user => user.DisplayName)
                     .Take(10)
+                    .ToList();
+            return await Task.FromResult(userBEs);
+        }
+
+        public async Task<List<UserBE>> GetAdminUsers()
+        {
+            //List<UserEntity> userEntities =
+            //    await _dataSvc.User.UserRepo.GetAdminUsers();
+            //List<UserBE> userBEs =
+            //    userEntities?.Select(user => _mapper.Map<UserBE>(user)).ToList();
+            List<UserBE> userBEs =
+                TestUsers
+                    .Where(user => user.IsAdmin)
                     .ToList();
             return await Task.FromResult(userBEs);
         }

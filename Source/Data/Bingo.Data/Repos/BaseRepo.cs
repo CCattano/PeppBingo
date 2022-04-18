@@ -43,14 +43,15 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
             await conn.CloseAsync();
         }
 
-        protected virtual async Task<List<T>> Read<T>(string sproc, List<SqlParameter> sprocParams) where T : new()
+        protected virtual async Task<List<T>> Read<T>(string sproc, List<SqlParameter> sprocParams = null) where T : new()
         {
             using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
             using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
-            cmd.Parameters.AddRange(sprocParams.ToArray());
+            if(sprocParams != null)
+                cmd.Parameters.AddRange(sprocParams.ToArray());
             using SqlDataReader queryResults = await cmd.ExecuteReaderAsync();
             DataTable resultTable = new();
             resultTable.Load(queryResults);

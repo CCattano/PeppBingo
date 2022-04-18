@@ -45,5 +45,18 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
             return userBMs;
         }
+
+        [TokenRequired]
+        [HttpGet]
+        public async Task<List<UserBM>> Admins()
+        {
+            string token = base.TryGetAccessTokenFromRequestHeader();
+            UserBE requestingUser = await base.Adapter.GetUser(token);
+            if (!requestingUser.IsAdmin)
+                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot search for users");
+            List<UserBE> userBEs = await base.Adapter.GetAdminUsers();
+            List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
+            return userBMs;
+        }
     }
 }

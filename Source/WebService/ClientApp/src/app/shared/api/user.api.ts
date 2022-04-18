@@ -31,15 +31,7 @@ export class UserApi {
    * Fetches users who are marked as Administrators in the system
    */
   public async getAdmins(): Promise<UserDto[]> {
-    //return await this._http.get<UserDto[]>("User/Admins").toPromise();
-    return await of([
-      ...new Array(12).fill(0).map((_, i) => ({
-        displayName: `TORGUTAN_TORRES${i + 1}`,
-        isAdmin: true,
-        profileImageUri: 'https://static-cdn.jtvnw.net/jtv_user_pictures/28589ef5-43c3-468d-a839-f5c6f8bb4421-profile_image-300x300.png'
-      }) as UserDto)
-    ]).pipe(delay(750))
-      .toPromise();
+    return await this._http.get<UserDto[]>("User/Admins").toPromise();
   }
 
   /**
@@ -51,7 +43,7 @@ export class UserApi {
     return of(null)
       .pipe(
         tap(() => console.log('In removeAdminPermissionForUser req')),
-        delay(3000)
+        delay(750)
       )
       .toPromise();
   }
@@ -65,7 +57,7 @@ export class UserApi {
     return of(null)
       .pipe(
         tap(() => console.log('In grantAdminPermissionForUser req')),
-        delay(3000)
+        delay(750)
       )
       .toPromise();
   }

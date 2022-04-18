@@ -108,6 +108,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
       }),
       switchMap((searchTerm: string) => of(null).pipe(
         switchMap(() => this._userApi.searchUsersByName(searchTerm).catch(() => [])),
+        map((users: UserDto[]) => users?.filter(user => !user.isAdmin) ?? []),
         map((users: UserDto[]) => [searchTerm, users] as [string, UserDto[]])
       )),
       map(([searchTerm, users]: [string, UserDto[]]) => users?.map(user => {

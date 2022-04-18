@@ -37,6 +37,11 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
         /// <returns></returns>
         Task<List<UserEntity>> GetUsers(string displayName);
         /// <summary>
+        /// Fetches all users with an IsAdmin value of 1
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserEntity>> GetAdminUsers();
+        /// <summary>
         /// Updates User information in the table
         /// </summary>
         /// <param name="user"></param>
@@ -139,6 +144,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             return queryData;
         }
 
+        public async Task<List<UserEntity>> GetAdminUsers()
+        {
+            List<UserEntity> queryData = await base.Read<UserEntity>(Sprocs.GetAdminUsers);
+            return queryData;
+        }
+
         public async Task UpdateUser(UserEntity user)
         {
             List<SqlParameter> @params = new()
@@ -186,7 +197,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             public const string GetUserByTwitchUserID = "user.usp_SELECT_User_ByTwitchUserID";
             public const string GetUserByUserID = "user.usp_SELECT_User_ByUserID";
             public const string GetUsersByDisplayName = "user.usp_SELECT_Users_ByDisplayName";
+            public const string GetAdminUsers = "user.usp_SELECT_Users_ByIsAdminTrue";
             public const string UpdateUser = "user.usp_UPDATE_User";
+            //
         }
     }
 }

@@ -38,6 +38,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="displayName"></param>
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(string displayName);
+        /// <summary>
+        /// Fetch all users with an IsAdmin value of 1
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserBE>> GetAdminUsers();
     }
 
     /// <inheritdoc cref="IUserAdapter"/>
@@ -59,6 +64,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task<List<UserBE>> GetUsers(string displayName)
         {
             List<UserBE> userBEs = await _facade.GetUsers(displayName);
+            return userBEs;
+        }
+
+        public async Task<List<UserBE>> GetAdminUsers()
+        {
+            List<UserBE> userBEs = await _facade.GetAdminUsers();
             return userBEs;
         }
     }
