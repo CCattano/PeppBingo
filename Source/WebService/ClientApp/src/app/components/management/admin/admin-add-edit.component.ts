@@ -156,7 +156,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
     const affirmativeAction =
       async () =>
-        await this._userApi.removeAdminPermissionForUser(this._admins[index].userID)
+        await this._userApi.grantAdminPermissionForUser(this._userModalData.userID)
           .then(() => this._admins.push(this._userModalData) && null)
           .catch(() => alert('Could not add user. Please try again.'));
     await this._openModal(index, content, affirmativeAction);

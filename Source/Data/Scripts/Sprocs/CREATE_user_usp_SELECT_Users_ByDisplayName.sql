@@ -17,7 +17,7 @@ BEGIN
 	SET NOCOUNT ON;
 
 	SELECT
-		[UserID]
+		[UserID],
 		[TwitchUserID],
 		[DisplayName],
 		[ProfileImageUri],

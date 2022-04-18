@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.BusinessModels.User;
-using Pepp.Web.Apps.Bingo.Infrastructure.Exceptions;
 using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
 using System.Collections.Generic;
 using System.Linq;

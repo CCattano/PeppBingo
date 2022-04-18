@@ -133,7 +133,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
                 new SqlParameter()
                 {
                     ParameterName = $"@{nameof(UserEntity.DisplayName)}",
-                    SqlDbType = SqlDbType.Int,
+                    SqlDbType = SqlDbType.VarChar,
                     Value = displayName
                 }
             };
