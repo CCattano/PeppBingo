@@ -3,6 +3,10 @@
     public class UserBM
     {
         /// <summary>
+        /// The ID of the user
+        /// </summary>
+        public int UserID { get; set; }
+        /// <summary>
         /// Twitch-provided display name for a User
         /// </summary>
         public string DisplayName { get; set; }

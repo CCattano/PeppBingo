@@ -2,11 +2,11 @@
 using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Data.Entities.User;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
+using System.Net;
 using System.Threading.Tasks;
+using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Facades
 {
@@ -56,6 +56,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// </summary>
         /// <returns></returns>
         Task<List<UserBE>> GetAdminUsers();
+        /// <summary>
+        /// Sets a user's IsAdmin field with the value provided
+        /// </summary>
+        /// <param name="userBE"></param>
+        /// <returns></returns>
+        Task SetIsAdminForUser(int userID, bool isAdmin);
     }
 
     /// <inheritdoc cref="IUserFacade"/>
@@ -130,6 +136,15 @@ namespace Pepp.Web.Apps.Bingo.Facades
             await _dataSvc.User.UserRepo.UpdateUser(userEntity);
             UserBE updatedUser = _mapper.Map<UserBE>(userEntity);
             return updatedUser;
+        }
+
+        public async Task SetIsAdminForUser(int userID, bool isAdmin)
+        {
+            UserEntity userEntity = await _dataSvc.User.UserRepo.GetUser(userID);
+            if (userEntity == null)
+                throw new WebException(HttpStatusCode.BadRequest, "Could not update user");
+            userEntity.IsAdmin = isAdmin;
+            await _dataSvc.User.UserRepo.UpdateUser(userEntity);
         }
     }
 }

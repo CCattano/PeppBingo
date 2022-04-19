@@ -38,28 +38,16 @@ export class UserApi {
    * Updates the user with the userID specified to no longer be considered an Admin by the application
    * @param userID
    */
-  public async removeAdminPermissionForUser(userID: number): Promise<void> {
-    //return await this._http.put<void>("User/RemoveAdminPermission", { userID }).toPromise();
-    return of(null)
-      .pipe(
-        tap(() => console.log('In removeAdminPermissionForUser req')),
-        delay(750)
-      )
-      .toPromise();
+  public async revokeAdminPermissionForUser(userID: number): Promise<void> {
+    return await this._http.put<null>("User/RevokeAdminPermission", userID).toPromise();
   }
 
   /**
    * Updates the user with the userID specified to be considered an Admin by the application
    * @param userID
    */
-  public async grantAdminPermissionForUser(userID: number): Promise<void> {
-    //return await this._http.put<void>("User/GrantAdminPermission", { userID }).toPromise();
-    return of(null)
-      .pipe(
-        tap(() => console.log('In grantAdminPermissionForUser req')),
-        delay(750)
-      )
-      .toPromise();
+  public async GrantAdminPermissionForUser(userID: number): Promise<void> {
+    return await this._http.put<null>("User/GrantAdminPermission", userID).toPromise();
   }
 }
 

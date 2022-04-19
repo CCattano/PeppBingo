@@ -43,6 +43,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <returns></returns>
         Task<List<UserBE>> GetAdminUsers();
+        /// <summary>
+        /// Sets a user's IsAdmin property to the value provided
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        Task SetAdminPermissionForUser(int userID, bool isAdmin);
     }
 
     /// <inheritdoc cref="IUserAdapter"/>
@@ -71,6 +77,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             List<UserBE> userBEs = await _facade.GetAdminUsers();
             return userBEs;
+        }
+
+        public async Task SetAdminPermissionForUser(int userID, bool isAdmin)
+        {
+            await _facade.SetIsAdminForUser(userID, isAdmin);
         }
     }
 }

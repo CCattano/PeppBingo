@@ -142,7 +142,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     this._userModalData = this._admins[index];
     const affirmativeAction =
       async () =>
-        await this._userApi.removeAdminPermissionForUser(this._admins[index].userID)
+        await this._userApi.revokeAdminPermissionForUser(this._admins[index].userID)
           .then(() => this._admins.splice(index, 1) && null)
           .catch(() => alert('Could not remove user. Please try again.'));
     await this._openModal(index, content, affirmativeAction);
@@ -155,8 +155,8 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
   public async _onAddAdminClick(index: number, content: TemplateRef<any>): Promise<void> {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
     const affirmativeAction =
-      async () =>
-        await this._userApi.grantAdminPermissionForUser(this._userModalData.userID)
+      async () => 
+        await this._userApi.GrantAdminPermissionForUser(this._userModalData.userID)
           .then(() => this._admins.push(this._userModalData) && null)
           .catch(() => alert('Could not add user. Please try again.'));
     await this._openModal(index, content, affirmativeAction);

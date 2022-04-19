@@ -47,7 +47,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 
         [TokenRequired]
         [HttpGet]
-        public async Task<List<UserBM>> Admins()
+        public async Task<ActionResult<List<UserBM>>> Admins()
         {
             string token = base.TryGetAccessTokenFromRequestHeader();
             UserBE requestingUser = await base.Adapter.GetUser(token);
@@ -56,6 +56,31 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             List<UserBE> userBEs = await base.Adapter.GetAdminUsers();
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
             return userBMs;
+        }
+
+        [TokenRequired]
+        [HttpPut]
+        public async Task<ActionResult> GrantAdminPermission([FromBody] int userID)
+        {
+            await ModifyAdminPermissionForUser(userID, true);
+            return Ok();
+        }
+
+        [TokenRequired]
+        [HttpPut]
+        public async Task<ActionResult> RevokeAdminPermission([FromBody] int userID)
+        {
+            await ModifyAdminPermissionForUser(userID, false);
+            return Ok();
+        }
+
+        private async Task ModifyAdminPermissionForUser(int userID, bool isAdmin)
+        {
+            string token = base.TryGetAccessTokenFromRequestHeader();
+            UserBE requestingUser = await base.Adapter.GetUser(token);
+            if (!requestingUser.IsAdmin)
+                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot modify permissions of other users");
+            await base.Adapter.SetAdminPermissionForUser(userID, isAdmin);
         }
     }
 }
