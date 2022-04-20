@@ -9,6 +9,7 @@ import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
+import { ToastContainerComponent } from './shared/components/toast/toast-container.component';
 import { AppInitializer } from './shared/middleware/app.initializer';
 import { TokenInterceptor } from './shared/middleware/token.interceptor';
 import { SafeHtmlPipe } from './shared/safe-html.pipe';
@@ -34,6 +35,7 @@ const appInitializers: Provider = [
     //#region SHARED COMPONENTS
     LayoutComponent,
     NavMenuComponent,
+    ToastContainerComponent,
     //#endregion
 
     //#region SHARED PIPES

@@ -5,6 +5,7 @@ import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
 import { UserApi } from '../../../shared/api/user.api';
 import { UserDto } from '../../../shared/dtos/user.dto';
+import { ToastService } from '../../../shared/service/toast.service';
 import { UserSearchResultVM } from './viewmodels/user-search-result.viewmodel';
 
 @Component({
@@ -38,7 +39,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
 
   /**
    * Users marked as Administrators in the system
-   */ 
+   */
   public _admins: UserDto[] = [];
 
   /**
@@ -50,7 +51,8 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
 
   constructor(
     private _userApi: UserApi,
-    private _modalService: NgbModal) {
+    private _modalService: NgbModal,
+    private _toastService: ToastService) {
   }
 
   //#region Lifecycle Hooks
@@ -143,8 +145,20 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     const affirmativeAction =
       async () =>
         await this._userApi.revokeAdminPermissionForUser(this._admins[index].userID)
-          .then(() => this._admins.splice(index, 1) && null)
-          .catch(() => alert('Could not remove user. Please try again.'));
+          .then(() => {
+            this._admins.splice(index, 1);
+            this._toastService.showSuccessToast({
+              header: 'Success!',
+              body: 'Admin permissions were revoked successfully',
+              ttlMs: 3000
+            });
+          })
+          .catch(() => this._toastService.showDangerToast({
+            header: 'Error!',
+            body: 'An error occurred trying to update the ' +
+                  'user\'s permissions. Please try again.',
+            ttlMs: 3000
+          }));
     await this._openModal(index, content, affirmativeAction);
   }
 
@@ -155,10 +169,21 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
   public async _onAddAdminClick(index: number, content: TemplateRef<any>): Promise<void> {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
     const affirmativeAction =
-      async () => 
+      async () =>
         await this._userApi.GrantAdminPermissionForUser(this._userModalData.userID)
-          .then(() => this._admins.push(this._userModalData) && null)
-          .catch(() => alert('Could not add user. Please try again.'));
+          .then(() => {
+            this._admins.push(this._userModalData);
+            this._toastService.showSuccessToast({
+              header: 'Success!',
+              body: 'New Admin was added successfully!',
+              ttlMs: 3000
+            });
+          })
+          .catch(() => this._toastService.showDangerToast({
+            header: 'Error!',
+            body: 'New Admin could not be added. Please try again.',
+            ttlMs: 3000
+          }));
     await this._openModal(index, content, affirmativeAction);
   }
 
