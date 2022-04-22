@@ -189,8 +189,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             await base.Update(Sprocs.UpdateUser, @params);
         }
 
-    
-
         private struct Sprocs
         {
             public const string InsertUser = "user.usp_INSERT_User";
@@ -199,7 +197,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             public const string GetUsersByDisplayName = "user.usp_SELECT_Users_ByDisplayName";
             public const string GetAdminUsers = "user.usp_SELECT_Users_ByIsAdminTrue";
             public const string UpdateUser = "user.usp_UPDATE_User";
-            //
         }
     }
 }
