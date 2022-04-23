@@ -37,6 +37,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
         /// <returns></returns>
         Task<List<UserEntity>> GetUsers(string displayName);
         /// <summary>
+        /// Fetches User information from the table
+        /// </summary>
+        /// <param name="displayName"></param>
+        /// <returns></returns>
+        Task<List<UserEntity>> GetUsers(List<int> userIDs);
+        /// <summary>
         /// Fetches all users with an IsAdmin value of 1
         /// </summary>
         /// <returns></returns>
@@ -144,6 +150,37 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             return queryData;
         }
 
+        public async Task<List<UserEntity>> GetUsers(List<int> userIDs)
+        {
+            string sprocParamName = nameof(userIDs)[..1].ToUpper() + nameof(userIDs)[1..];
+            string udtName = $"user.{sprocParamName}";
+            string udtColName = sprocParamName[..^1];
+
+            DataTable udt = new();
+            udt.Columns.Add(udtColName, typeof(int));
+            userIDs.ForEach(id =>
+            {
+                DataRow row = udt.NewRow();
+                row.SetField(udtColName, id);
+                udt.Rows.Add(row);
+            });
+
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{sprocParamName}",
+                    TypeName = udtName,
+                    Value = udt
+                }
+            };
+
+            List<UserEntity> queryData =
+                await base.Read<UserEntity>(Sprocs.GetUsersByUserIDs, @params);
+
+            return queryData;
+        }
+
         public async Task<List<UserEntity>> GetAdminUsers()
         {
             List<UserEntity> queryData = await base.Read<UserEntity>(Sprocs.GetAdminUsers);
@@ -195,6 +232,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.User
             public const string GetUserByTwitchUserID = "user.usp_SELECT_User_ByTwitchUserID";
             public const string GetUserByUserID = "user.usp_SELECT_User_ByUserID";
             public const string GetUsersByDisplayName = "user.usp_SELECT_Users_ByDisplayName";
+            public const string GetUsersByUserIDs = "user.usp_SELECT_Users_ByUserIDs";
             public const string GetAdminUsers = "user.usp_SELECT_Users_ByIsAdminTrue";
             public const string UpdateUser = "user.usp_UPDATE_User";
         }

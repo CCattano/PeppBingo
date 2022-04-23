@@ -52,6 +52,11 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(string displayName);
         /// <summary>
+        /// Fetch Users who's UserID is in the provided list
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserBE>> GetUsers(List<int> userIDs);
+        /// <summary>
         /// Fetch all users with an IsAdmin value of 1
         /// </summary>
         /// <returns></returns>
@@ -87,6 +92,15 @@ namespace Pepp.Web.Apps.Bingo.Facades
         {
             List<UserEntity> userEntities =
                 await _dataSvc.User.UserRepo.GetUsers(displayName);
+            List<UserBE> userBEs =
+                userEntities?.Select(user => _mapper.Map<UserBE>(user)).ToList();
+            return userBEs;
+        }
+
+        public async Task<List<UserBE>> GetUsers(List<int> userIDs)
+        {
+            List<UserEntity> userEntities =
+                   await _dataSvc.User.UserRepo.GetUsers(userIDs);
             List<UserBE> userBEs =
                 userEntities?.Select(user => _mapper.Map<UserBE>(user)).ToList();
             return userBEs;

@@ -39,10 +39,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UserBM>>> SearchUsersByName([FromQuery] string name)
         {
-            string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await _userAdapter.GetUser(token);
-            if (!requestingUser.IsAdmin)
-                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot search for users");
+            await ConfirmIsAdmin("Non-Administrators cannot search for users");
             List<UserBE> userBEs = await _userAdapter.GetUsers(name);
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
             return userBMs;
@@ -51,10 +48,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<UserBM>>> Admins()
         {
-            string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await _userAdapter.GetUser(token);
-            if (!requestingUser.IsAdmin)
-                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot search for users");
+            await ConfirmIsAdmin("Non-Administrators cannot search for users");
             List<UserBE> userBEs = await _userAdapter.GetAdminUsers();
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
             return userBMs;
@@ -76,11 +70,17 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 
         private async Task ModifyAdminPermissionForUser(int userID, bool isAdmin)
         {
-            string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await _userAdapter.GetUser(token);
-            if (!requestingUser.IsAdmin)
-                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot modify permissions of other users");
+            await ConfirmIsAdmin("Non-Administrators cannot modify permissions of other users");
             await _userAdapter.SetAdminPermissionForUser(userID, isAdmin);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<UserBM>>> GetUsersByIDs([FromQuery] List<int> userIDs)
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot search for users");
+            List<UserBE> userBEs = await _userAdapter.GetUsers(userIDs);
+            List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
+            return userBMs;
         }
 
         #endregion
@@ -90,10 +90,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<BoardBM>>> Boards()
         {
-            string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await _userAdapter.GetUser(token);
-            if (!requestingUser.IsAdmin)
-                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot access Board information");
+            await ConfirmIsAdmin("Non-Administrators cannot access Board information");
             List<BoardBE> boardBEs = await _gameAdapter.GetAllBoards();
             List<BoardBM> boardBMs = boardBEs?.Select(board => _mapper.Map<BoardBM>(board)).ToList();
             return boardBMs;
@@ -102,10 +99,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpPost]
         public async Task<ActionResult<BoardBM>> CreateBoard([FromBody] BoardBM newBoard)
         {
-            string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await _userAdapter.GetUser(token);
-            if (!requestingUser.IsAdmin)
-                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot create new Boards");
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
             BoardBE newBoardBE = _mapper.Map<BoardBE>(newBoard);
             BoardBE boardBE = await _gameAdapter.CreateBoard(requestingUser.UserID, newBoardBE);
             BoardBM boardBM = _mapper.Map<BoardBM>(boardBE);
@@ -113,5 +107,14 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         }
 
         #endregion
+
+        private async Task<UserBE> ConfirmIsAdmin(string rejectionMsg)
+        {
+            string token = base.TryGetAccessTokenFromRequestHeader();
+            UserBE requestingUser = await _userAdapter.GetUser(token);
+            if (!requestingUser.IsAdmin)
+                throw new WebException(HttpStatusCode.Forbidden, rejectionMsg);
+            return requestingUser;
+        }
     }
 }

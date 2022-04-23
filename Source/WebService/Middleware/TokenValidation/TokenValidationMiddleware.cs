@@ -32,7 +32,7 @@ namespace Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation
             bool isValid = tokenMan.TokenIsValid(token);
             if (!isValid)
                 throw new WebException(HttpStatusCode.BadRequest, "The JWT provided was not valid");
-            
+
             // Expired validation
             isValid = !TokenManager.TokenIsExpired(token);
             if (!isValid && context.Request.Path != "/Twitch/RefreshToken")

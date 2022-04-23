@@ -39,6 +39,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(string displayName);
         /// <summary>
+        /// Fetch Users who's UserID is in the provided list
+        /// </summary>
+        /// <returns></returns>
+        Task<List<UserBE>> GetUsers(List<int> userIDs);
+        /// <summary>
         /// Fetch all users with an IsAdmin value of 1
         /// </summary>
         /// <returns></returns>
@@ -76,6 +81,14 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task<List<UserBE>> GetAdminUsers()
         {
             List<UserBE> userBEs = await _facade.GetAdminUsers();
+            return userBEs;
+        }
+
+        public async Task<List<UserBE>> GetUsers(List<int> userIDs)
+        {
+            List<UserBE> userBEs = await _facade.GetUsers(userIDs);
+            if (userBEs.Count != userIDs.Count)
+                throw new WebException(HttpStatusCode.BadRequest, "Not all users were found for the IDs provided");
             return userBEs;
         }
 
