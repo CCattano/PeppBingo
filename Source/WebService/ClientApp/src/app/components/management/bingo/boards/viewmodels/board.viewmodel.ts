@@ -12,9 +12,9 @@ export class BoardVM extends BoardDto {
   /**
    * Flag indicating if the board is being actively edited
    */
-  public editing: boolean;
+  public editing: boolean = false;
   /**
    *Flag indicating if this is a new board being created
    */
-  public isNew: boolean;
+  public isNew: boolean = false;
 }

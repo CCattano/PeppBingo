@@ -170,7 +170,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
     const affirmativeAction =
       async () =>
-        await this._adminApi.GrantAdminPermissionForUser(this._userModalData.userID)
+        await this._adminApi.grantAdminPermissionForUser(this._userModalData.userID)
           .then(() => {
             this._admins.push(this._userModalData);
             this._toastService.showSuccessToast({

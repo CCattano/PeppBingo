@@ -1,13 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { faPlusCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { AdminApi } from '../../../../shared/api/admin.api';
 import { BoardDto } from '../../../../shared/dtos/board.dto';
+import { UserDto } from '../../../../shared/dtos/user.dto';
 import { BoardVM } from './viewmodels/board.viewmodel';
 
 @Component({
   templateUrl: './bingo-board-add-edit.component.html',
   styleUrls: ['./shared-board-styles.scss']
 })
-export class BingoBoardAddEditComponent {
+export class BingoBoardAddEditComponent implements OnInit {
 
   /**
    * Fontawesome icons used in the template
@@ -19,46 +21,23 @@ export class BingoBoardAddEditComponent {
   /**
    * Boards available to be modified
    */
-  public _boards: BoardVM[] = [
-    {
-      boardID: 1,
-      name: 'Horror',
-      description: 'Board of Horror tropes. Used only on Mondays',
-      tileCount: 45,
-      createdDateTime: new Date(new Date().setHours(-5)),
-      createdBy: 1,
-      createdByName: 'TORTUGAN_TORRES',
-      modDateTime: new Date(new Date().setHours(-1)),
-      modBy: 1,
-      modByName: 'TORTUGAN_TORRES'
-    } as BoardVM,
-    {
-      boardID: 2,
-      name: 'RPG',
-      description: 'Board of RPG tropes. Used only on Thursdays',
-      tileCount: 25,
-      createdDateTime: new Date(new Date().setHours(-4)),
-      createdBy: 2,
-      createdByName: 'WheelChairBanditTTV',
-      modDateTime: new Date(new Date().setHours(-4)),
-      modBy: 2,
-      modByName: 'WheelChairBanditTTV'
-    } as BoardVM
-  ];
+  public _boards: BoardVM[] = [];
+
+  constructor(private _adminApi: AdminApi) {
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public async ngOnInit(): Promise<void> {
+    await this._getBoardData();
+  }
 
   /**
    * Click event handler for adding a new board
    */
   public _onAddClick(): void {
-    const newBoard: BoardVM = {
-      createdByName: 'You',
-      modByName: 'You',
-      createdDateTime: new Date(),
-      modDateTime: new Date(),
-      isNew: true,
-      editing: true
-    } as BoardVM;
-    this._boards.push(newBoard);
+    this._addEmptyBoard();
   }
 
   /**
@@ -84,5 +63,43 @@ export class BingoBoardAddEditComponent {
   public _onEditCancled(index: number): void {
     if (this._boards[index].isNew)
       this._boards.splice(index, 1);
+  }
+
+  private _addEmptyBoard(): void {
+    const newBoard: BoardVM = {
+      createdByName: 'You',
+      modByName: 'You',
+      createdDateTime: new Date(),
+      modDateTime: new Date(),
+      isNew: true,
+      editing: true
+    } as BoardVM;
+    this._boards.push(newBoard);
+  }
+
+  /**
+   * Fetches board data and then user data associated with those boards.
+   */
+  private async _getBoardData(): Promise<void> {
+    debugger;
+    const boards: BoardDto[] = await this._adminApi.getAllBoards();
+    if (!boards?.length) {
+      this._addEmptyBoard();
+      return;
+    }
+    const allUserIDs: { [id: string]: number; } = {};
+    boards.forEach(board => {
+      allUserIDs[board.createdBy] = board.createdBy;
+      allUserIDs[board.modBy] = board.modBy;
+    });
+    const users: UserDto[] =
+      await this._adminApi.getUsersByUserIDs(Object.values(allUserIDs));
+    const displayNamesById: Map<number, string> = new Map();
+    users.forEach(user => displayNamesById.set(user.userID, user.displayName));
+    this._boards = boards.map(boardDto => ({
+      ...boardDto,
+      createdByName: displayNamesById.get(boardDto.createdBy),
+      modByName: displayNamesById.get(boardDto.modBy)
+    } as BoardVM));
   }
 }
