@@ -12,6 +12,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
             result.BoardID = source.BoardID;
             result.Name = source.Name;
             result.Description = source.Description;
+            //result.TileCount = source.TileCount;
             //result.CreatedDateTime = source.CreatedDateTime;
             result.CreatedBy = source.CreatedBy;
             //result.ModDateTime = source.ModDateTime;
@@ -25,6 +26,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
             result.BoardID = source.BoardID;
             result.Name = source.Name;
             result.Description = source.Description;
+            result.TileCount = source.TileCount;
             result.CreatedDateTime = source.CreatedDateTime;
             result.CreatedBy = source.CreatedBy;
             result.ModDateTime = source.ModDateTime;

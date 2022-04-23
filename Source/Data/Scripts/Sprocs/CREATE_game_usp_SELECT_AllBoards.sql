@@ -16,6 +16,7 @@ BEGIN
 		[BoardID],
 		[Name],
 		[Description],
+		[TileCount],
 		[CreatedDateTime],
 		[CreatedBy],
 		[ModDateTime],

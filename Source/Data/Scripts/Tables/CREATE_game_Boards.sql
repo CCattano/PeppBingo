@@ -2,6 +2,7 @@ CREATE TABLE game.Boards(
 	BoardID int NOT NULL IDENTITY(1,1),
 	[Name] varchar(50) NOT NULL,
 	[Description] varchar(150) NOT NULL,
+	TileCount int NOT NULL CONSTRAINT D_Boards_TileCount DEFAULT(0),
 	CreatedDateTime datetime NOT NULL CONSTRAINT D_Boards_CreateDateTime DEFAULT(GETUTCDATE()),
 	CreatedBy int NOT NULL,
 	ModDateTime datetime NOT NULL CONSTRAINT D_Boards_ModDateTime DEFAULT(GETUTCDATE()),

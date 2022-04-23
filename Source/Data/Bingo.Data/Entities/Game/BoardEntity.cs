@@ -17,6 +17,10 @@ namespace Pepp.Web.Apps.Bingo.Data.Entities.Game
         /// </summary>
         public string Description;
         /// <summary>
+        /// Quantity of active tiles available for this board
+        /// </summary>
+        public string TileCount;
+        /// <summary>
         /// When the board was created
         /// </summary>
         public DateTime CreatedDateTime;
