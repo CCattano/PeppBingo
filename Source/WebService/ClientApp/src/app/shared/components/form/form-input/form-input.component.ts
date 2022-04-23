@@ -80,7 +80,6 @@ export class FormInputComponent implements OnInit, OnDestroy {
   }
 
   private _processControlError(): void {
-    console.log(this._control);
     const errName: string = Object.keys(this.control.errors)[0];
     switch (errName.toLowerCase()) {
       case 'required':

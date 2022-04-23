@@ -12,8 +12,8 @@
       <app-edit-board-card *ngIf="board.editing"
                            [board]="board"
                            [index]="i"
-                           (saveSuccess)="_onEditSaveSuccess()"
-                           (cancelClick)="_onEditCancled($event)">
+                           (saveSuccess)="_onSaveSuccess($event)"
+                           (cancelClick)="_onEditCancelClick($event)">
       </app-edit-board-card>
     </ng-container>
   </div>

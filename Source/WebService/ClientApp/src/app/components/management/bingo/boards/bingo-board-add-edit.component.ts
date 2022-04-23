@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { faPlusCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { AdminApi } from '../../../../shared/api/admin.api';
+import { UserApi } from '../../../../shared/api/user.api';
 import { BoardDto } from '../../../../shared/dtos/board.dto';
 import { UserDto } from '../../../../shared/dtos/user.dto';
 import { BoardVM } from './viewmodels/board.viewmodel';
@@ -23,6 +24,11 @@ export class BingoBoardAddEditComponent implements OnInit {
    */
   public _boards: BoardVM[] = [];
 
+  /**
+   * A map that contains user's display names by their userID
+   */
+  private _displayNamesById: Map<number, string> = new Map();
+
   constructor(private _adminApi: AdminApi) {
   }
 
@@ -43,10 +49,25 @@ export class BingoBoardAddEditComponent implements OnInit {
   /**
    * Event handler for when changes to a board are successfully made
    *
-   * If all boards are in a non-editing state then the boards are
-   * sorted alphabetically by name
    */
-  public _onEditSaveSuccess(): void {
+  public async _onSaveSuccess(index: number): Promise<void> {
+    const changedBoard: BoardVM = this._boards[index];
+
+    const usersToFetch: { [id: string]: number; } = {};
+    if (!this._displayNamesById.has(changedBoard.createdBy))
+      usersToFetch[changedBoard.createdBy] = changedBoard.createdBy;
+    if (!this._displayNamesById.has(changedBoard.modBy))
+      usersToFetch[changedBoard.modBy] = changedBoard.modBy;
+
+    if (Object.keys(usersToFetch).length) {
+      const users: UserDto[] =
+        await this._adminApi.getUsersByUserIDs(Object.values(usersToFetch));
+      users.forEach(user => this._displayNamesById.set(user.userID, user.displayName));
+    }
+
+    changedBoard.createdByName = this._displayNamesById.get(changedBoard.createdBy);
+    changedBoard.modByName = this._displayNamesById.get(changedBoard.modBy);
+
     if (this._boards.every(board => !board.editing))
       this._boards = this._boards.sort((a, b) => a.name > b.name ? 1 : -1);
   }
@@ -60,7 +81,7 @@ export class BingoBoardAddEditComponent implements OnInit {
    * If it was it is removed from the array of boards in the template
    * @param index
    */
-  public _onEditCancled(index: number): void {
+  public _onEditCancelClick(index: number): void {
     if (this._boards[index].isNew)
       this._boards.splice(index, 1);
   }
@@ -81,7 +102,6 @@ export class BingoBoardAddEditComponent implements OnInit {
    * Fetches board data and then user data associated with those boards.
    */
   private async _getBoardData(): Promise<void> {
-    debugger;
     const boards: BoardDto[] = await this._adminApi.getAllBoards();
     if (!boards?.length) {
       this._addEmptyBoard();
@@ -94,12 +114,11 @@ export class BingoBoardAddEditComponent implements OnInit {
     });
     const users: UserDto[] =
       await this._adminApi.getUsersByUserIDs(Object.values(allUserIDs));
-    const displayNamesById: Map<number, string> = new Map();
-    users.forEach(user => displayNamesById.set(user.userID, user.displayName));
+    users.forEach(user => this._displayNamesById.set(user.userID, user.displayName));
     this._boards = boards.map(boardDto => ({
       ...boardDto,
-      createdByName: displayNamesById.get(boardDto.createdBy),
-      modByName: displayNamesById.get(boardDto.modBy)
+      createdByName: this._displayNamesById.get(boardDto.createdBy),
+      modByName: this._displayNamesById.get(boardDto.modBy)
     } as BoardVM));
   }
 }

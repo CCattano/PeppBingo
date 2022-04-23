@@ -8,7 +8,7 @@ import { AdminAuthGuard } from './shared/middleware/authguards/admin.authguard';
 import { CommonAuthGuard } from './shared/middleware/authguards/common.authguard';
 
 const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: "dashboard" },
+  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
   { path: 'dashboard', component: DashboardComponent, pathMatch: 'full', canActivate: [CommonAuthGuard] },
   { path: 'login', component: LoginComponent, pathMatch: 'full', canActivate: [CommonAuthGuard] },
   { path: 'admin/mods/add-edit', pathMatch: 'full', component: AddEditAdminComponent, canActivate: [AdminAuthGuard] },

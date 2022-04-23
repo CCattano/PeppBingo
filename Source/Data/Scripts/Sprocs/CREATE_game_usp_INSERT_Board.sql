@@ -9,8 +9,8 @@ GO
 -- =============================================
 CREATE PROCEDURE game.usp_INSERT_Board
 	@BoardID int OUTPUT,
-	@Name varchar,
-	@Description varchar,
+	@Name varchar(50),
+	@Description varchar(150),
 	@CreatedBy int,
 	@ModBy int
 AS

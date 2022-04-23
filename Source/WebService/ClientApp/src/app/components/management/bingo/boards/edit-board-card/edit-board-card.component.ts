@@ -2,6 +2,10 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { BoardVM } from '../viewmodels/board.viewmodel';
 import { EditBoardForm } from './edit-board.form';
 import { faSave, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { AdminApi } from '../../../../../shared/api/admin.api';
+import { BoardDto } from '../../../../../shared/dtos/board.dto';
+import { TokenService } from '../../../../../shared/service/token.service';
+import { ToastService } from '../../../../../shared/service/toast.service';
 
 @Component({
   selector: 'app-edit-board-card',
@@ -33,7 +37,7 @@ export class EditBoardCardComponent implements OnInit {
    * Event that emits when a save has been made successfully
    */
   @Output()
-  public readonly saveSuccess: EventEmitter<void> = new EventEmitter<void>();
+  public readonly saveSuccess: EventEmitter<number> = new EventEmitter<number>();
 
   /**
    * The form that holds all user changes made until saved of discarded
@@ -48,6 +52,12 @@ export class EditBoardCardComponent implements OnInit {
     'faTrash': faTrash
   };
 
+  constructor(
+    private _adminApi: AdminApi,
+    private _toastService: ToastService
+  ) {
+  }
+
   /**
    * @inheritdoc
    */
@@ -59,19 +69,33 @@ export class EditBoardCardComponent implements OnInit {
   /**
    * Event handler for the Save click event
    */
-  public _onSaveClick(): void {
+  public async _onSaveClick(): Promise<void> {
     if (!this._boardForm.form.valid) {
       this._boardForm.form.markAllAsTouched();
       return;
     }
     if (this._boardForm.form.pristine) return;
-    console.log('save changes goes here');
-    this.board.name = this._boardForm.controls.name.value;
-    this.board.description = this._boardForm.controls.description.value;
+    let newBoard: BoardDto;
+    if (this.board.isNew) {
+      const boardToCreate: BoardDto = new BoardDto();
+      boardToCreate.name = this._boardForm.controls.name.value;
+      boardToCreate.description = this._boardForm.controls.description.value;
+      newBoard = await this._adminApi.createNewBoard(boardToCreate).catch(() => {
+        this._toastService.showDangerToast({
+          header: 'An Error Occurred!',
+          body: 'We couldn\'t create your board. Please try again.',
+          ttlMs: 3000
+        });
+        return null;
+      });
+    } else {
+      // perform save changes
+    }
+    if (!newBoard) return;
+    Object.keys(newBoard).forEach((key: string) => (this.board as any)[key] = (newBoard as any)[key]);
     this.board.isNew = false;
     this.board.editing = false;
-    this.saveSuccess.emit();
-    console.log('test');
+    this.saveSuccess.emit(this.index);
   }
 
   /**

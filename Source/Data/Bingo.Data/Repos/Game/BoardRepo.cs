@@ -1,4 +1,5 @@
 ﻿using Pepp.Web.Apps.Bingo.Data.Entities.Game;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -65,6 +66,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
 
             int newPrimaryKey = await base.CreateWithPrimaryKey(Sprocs.InsertBoard, @params);
             board.BoardID = newPrimaryKey;
+            board.CreatedDateTime = board.ModDateTime = DateTime.UtcNow;
         }
 
         public async Task<List<BoardEntity>> GetAllBoards()

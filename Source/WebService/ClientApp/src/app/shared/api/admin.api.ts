@@ -25,7 +25,7 @@ export class AdminApi {
  */
   public async getUsersByUserIDs(userIDs: number[]): Promise<UserDto[]> {
     const path: string = 'Admin/GetUsersByIDs';
-    const queryParam: string = userIDs.map(id => `userID=${id}`).join('&');
+    const queryParam: string = userIDs.map(id => `userIDs=${id}`).join('&');
     return await this._http.get<UserDto[]>(`${path}?${queryParam}`).toPromise();
   }
 
@@ -61,6 +61,14 @@ export class AdminApi {
    */
   public async getAllBoards(): Promise<BoardDto[]> {
     return await this._http.get<BoardDto[]>('Admin/Boards').toPromise();
+  }
+
+  /**
+   * Create a new bingo board
+   * @param board
+   */
+  public async createNewBoard(board: BoardDto): Promise<BoardDto> {
+    return await this._http.post<BoardDto>('Admin/CreateBoard', board).toPromise();
   }
 
   //#endregion

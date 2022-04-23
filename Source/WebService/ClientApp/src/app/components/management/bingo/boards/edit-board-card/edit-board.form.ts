@@ -33,9 +33,6 @@ export class EditBoardForm {
    */
   public getFirstErrorForCtrl(formCtrl: FormControl): string {
     const response: string = Object.values(formCtrl?.errors ?? {})?.[0];
-    console.log(formCtrl);
-    console.log('Returning');
-    console.log(response);
     return response;
   }
 }

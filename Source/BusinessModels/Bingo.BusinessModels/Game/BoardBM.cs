@@ -16,34 +16,34 @@ namespace Pepp.Web.Apps.Bingo.BusinessModels.Game
         /// <summary>
         /// The internal ID that represent this bingo board
         /// </summary>
-        public int BoardID;
+        public int BoardID { get; set; }
         /// <summary>
         /// The name of the bingo board
         /// </summary>
-        public string Name;
+        public string Name { get; set; }
         /// <summary>
         /// A brief dsescription about the bingo board
         /// </summary>
-        public string Description;
+        public string Description { get; set; }
         /// <summary>
         /// Quantity of active tiles available for this board
         /// </summary>
-        public int TileCount;
+        public int TileCount { get; set; }
         /// <summary>
         /// When the board was created
         /// </summary>
-        public DateTime CreatedDateTime;
+        public DateTime CreatedDateTime { get; set; }
         /// <summary>
         /// The UserID of who created the board
         /// </summary>
-        public int CreatedBy;
+        public int CreatedBy { get; set; }
         /// <summary>
         /// When details about the bingo board were last edited
         /// </summary>
-        public DateTime ModDateTime;
+        public DateTime ModDateTime { get; set; }
         /// <summary>
         /// Who last edited details about the bingo board
         /// </summary>
-        public int ModBy;
+        public int ModBy { get; set; }
     }
 }

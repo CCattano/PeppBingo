@@ -87,7 +87,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task<List<UserBE>> GetUsers(List<int> userIDs)
         {
             List<UserBE> userBEs = await _facade.GetUsers(userIDs);
-            if (userBEs.Count != userIDs.Count)
+            if ((userBEs?.Count ?? 0) != (userIDs?.Count ?? 0))
                 throw new WebException(HttpStatusCode.BadRequest, "Not all users were found for the IDs provided");
             return userBEs;
         }
