@@ -23,8 +23,17 @@
           <li class="nav-item">
             <a class="nav-link" href="#">Leaderboard</a>
           </li>
-          <li *ngIf="_user.isAdmin" class="nav-item">
-            <a class="nav-link" routerLink="admin/add-edit" routerLinkActive="active">Admin</a>
+          <li *ngIf="_user.isAdmin" class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Admin
+            </a>
+            <ul class="dropdown-menu dark-dropdown" aria-labelledby="adminDropdown">
+              <li><a class="dropdown-item" routerLink="admin/add-edit">Moderators</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item">Bingo Boards</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item">Live Controls</a></li>
+            </ul>
           </li>
         </ul>
       </div>

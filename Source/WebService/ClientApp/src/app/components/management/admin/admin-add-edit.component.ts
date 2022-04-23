@@ -3,7 +3,7 @@ import { faMinusCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { BehaviorSubject, Observable, of, Subscription } from 'rxjs';
 import { debounceTime, filter, map, switchMap, tap } from 'rxjs/operators';
-import { UserApi } from '../../../shared/api/user.api';
+import { AdminApi } from '../../../shared/api/admin.api';
 import { UserDto } from '../../../shared/dtos/user.dto';
 import { ToastService } from '../../../shared/service/toast.service';
 import { UserSearchResultVM } from './viewmodels/user-search-result.viewmodel';
@@ -50,7 +50,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
   //#enregion
 
   constructor(
-    private _userApi: UserApi,
+    private _adminApi: AdminApi,
     private _modalService: NgbModal,
     private _toastService: ToastService) {
   }
@@ -62,7 +62,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
    */
   public async ngOnInit(): Promise<void> {
     this._inputChangeSubscription = this._initInputValueChangePipeline().subscribe();
-    this._admins = await this._userApi.getAdmins();
+    this._admins = await this._adminApi.getAdmins();
   }
 
   /**
@@ -109,7 +109,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
         return shouldContinue;
       }),
       switchMap((searchTerm: string) => of(null).pipe(
-        switchMap(() => this._userApi.searchUsersByName(searchTerm).catch(() => [])),
+        switchMap(() => this._adminApi.searchUsersByName(searchTerm).catch(() => [])),
         map((users: UserDto[]) => users?.filter(user => !user.isAdmin) ?? []),
         map((users: UserDto[]) => [searchTerm, users] as [string, UserDto[]])
       )),
@@ -144,7 +144,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     this._userModalData = this._admins[index];
     const affirmativeAction =
       async () =>
-        await this._userApi.revokeAdminPermissionForUser(this._admins[index].userID)
+        await this._adminApi.revokeAdminPermissionForUser(this._admins[index].userID)
           .then(() => {
             this._admins.splice(index, 1);
             this._toastService.showSuccessToast({
@@ -170,7 +170,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
     const affirmativeAction =
       async () =>
-        await this._userApi.GrantAdminPermissionForUser(this._userModalData.userID)
+        await this._adminApi.GrantAdminPermissionForUser(this._userModalData.userID)
           .then(() => {
             this._admins.push(this._userModalData);
             this._toastService.showSuccessToast({

@@ -1,5 +1,6 @@
 @import "bootstrap/scss/functions";
 @import "bootstrap/scss/variables";
+@import "../../../../styles.scss";
 
 .navBorder {
   border-bottom: 1px solid $light
@@ -13,4 +14,19 @@
 .mobileUserDetails {
   border-top: .125rem solid $light;
   border-bottom: .125rem solid $light;
+}
+
+.dropdown-menu {
+  background-color: $dark;
+  color: $light;
+  border-color: $light;
+
+  .dropdown-item {
+    color: $light;
+
+    &:hover {
+      background-color: $dark;
+      color: $bonani;
+    }
+  }
 }
