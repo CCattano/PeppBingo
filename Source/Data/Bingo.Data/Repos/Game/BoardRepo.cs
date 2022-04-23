@@ -51,21 +51,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
                 },
                 new SqlParameter()
                 {
-                    ParameterName = $"@{nameof(BoardEntity.CreatedDateTime)}",
-                    SqlDbType = SqlDbType.DateTime,
-                    Value = board.CreatedDateTime
-                },
-                new SqlParameter()
-                {
                     ParameterName = $"@{nameof(BoardEntity.CreatedBy)}",
                     SqlDbType = SqlDbType.Int,
                     Value = board.CreatedBy
-                },
-                new SqlParameter()
-                {
-                    ParameterName = $"@{nameof(BoardEntity.ModDateTime)}",
-                    SqlDbType = SqlDbType.DateTime,
-                    Value = board.ModDateTime
                 },
                 new SqlParameter()
                 {

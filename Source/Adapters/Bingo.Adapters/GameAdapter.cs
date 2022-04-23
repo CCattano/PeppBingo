@@ -11,6 +11,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
     public interface IGameAdapter
     {
         /// <summary>
+        /// Create a new Bingo board that can contain tiles
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="newBoard"></param>
+        /// <returns></returns>
+        Task<BoardBE> CreateBoard(int userID, BoardBE newBoard);
+        /// <summary>
         /// Fetches all board maintained by admins in the application
         /// </summary>
         /// <returns></returns>
@@ -28,6 +35,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             List<BoardBE> boardBEs = await _facade.GetAllBoards();
             return boardBEs;
+        }
+
+        public async Task<BoardBE> CreateBoard(int userID, BoardBE newBoard)
+        {
+            newBoard.CreatedBy = newBoard.ModBy = userID;
+            BoardBE boardBE = await _facade.CreateBoard(newBoard);
+            return boardBE;
         }
     }
 }

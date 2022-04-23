@@ -11,20 +11,18 @@ CREATE PROCEDURE game.usp_INSERT_Board
 	@BoardID int OUTPUT,
 	@Name varchar,
 	@Description varchar,
-	@CreatedDateTime datetime,
 	@CreatedBy int,
-	@ModDateTime datetime,
 	@ModBy int
 AS
-BEGIN	
+BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 
 		INSERT INTO
 			[game].[Boards]
-			([Name], [Description], [CreatedDateTime], [CreatedBy], [ModDateTime], [ModBy])
+			([Name], [Description], [CreatedBy], [ModBy])
 		VALUES
-			(@Name, @Description, @CreatedDateTime, @CreatedBy, @ModDateTime, @ModBy);
+			(@Name, @Description, @CreatedBy, @ModBy);
 
 		COMMIT TRANSACTION
 

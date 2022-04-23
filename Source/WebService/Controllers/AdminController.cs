@@ -24,8 +24,8 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 
         public AdminController
         (
-            IMapper mapper, 
-            IUserAdapter userAdapter, 
+            IMapper mapper,
+            IUserAdapter userAdapter,
             IGameAdapter gameAdapter
         )
         {
@@ -97,6 +97,19 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             List<BoardBE> boardBEs = await _gameAdapter.GetAllBoards();
             List<BoardBM> boardBMs = boardBEs?.Select(board => _mapper.Map<BoardBM>(board)).ToList();
             return boardBMs;
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BoardBM>> CreateBoard([FromBody] BoardBM newBoard)
+        {
+            string token = base.TryGetAccessTokenFromRequestHeader();
+            UserBE requestingUser = await _userAdapter.GetUser(token);
+            if (!requestingUser.IsAdmin)
+                throw new WebException(HttpStatusCode.Forbidden, "Non-Administrators cannot create new Boards");
+            BoardBE newBoardBE = _mapper.Map<BoardBE>(newBoard);
+            BoardBE boardBE = await _gameAdapter.CreateBoard(requestingUser.UserID, newBoardBE);
+            BoardBM boardBM = _mapper.Map<BoardBM>(boardBE);
+            return boardBM;
         }
 
         #endregion

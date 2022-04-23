@@ -15,6 +15,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
     public interface IGameFacade
     {
         /// <summary>
+        /// Inserts board data into the Boards table
+        /// </summary>
+        /// <param name="newBoard"></param>
+        /// <returns></returns>
+        Task<BoardBE> CreateBoard(BoardBE newBoard);
+        /// <summary>
         /// Fetches all board maintained by admins in the application
         /// </summary>
         /// <returns></returns>
@@ -31,6 +37,14 @@ namespace Pepp.Web.Apps.Bingo.Facades
         {
             _mapper = mapper;
             _dataSvc = dataSvc;
+        }
+
+        public async Task<BoardBE> CreateBoard(BoardBE newBoard)
+        {
+            BoardEntity boardEntity = _mapper.Map<BoardEntity>(newBoard);
+            await _dataSvc.Game.BoardRepo.InsertBoard(boardEntity);
+            BoardBE boardBE = _mapper.Map<BoardBE>(boardEntity);
+            return boardBE;
         }
 
         public async Task<List<BoardBE>> GetAllBoards()
