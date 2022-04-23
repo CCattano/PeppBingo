@@ -55,20 +55,25 @@ namespace Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation
             IEnumerable<Type> controllerClasses = Assembly
                 .GetExecutingAssembly()
                 .GetTypes()
-                .Where(type => type.Namespace.StartsWith("Pepp") && type.Name.Contains("Controller"));
+                .Where(type => 
+                    type.Namespace.StartsWith("Pepp") 
+                    && type.Name.Contains("Controller") 
+                    && !type.Name.Contains("Base"));
 
             foreach (Type ctrlClass in controllerClasses)
             {
+                TokenRequired tokenAttr = (TokenRequired)Attribute.GetCustomAttribute(ctrlClass, typeof(TokenRequired));
+
                 List<MethodInfo> methods = ctrlClass.GetMethods().ToList();
-                methods.RemoveAll(method => method.DeclaringType.Namespace.StartsWith("Microsoft"));
+                methods.RemoveAll(method => !method.DeclaringType.Namespace.StartsWith("Pepp") || !method.IsPublic);
 
                 foreach (MemberInfo method in methods)
                 {
-                    TokenRequired tokenAttr = (TokenRequired)Attribute.GetCustomAttribute(method, typeof(TokenRequired));
+                    tokenAttr ??= (TokenRequired)Attribute.GetCustomAttribute(method, typeof(TokenRequired));
                     if (tokenAttr != null)
                     {
                         string path = ctrlClass.Name[..ctrlClass.Name.IndexOf("Controller")];
-                        PathsToInclude.Add($"^/{path}/{tokenAttr.EndpointName}$");
+                        PathsToInclude.Add($"^/{path}/{tokenAttr.EndpointName ?? method.Name}$");
                     }
                 }
             }

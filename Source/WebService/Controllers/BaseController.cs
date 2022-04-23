@@ -7,12 +7,16 @@ using System.Linq;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 {
-    public abstract class BaseController<TAdapter> : Controller
+    public abstract class BaseController<TAdapter> : BaseController
     {
         protected readonly TAdapter Adapter;
-        protected string BaseUri => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
 
-        public BaseController(TAdapter adapter) => Adapter = adapter;
+        protected BaseController(TAdapter adapter) : base() => Adapter = adapter;
+    }
+
+    public abstract class BaseController : Controller
+    {
+        protected string BaseUri => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
 
         protected string TryGetAccessTokenFromRequestHeader() =>
             HttpContext.Request.Headers.TryGetValue(TokenManager.AccessJWTCookieName, out StringValues headerVal)

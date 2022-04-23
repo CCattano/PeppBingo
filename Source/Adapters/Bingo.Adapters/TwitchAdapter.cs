@@ -30,6 +30,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         Task<string> RefreshAccessTokenForUser(string obsoleteToken);
     }
 
+    /// <inheritdoc cref="ITwitchAdapter"/>
     public class TwitchAdapter : ITwitchAdapter
     {
         private readonly IMapper _mapper;

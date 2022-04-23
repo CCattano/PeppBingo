@@ -45,6 +45,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #region ADAPTERS
             services.AddScoped<ITwitchAdapter, TwitchAdapter>();
             services.AddScoped<IUserAdapter, UserAdapter>();
+            services.AddScoped<IGameAdapter, GameAdapter>();
             #endregion
 
             #region MANAGERS
@@ -54,6 +55,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #region FACADES
             services.AddScoped<ITwitchFacade, TwitchFacade>();
             services.AddScoped<IUserFacade, UserFacade>();
+            services.AddScoped<IGameFacade, GameFacade>();
             #endregion
 
             #region CACHES
@@ -62,7 +64,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #endregion
 
             #region SERVICES
-            services.AddPracticeAPIDataService(Configuration.GetConnectionString(ConnStrings.PeppBingo));
+            services.AddBingoDataService(Configuration.GetConnectionString(ConnStrings.PeppBingo));
             #endregion
 
             #region CLIENTS
@@ -163,7 +165,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 if (env.IsDevelopment())
                 {
                     //spa.UseAngularCliServer(npmScript: "start");
-                    spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
+                    //spa.UseProxyToSpaDevelopmentServer("http://localhost:4200");
                 }
             });
         }

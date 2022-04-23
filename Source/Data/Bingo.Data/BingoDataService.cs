@@ -54,7 +54,7 @@ namespace Pepp.Web.Apps.Bingo.Data
         ///     The connection string used by the
         ///     data service to connect to the database
         /// </param>
-        public static void AddPracticeAPIDataService(this IServiceCollection services, string connStr) =>
+        public static void AddBingoDataService(this IServiceCollection services, string connStr) =>
             services.AddScoped<IBingoDataService, BingoDataService>(_ => new BingoDataService(connStr));
     }
 }
