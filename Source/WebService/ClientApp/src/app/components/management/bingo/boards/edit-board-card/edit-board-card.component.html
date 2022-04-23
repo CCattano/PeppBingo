@@ -1,0 +1,50 @@
+<div class="card text-light bg-dark border-light mb-3">
+  <div class="card-header border-light">
+    <span class="float-start">
+      <form-input [control]="_boardForm.controls.name"
+                  label="Board Name"
+                  placeholder="Bingo Board Name">
+      </form-input>
+    </span>
+    <span class="float-end mt-2 me-2">
+      <fa-icon [icon]="icons.faSave"
+               class="pointer text-success fs-2"
+               ngbTooltip="Save Changes"
+               placement="auto"
+               (click)="_onSaveClick()">
+      </fa-icon>
+      <fa-icon [icon]="icons.faTrash"
+               class="pointer text-danger fs-2 ms-4"
+               ngbTooltip="Discard Changes"
+               placement="auto"
+               (click)="_onCancelClick()">
+      </fa-icon>
+    </span>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-12 mb-2">
+        <form-input [control]="_boardForm.controls.description"
+                    label="Description"
+                    placeholder="Bingo Board Description">
+        </form-input>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12 detail-container">
+        <label class="detail-label">Created</label>
+        <label class="detail-value">{{board.createdDateTime | date:'short'}}</label>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12 detail-container">
+        <label class="detail-label">Created By</label>
+        <label class="detail-value">{{board.createdByName}}</label>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12 detail-container">
+        <label class="detail-label">Modified</label>
+        <label class="detail-value">{{board.modDateTime | date:'short'}}</label>
+      </div>
+      <div class="col-lg-3 col-sm-6 col-12 detail-container">
+        <label class="detail-label">Modified By</label>
+        <label class="detail-value">{{board.modByName}}</label>
+      </div>
+    </div>
+  </div>
+</div>

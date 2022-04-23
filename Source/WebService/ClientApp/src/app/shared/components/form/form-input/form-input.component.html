@@ -1,0 +1,8 @@
+<label for="formCtrl" class="form-label form-label-sm">{{label}}</label>
+<input id="formCtrl"
+       class="form-control form-control-sm"
+       [formControl]="control"
+       [placeholder]="placeholder" />
+<div *ngIf="control.touched && !control.valid" class="error">
+  {{_errorMsg}}
+</div>

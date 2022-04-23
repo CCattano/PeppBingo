@@ -4,3 +4,13 @@
 @import '~bootstrap/scss/bootstrap';
 
 $bonani: #fed800;
+
+.popover-dark {
+  border-color: $light !important;
+
+  & > .popover-header, .popover-body {
+    color: $light !important;
+    background-color: $dark !important;
+    border-color: $light !important;
+  }
+}

@@ -1,5 +1,6 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { APP_INITIALIZER, NgModule, Provider } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
@@ -7,6 +8,10 @@ import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
+import { BingoBoardAddEditComponent } from './components/management/bingo/boards/bingo-board-add-edit.component';
+import { BoardCardComponent } from './components/management/bingo/boards/board-card/board-card.component';
+import { EditBoardCardComponent } from './components/management/bingo/boards/edit-board-card/edit-board-card.component';
+import { FormInputComponent } from './shared/components/form/form-input/form-input.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { ToastContainerComponent } from './shared/components/toast/toast-container.component';
@@ -30,12 +35,16 @@ const appInitializers: Provider = [
     LoginComponent,
     DashboardComponent,
     AddEditAdminComponent,
+    BingoBoardAddEditComponent,
+    BoardCardComponent,
+    EditBoardCardComponent,
     //#endregion
 
     //#region SHARED COMPONENTS
     LayoutComponent,
     NavMenuComponent,
     ToastContainerComponent,
+    FormInputComponent,
     //#endregion
 
     //#region SHARED PIPES
@@ -47,7 +56,8 @@ const appInitializers: Provider = [
     AppRoutingModule,
     HttpClientModule,
     FontAwesomeModule,
-    NgbModule
+    NgbModule,
+    ReactiveFormsModule
   ],
   providers: [
     //#region Interceptors

@@ -1,0 +1,84 @@
+<div class="card text-light bg-dark border-light mb-3">
+  <h5 class="card-header border-light">
+    <span class="float-start pt-1">
+      <span>{{board.name}}</span>
+      <fa-icon [icon]="icons.faEdit"
+               class="pointer fs-6 ms-2"
+               ngbTooltip="Edit Board Details"
+               placement="auto"
+               (click)="_onEditBoardClick()">
+      </fa-icon>
+    </span>
+    <span class="float-end">
+      <span>{{board.tileCount}} Tile{{board.tileCount === 1 ? '' : 's'}}</span>
+      <fa-icon [icon]="icons.faArrowCircleRight"
+               class="pointer fs-4 ms-2"
+               ngbTooltip="Edit Board Tiles"
+               placement="auto">
+      </fa-icon>
+    </span>
+  </h5>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-sm-11 col-12">
+        <div class="row">
+          <div class="col-12 mb-2">
+            <div class="detail-container">
+              <label class="detail-label">Description</label>
+              <label class="detail-value">{{board.description}}</label>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12 detail-container">
+            <label class="detail-label">Created</label>
+            <label class="detail-value">{{board.createdDateTime | date:'short'}}</label>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12 detail-container">
+            <label class="detail-label">Created By</label>
+            <label class="detail-value">{{board.createdByName}}</label>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12 detail-container">
+            <label class="detail-label">Modified</label>
+            <label class="detail-value">{{board.modDateTime | date:'short'}}</label>
+          </div>
+          <div class="col-lg-3 col-sm-6 col-12 detail-container">
+            <label class="detail-label">Modified By</label>
+            <label class="detail-value">{{board.modByName}}</label>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-1 col-12 align-self-end text-end">
+        <fa-icon [icon]="icons.faTrash"
+                 class="pointer text-danger fs-4 ms-2"
+                 popoverTitle="Delete Board?"
+                 ngbPopover="You will be prompted to confirm this action"
+                 popoverClass="popover-dark"
+                 container="body"
+                 triggers="mouseenter:mouseleave"
+                 (click)="_onDeleteBoardClick(confirmRemoveBoard)">
+        </fa-icon>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Add/Remove Confirmation Modals -->
+<ng-template #confirmRemoveBoard let-modal>
+  <div class="modal-header bg-danger text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Delete Board?</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>
+      Are you sure you want to permanently delete the
+      <strong><u>{{board.name}}</u></strong> board?
+      <br />
+      <br />
+      This is a <strong><u>permanent</u></strong> and <strong><u>irreversible</u></strong> action.
+      <br />
+      <br />
+      The board will have to be rebuilt from scratch if you want it back.
+    </label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-danger" (click)="modal.close(true)">Remove</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.close(false)">Cancel</button>
+  </div>
+</ng-template>

@@ -18,7 +18,6 @@ export class AdminAuthGuard implements CanActivate {
   }
 
   public async canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Promise<boolean> {
-    //Check if token exists
     if (this._tokenSvc.haveToken) {
       if (this._tokenSvc.tokenIsExpired) {
         await this._twitchApi.refreshToken();

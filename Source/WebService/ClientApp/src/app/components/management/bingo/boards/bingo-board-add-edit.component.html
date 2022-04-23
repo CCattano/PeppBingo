@@ -1,0 +1,20 @@
+<div class="d-flex flex-column justify-content-around">
+  <h4 class="pointer text-end" (click)="_onAddClick()">
+    Add
+    <fa-icon [icon]="icons.faPlusCircle"
+             class="text-success fs-4"
+             >
+    </fa-icon>
+  </h4>
+  <div>
+    <ng-container *ngFor="let board of _boards; let i = index;">
+      <app-board-card *ngIf="!board.editing" [board]="board"></app-board-card>
+      <app-edit-board-card *ngIf="board.editing"
+                           [board]="board"
+                           [index]="i"
+                           (saveSuccess)="_onEditSaveSuccess()"
+                           (cancelClick)="_onEditCancled($event)">
+      </app-edit-board-card>
+    </ng-container>
+  </div>
+</div>
