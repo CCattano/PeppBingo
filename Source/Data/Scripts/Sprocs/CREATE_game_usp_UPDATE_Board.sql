@@ -22,6 +22,7 @@ BEGIN
 		SET
 			[Name] = @Name,
 			[Description] = @Description,
+			[ModDateTime] = GETUTCDATE(),
 			[ModBy] = @ModBy
 		WHERE
 			BoardID = @BoardID;

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { tap } from 'rxjs/operators';
 import { BoardDto } from '../dtos/board.dto';
 import { UserDto } from '../dtos/user.dto';
 
@@ -56,21 +57,41 @@ export class AdminApi {
 
   //#region Admin Game Data Endpoints
 
-  /**
-   * Get all bingo board metadata for all boards maintained in the application
-   */
-  public async getAllBoards(): Promise<BoardDto[]> {
-    return await this._http.get<BoardDto[]>('Admin/Boards').toPromise();
-  }
 
   /**
    * Create a new bingo board
    * @param board
    */
   public async createNewBoard(board: BoardDto): Promise<BoardDto> {
-    return await this._http.post<BoardDto>('Admin/CreateBoard', board).toPromise();
+    return await this._http.post<BoardDto>('Admin/CreateBoard', board)
+      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .toPromise();
   }
 
+  /**
+   * Get all bingo board metadata for all boards maintained in the application
+   */
+  public async getAllBoards(): Promise<BoardDto[]> {
+    return await this._http.get<BoardDto[]>('Admin/Boards')
+      .pipe(tap(boards => boards?.forEach(board => this._convertDateStringsToDates(board))))
+      .toPromise();
+  }
+
+  /**
+   * Updates and existing board with new information
+   * @param board
+   */
+  public async updateBoard(board: BoardDto): Promise<BoardDto> {
+    return await this._http.put<BoardDto>('Admin/UpdateBoard', board)
+      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .toPromise();
+  }
+
+  private _convertDateStringsToDates(board: BoardDto): void {
+    if (!board) return;
+    board.createdDateTime = new Date((board.createdDateTime as any as string).endsWith('Z') ? board.createdDateTime : board.createdDateTime + 'Z');
+    board.modDateTime = new Date((board.modDateTime as any as string).endsWith('Z') ? board.modDateTime : board.modDateTime + 'Z');
+  }
   //#endregion
 }
 

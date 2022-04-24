@@ -90,8 +90,8 @@ export class BingoBoardAddEditComponent implements OnInit {
     const newBoard: BoardVM = {
       createdByName: 'You',
       modByName: 'You',
-      createdDateTime: new Date(),
-      modDateTime: new Date(),
+      createdDateTime: new Date(new Date().toISOString()),
+      modDateTime: new Date(new Date().toISOString()),
       isNew: true,
       editing: true
     } as BoardVM;

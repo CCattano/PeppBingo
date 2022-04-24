@@ -31,7 +31,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 col-12 detail-container">
         <label class="detail-label">Created</label>
-        <label class="detail-value">{{board.createdDateTime.toLocaleString() + 'Z' | date:'short'}}</label>
+        <label class="detail-value">{{board.createdDateTime | date:'short'}}</label>
       </div>
       <div class="col-lg-3 col-sm-6 col-12 detail-container">
         <label class="detail-label">Created By</label>
@@ -39,7 +39,7 @@
       </div>
       <div class="col-lg-3 col-sm-6 col-12 detail-container">
         <label class="detail-label">Modified</label>
-        <label class="detail-value">{{board.modDateTime.toLocaleString() + 'Z' | date:'short'}}</label>
+        <label class="detail-value">{{board.modDateTime | date:'short'}}</label>
       </div>
       <div class="col-lg-3 col-sm-6 col-12 detail-container">
         <label class="detail-label">Modified By</label>

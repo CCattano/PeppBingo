@@ -80,16 +80,14 @@ export class EditBoardCardComponent implements OnInit {
       const boardToCreate: BoardDto = new BoardDto();
       boardToCreate.name = this._boardForm.controls.name.value;
       boardToCreate.description = this._boardForm.controls.description.value;
-      newBoard = await this._adminApi.createNewBoard(boardToCreate).catch(() => {
-        this._toastService.showDangerToast({
-          header: 'An Error Occurred!',
-          body: 'We couldn\'t create your board. Please try again.',
-          ttlMs: 3000
-        });
-        return null;
-      });
+      newBoard = await this._createBoard(boardToCreate);
     } else {
-      // perform save changes
+      const boardToUpdate: BoardDto = {
+        ...this.board,
+        name: this._boardForm.controls.name.value,
+        description: this._boardForm.controls.description.value
+      };
+      newBoard = await this._updateBoard(boardToUpdate);
     }
     if (!newBoard) return;
     Object.keys(newBoard).forEach((key: string) => (this.board as any)[key] = (newBoard as any)[key]);
@@ -104,5 +102,27 @@ export class EditBoardCardComponent implements OnInit {
   public _onCancelClick(): void {
     this.board.editing = false;
     this.cancelClick.emit(this.index);
+  }
+
+  private async _createBoard(board: BoardDto): Promise<BoardDto> {
+    return await this._adminApi.createNewBoard(board).catch(() => {
+      this._toastService.showDangerToast({
+        header: 'An Error Occurred!',
+        body: 'We couldn\'t create your board. Please try again.',
+        ttlMs: 3000
+      });
+      return null;
+    });
+  }
+
+  private async _updateBoard(board: BoardDto): Promise<BoardDto> {
+    return await this._adminApi.updateBoard(board).catch(() => {
+      this._toastService.showDangerToast({
+        header: 'An Error Occurred!',
+        body: 'We couldn\'t update this board. Please try again.',
+        ttlMs: 3000
+      });
+      return null;
+    });
   }
 }
