@@ -24,6 +24,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.15.3",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@ng-bootstrap/ng-bootstrap": "^10.0.0",
+    "@nth-cloud/ng-toggle": "^8.0.2",
     "bootstrap": "^5.1.3",
     "rxjs": "~6.6.0",
     "tslib": "^2.3.0",

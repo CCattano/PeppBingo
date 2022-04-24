@@ -9,7 +9,7 @@
                (click)="_onEditBoardClick()">
       </fa-icon>
     </span>
-    <span class="float-end">
+    <span class="float-end" routerLink="/admin/bingo/board/{{board.boardID}}/tiles/add-edit">
       <span>{{board.tileCount}} Tile{{board.tileCount === 1 ? '' : 's'}}</span>
       <fa-icon [icon]="icons.faArrowCircleRight"
                class="pointer fs-4 ms-2"
@@ -25,24 +25,24 @@
           <div class="col-12 mb-2">
             <div class="detail-container">
               <label class="detail-label">Description</label>
-              <label class="detail-value">{{board.description}}</label>
+              <label>{{board.description}}</label>
             </div>
           </div>
           <div class="col-lg-3 col-sm-6 col-12 detail-container">
             <label class="detail-label">Created</label>
-            <label class="detail-value">{{board.createdDateTime | date:'short'}}</label>
+            <label>{{board.createdDateTime | date:'short'}}</label>
           </div>
           <div class="col-lg-3 col-sm-6 col-12 detail-container">
             <label class="detail-label">Created By</label>
-            <label class="detail-value">{{board.createdByName}}</label>
+            <label>{{board.createdByName}}</label>
           </div>
           <div class="col-lg-3 col-sm-6 col-12 detail-container">
             <label class="detail-label">Modified</label>
-            <label class="detail-value">{{board.modDateTime | date:'short'}}</label>
+            <label>{{board.modDateTime | date:'short'}}</label>
           </div>
           <div class="col-lg-3 col-sm-6 col-12 detail-container">
             <label class="detail-label">Modified By</label>
-            <label class="detail-value">{{board.modByName}}</label>
+            <label>{{board.modByName}}</label>
           </div>
         </div>
       </div>
