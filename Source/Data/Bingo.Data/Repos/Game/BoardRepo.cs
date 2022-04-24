@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
@@ -16,10 +17,22 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
         /// <returns></returns>
         Task InsertBoard(BoardEntity board);
         /// <summary>
+        /// Fetches Board information stored in the table
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task<BoardEntity> GetBoard(int boardID);
+        /// <summary>
         /// Fetches all Board information in the table
         /// </summary>
         /// <returns></returns>
         Task<List<BoardEntity>> GetAllBoards();
+        /// <summary>
+        /// Updated Board information in the table
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        Task UpdateBoard(BoardEntity entity);
     }
 
     public class BoardRepo : BaseRepo, IBoardRepo
@@ -28,7 +41,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
         {
         }
 
-        public async Task InsertBoard(BoardEntity board)
+        public async Task InsertBoard(BoardEntity entity)
         {
             List<SqlParameter> @params = new()
             {
@@ -42,31 +55,48 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
                 {
                     ParameterName = $"@{nameof(BoardEntity.Name)}",
                     SqlDbType = SqlDbType.VarChar,
-                    Value = board.Name
+                    Value = entity.Name
                 },
                 new SqlParameter()
                 {
                     ParameterName = $"@{nameof(BoardEntity.Description)}",
                     SqlDbType = SqlDbType.VarChar,
-                    Value = board.Description
+                    Value = entity.Description
                 },
                 new SqlParameter()
                 {
                     ParameterName = $"@{nameof(BoardEntity.CreatedBy)}",
                     SqlDbType = SqlDbType.Int,
-                    Value = board.CreatedBy
+                    Value = entity.CreatedBy
                 },
                 new SqlParameter()
                 {
                     ParameterName = $"@{nameof(BoardEntity.ModBy)}",
                     SqlDbType = SqlDbType.Int,
-                    Value = board.ModBy
+                    Value = entity.ModBy
                 }
             };
 
             int newPrimaryKey = await base.CreateWithPrimaryKey(Sprocs.InsertBoard, @params);
-            board.BoardID = newPrimaryKey;
-            board.CreatedDateTime = board.ModDateTime = DateTime.UtcNow;
+            entity.BoardID = newPrimaryKey;
+            entity.CreatedDateTime = entity.ModDateTime = DateTime.UtcNow;
+        }
+
+        public async Task<BoardEntity> GetBoard(int boardID)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.BoardID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = boardID
+                }
+            };
+
+            List<BoardEntity> queryData =
+                await base.Read<BoardEntity>(Sprocs.GetBoardByBoardID, @params);
+            return queryData?.SingleOrDefault();
         }
 
         public async Task<List<BoardEntity>> GetAllBoards()
@@ -76,11 +106,45 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             return queryData;
         }
 
+        public async Task UpdateBoard(BoardEntity entity)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.BoardID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = entity.BoardID
+                },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.Name)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = entity.Name
+                },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.Description)}",
+                    SqlDbType = SqlDbType.VarChar,
+                    Value = entity.Description
+                },
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.ModBy)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = entity.ModBy
+                }
+            };
+            await base.Update(Sprocs.UpdateBoard, @params);
+            entity.ModDateTime = DateTime.UtcNow;
+        }
 
         private struct Sprocs
         {
             public const string InsertBoard = "game.usp_INSERT_Board";
+            public const string GetBoardByBoardID = "game.usp_SELECT_Board_ByBoardID";
             public const string GetAllBoards = "game.usp_SELECT_AllBoards";
+            public const string UpdateBoard = "game.usp_UPDATE_Board";
         }
     }
 }

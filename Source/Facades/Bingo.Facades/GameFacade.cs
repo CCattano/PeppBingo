@@ -4,7 +4,9 @@ using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Data.Entities.Game;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Facades
 {
@@ -25,6 +27,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// </summary>
         /// <returns></returns>
         Task<List<BoardBE>> GetAllBoards();
+        /// <summary>
+        ///Updates an existing Board w/ new information from the param provided
+        /// </summary>
+        /// <param name="boardBE"></param>
+        /// <returns></returns>
+        Task<BoardBE> UpdateBoard(BoardBE boardBE);
     }
 
     /// <inheritdoc cref="IGameFacade"/>
@@ -54,6 +62,17 @@ namespace Pepp.Web.Apps.Bingo.Facades
             List<BoardBE> boardBEs =
                 boardEntities?.Select(board => _mapper.Map<BoardBE>(board)).ToList();
             return boardBEs;
+        }
+
+        public async Task<BoardBE> UpdateBoard(BoardBE boardBE)
+        {
+            BoardEntity boardEntity = await _dataSvc.Game.BoardRepo.GetBoard(boardBE.BoardID);
+            if (boardEntity == null)
+                throw new WebException(HttpStatusCode.BadRequest, "Could not update board");
+            boardEntity = _mapper.Map(boardBE, boardEntity);
+            await _dataSvc.Game.BoardRepo.UpdateBoard(boardEntity);
+            BoardBE updatedBoard = _mapper.Map<BoardBE>(boardEntity);
+            return updatedBoard;
         }
     }
 }

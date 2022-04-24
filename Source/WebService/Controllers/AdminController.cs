@@ -42,7 +42,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await ConfirmIsAdmin("Non-Administrators cannot search for users");
             List<UserBE> userBEs = await _userAdapter.GetUsers(name);
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
-            return userBMs;
+            return Ok(userBMs);
         }
 
         [HttpGet]
@@ -51,7 +51,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await ConfirmIsAdmin("Non-Administrators cannot search for users");
             List<UserBE> userBEs = await _userAdapter.GetAdminUsers();
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
-            return userBMs;
+            return Ok(userBMs);
         }
 
         [HttpPut]
@@ -80,21 +80,12 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await ConfirmIsAdmin("Non-Administrators cannot search for users");
             List<UserBE> userBEs = await _userAdapter.GetUsers(userIDs);
             List<UserBM> userBMs = userBEs?.Select(userBE => _mapper.Map<UserBM>(userBE)).ToList();
-            return userBMs;
+            return Ok(userBMs);
         }
 
         #endregion
 
         #region Admin Game Data Endpoints
-
-        [HttpGet]
-        public async Task<ActionResult<List<BoardBM>>> Boards()
-        {
-            await ConfirmIsAdmin("Non-Administrators cannot access Board information");
-            List<BoardBE> boardBEs = await _gameAdapter.GetAllBoards();
-            List<BoardBM> boardBMs = boardBEs?.Select(board => _mapper.Map<BoardBM>(board)).ToList();
-            return boardBMs;
-        }
 
         [HttpPost]
         public async Task<ActionResult<BoardBM>> CreateBoard([FromBody] BoardBM newBoard)
@@ -103,7 +94,26 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             BoardBE newBoardBE = _mapper.Map<BoardBE>(newBoard);
             BoardBE boardBE = await _gameAdapter.CreateBoard(requestingUser.UserID, newBoardBE);
             BoardBM boardBM = _mapper.Map<BoardBM>(boardBE);
-            return boardBM;
+            return Ok(boardBM);
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<BoardBM>>> Boards()
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot access Board information");
+            List<BoardBE> boardBEs = await _gameAdapter.GetAllBoards();
+            List<BoardBM> boardBMs = boardBEs?.Select(board => _mapper.Map<BoardBM>(board)).ToList();
+            return Ok(boardBMs);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<BoardBM>> UpdateBoard([FromBody] BoardBM board)
+        {
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
+            BoardBE newBoardBE = _mapper.Map<BoardBE>(board);
+            BoardBE boardBE = await _gameAdapter.UpdateBoard(requestingUser.UserID, newBoardBE);
+            BoardBM boardBM = _mapper.Map<BoardBM>(boardBE);
+            return Ok(boardBM);
         }
 
         #endregion

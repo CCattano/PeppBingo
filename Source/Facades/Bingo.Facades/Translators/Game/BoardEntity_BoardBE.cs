@@ -9,12 +9,13 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
         public BoardEntity Convert(BoardBE source, BoardEntity destination, ResolutionContext context)
         {
             BoardEntity result = destination ?? new();
-            result.BoardID = source.BoardID;
+            if (result.BoardID == default)
+                result.BoardID = source.BoardID;
             result.Name = source.Name;
             result.Description = source.Description;
             //result.TileCount = source.TileCount;
             //result.CreatedDateTime = source.CreatedDateTime;
-            result.CreatedBy = source.CreatedBy;
+            //result.CreatedBy = source.CreatedBy;
             //result.ModDateTime = source.ModDateTime;
             result.ModBy = source.ModBy;
             return result;

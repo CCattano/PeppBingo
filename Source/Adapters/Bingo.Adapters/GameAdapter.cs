@@ -22,6 +22,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <returns></returns>
         Task<List<BoardBE>> GetAllBoards();
+        /// <summary>
+        /// Update an existing board w/ new information
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="boardBE"></param>
+        /// <returns></returns>
+        Task<BoardBE> UpdateBoard(int userID, BoardBE boardBE);
     }
 
     /// <inheritdoc cref="IGameAdapter"/>
@@ -42,6 +49,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             newBoard.CreatedBy = newBoard.ModBy = userID;
             BoardBE boardBE = await _facade.CreateBoard(newBoard);
             return boardBE;
+        }
+
+        public async Task<BoardBE> UpdateBoard(int userID, BoardBE boardBE)
+        {
+            boardBE.ModBy = userID;
+            BoardBE updatedBoard = await _facade.UpdateBoard(boardBE);
+            return updatedBoard;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Pepp.Web.Apps.Bingo.BusinessEntities.Game;
 using Pepp.Web.Apps.Bingo.BusinessModels.Game;
-using System;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers.Translators.Game
 {
