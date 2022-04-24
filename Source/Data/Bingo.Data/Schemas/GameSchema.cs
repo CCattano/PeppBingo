@@ -9,17 +9,21 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
     {
         /// <inheritdoc cref="IBoardRepo"/>
         IBoardRepo BoardRepo { get; }
+        /// <inheritdoc cref="IBoardTileRepo"/>
+        IBoardTileRepo BoardTileRepo { get; }
     }
 
     /// <inheritdoc cref="IGameSchema"/>
     public class GameSchema : BaseSchema, IGameSchema
     {
         private IBoardRepo _boardRepo;
+        private IBoardTileRepo _boardTileRepo;
 
         public GameSchema(BaseDataService dataSvc) : base(dataSvc)
         {
         }
 
         public IBoardRepo BoardRepo { get => _boardRepo ??= new BoardRepo(base.DataSvc); }
+        public IBoardTileRepo BoardTileRepo { get => _boardTileRepo ??= new BoardTileRepo(base.DataSvc); }
     }
 }

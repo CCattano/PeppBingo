@@ -33,6 +33,23 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <param name="boardBE"></param>
         /// <returns></returns>
         Task<BoardBE> UpdateBoard(BoardBE boardBE);
+        /// <summary>
+        /// Inserts board tile data into the Boards table
+        /// </summary>
+        /// <param name="newTile"></param>
+        /// <returns></returns>
+        Task<BoardTileBE> CreateBoardTile(BoardTileBE newTile);
+        /// <summary>
+        /// Fetches all board tiles for a given board
+        /// </summary>
+        /// <returns></returns>
+        Task<List<BoardTileBE>> GetAllBoardTiles(int boardID);
+        /// <summary>
+        /// Updates an existing Board Tile w/ new information from the param provided
+        /// </summary>
+        /// <param name="boardTileBE"></param>
+        /// <returns></returns>
+        Task<BoardTileBE> UpdateBoardTile(BoardTileBE boardTileBE);
     }
 
     /// <inheritdoc cref="IGameFacade"/>
@@ -72,6 +89,34 @@ namespace Pepp.Web.Apps.Bingo.Facades
             boardEntity = _mapper.Map(boardBE, boardEntity);
             await _dataSvc.Game.BoardRepo.UpdateBoard(boardEntity);
             BoardBE updatedBoard = _mapper.Map<BoardBE>(boardEntity);
+            return updatedBoard;
+        }
+
+        public async Task<BoardTileBE> CreateBoardTile(BoardTileBE newTile)
+        {
+            BoardTileEntity tileEntity = _mapper.Map<BoardTileEntity>(newTile);
+            await _dataSvc.Game.BoardTileRepo.InsertBoardTile(tileEntity);
+            BoardTileBE tileBE = _mapper.Map<BoardTileBE>(tileEntity);
+            return tileBE;
+        }
+
+        public async Task<List<BoardTileBE>> GetAllBoardTiles(int boardID)
+        {
+            List<BoardTileEntity> boardTileEntities =
+                await _dataSvc.Game.BoardTileRepo.GetBoardTiles(boardID);
+            List<BoardTileBE> boardTileBEs =
+                boardTileEntities?.Select(tile => _mapper.Map<BoardTileBE>(tile)).ToList();
+            return boardTileBEs;
+        }
+
+        public async Task<BoardTileBE> UpdateBoardTile(BoardTileBE boardTileBE)
+        {
+            BoardTileEntity boardTileEntity = await _dataSvc.Game.BoardTileRepo.GetBoardTile(boardTileBE.TileID);
+            if (boardTileEntity == null)
+                throw new WebException(HttpStatusCode.BadRequest, "Could not update board tile");
+            boardTileEntity = _mapper.Map(boardTileBE, boardTileEntity);
+            await _dataSvc.Game.BoardTileRepo.UpdateBoardTile(boardTileEntity);
+            BoardTileBE updatedBoard = _mapper.Map<BoardTileBE>(boardTileEntity);
             return updatedBoard;
         }
     }

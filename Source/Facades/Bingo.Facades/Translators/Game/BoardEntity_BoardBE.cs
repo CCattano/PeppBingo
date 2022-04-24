@@ -15,6 +15,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
             result.Description = source.Description;
             //result.TileCount = source.TileCount;
             //result.CreatedDateTime = source.CreatedDateTime;
+            // Passed up and used in Create only, not used by Update
             result.CreatedBy = source.CreatedBy;
             //result.ModDateTime = source.ModDateTime;
             result.ModBy = source.ModBy;

@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
 {
+    /// <summary>
+    /// Repo used to interface with data stored in the game.Board table
+    /// </summary>
     public interface IBoardRepo
     {
         /// <summary>

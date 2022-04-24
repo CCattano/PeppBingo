@@ -110,10 +110,39 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         public async Task<ActionResult<BoardBM>> UpdateBoard([FromBody] BoardBM board)
         {
             UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
-            BoardBE newBoardBE = _mapper.Map<BoardBE>(board);
-            BoardBE boardBE = await _gameAdapter.UpdateBoard(requestingUser.UserID, newBoardBE);
-            BoardBM boardBM = _mapper.Map<BoardBM>(boardBE);
+            BoardBE boardBE = _mapper.Map<BoardBE>(board);
+            BoardBE updatedBoardBE = await _gameAdapter.UpdateBoard(requestingUser.UserID, boardBE);
+            BoardBM boardBM = _mapper.Map<BoardBM>(updatedBoardBE);
             return Ok(boardBM);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<BoardTileBM>> CreateBoardTile([FromBody] BoardTileBM newTile)
+        {
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Board Tiles");
+            BoardTileBE newBoardTileBE = _mapper.Map<BoardTileBE>(newTile);
+            BoardTileBE boardTileBE = await _gameAdapter.CreateBoardTile(requestingUser.UserID, newBoardTileBE);
+            BoardTileBM boardTileBM = _mapper.Map<BoardTileBM>(boardTileBE);
+            return boardTileBM;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<BoardTileBM>>> Tiles([FromQuery] int boardID)
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot access Board information");
+            List<BoardTileBE> boardTileBEs = await _gameAdapter.GetAllBoardTiles(boardID);
+            List<BoardTileBM> boardTileBMs = boardTileBEs?.Select(tile => _mapper.Map<BoardTileBM>(tile)).ToList();
+            return Ok(boardTileBMs);
+        }
+
+        [HttpPut]
+        public async Task<ActionResult<BoardTileBM>> UpdateBoardTile([FromBody] BoardTileBM boardTile)
+        {
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
+            BoardTileBE boardTileBE = _mapper.Map<BoardTileBE>(boardTile);
+            BoardTileBE updatedBoardTileBE = await _gameAdapter.UpdateBoardTile(requestingUser.UserID, boardTileBE);
+            BoardTileBM boardTileBM = _mapper.Map<BoardTileBM>(updatedBoardTileBE);
+            return Ok(boardTileBM);
         }
 
         #endregion
