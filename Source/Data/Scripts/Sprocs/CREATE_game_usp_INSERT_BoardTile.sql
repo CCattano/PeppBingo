@@ -25,9 +25,26 @@ BEGIN
 		VALUES
 			(@BoardID, @Text, @IsActive, @CreatedBy, @ModBy)
 
-		COMMIT TRANSACTION
-
 		SET @TileID = SCOPE_IDENTITY();
+
+		-- Now that a new tile has been added for a board
+		-- We need to update that board's tile count
+		UPDATE
+			game.Boards
+		SET
+			TileCount = (
+				SELECT
+					COUNT(*)
+				FROM
+					game.BoardTiles
+				WHERE
+					BoardID = @BoardID
+					AND IsActive = 1
+			)
+		WHERE
+			BoardID = @BoardID
+
+		COMMIT TRANSACTION
 
 	END TRY
 	BEGIN CATCH

@@ -25,14 +25,4 @@ export class EditBoardForm {
   constructor() {
     this.form = new FormGroup(this.controls);
   }
-
-  /**
-   * Gets the first error on the form control provided.
-   * Returns null if there are no errors on the control
-   * @param formCtrl
-   */
-  public getFirstErrorForCtrl(formCtrl: FormControl): string {
-    const response: string = Object.values(formCtrl?.errors ?? {})?.[0];
-    return response;
-  }
 }

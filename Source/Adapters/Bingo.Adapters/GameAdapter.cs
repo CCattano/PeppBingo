@@ -34,9 +34,10 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// Create a new board tile for a bingo board
         /// </summary>
         /// <param name="userID"></param>
+        /// <param name="boardID"></param>
         /// <param name="newTile"></param>
         /// <returns></returns>
-        Task<BoardTileBE> CreateBoardTile(int userID, BoardTileBE newTile);
+        Task<BoardTileBE> CreateBoardTile(int userID, int boardID, BoardTileBE newTile);
         /// <summary>
         /// Fetches all board tiles for a given board
         /// </summary>
@@ -89,9 +90,10 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             return boardTileBEs;
         }
 
-        public async Task<BoardTileBE> CreateBoardTile(int userID, BoardTileBE newTile)
+        public async Task<BoardTileBE> CreateBoardTile(int userID, int boardID, BoardTileBE newTile)
         {
             newTile.CreatedBy = newTile.ModBy = userID;
+            newTile.BoardID = boardID;
             BoardTileBE boardTileBE = await _facade.CreateBoardTile(newTile);
             return boardTileBE;
         }

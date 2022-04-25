@@ -13,7 +13,10 @@ import { BingoBoardAddEditComponent } from './components/management/bingo/boards
 import { BoardCardComponent } from './components/management/bingo/boards/board-card/board-card.component';
 import { EditBoardCardComponent } from './components/management/bingo/boards/edit-board-card/edit-board-card.component';
 import { BingoTileAddEditComponent } from './components/management/bingo/tiles/bingo-tile-add-edit.component';
+import { EditTileCardComponent } from './components/management/bingo/tiles/edit-tile-card/edit-tile-card.component';
+import { TileCardComponent } from './components/management/bingo/tiles/tile-card/tile-card.component';
 import { FormInputComponent } from './shared/components/form/form-input/form-input.component';
+import { FormTextAreaComponent } from './shared/components/form/form-textarea/form-textarea.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
 import { NavMenuComponent } from './shared/components/nav-menu/nav-menu.component';
 import { ToastContainerComponent } from './shared/components/toast/toast-container.component';
@@ -34,24 +37,39 @@ const appInitializers: Provider = [
 @NgModule({
   declarations: [
     //#region PAGE COMPONENTS
+
     LoginComponent,
     DashboardComponent,
+
+    // -- Admin Management
     AddEditAdminComponent,
+
+    // -- Bingo Board Management
     BingoBoardAddEditComponent,
     BoardCardComponent,
     EditBoardCardComponent,
+
+    // -- Bingo Tile Management
     BingoTileAddEditComponent,
+    TileCardComponent,
+    EditTileCardComponent,
+
     //#endregion
 
     //#region SHARED COMPONENTS
+
     LayoutComponent,
     NavMenuComponent,
     ToastContainerComponent,
     FormInputComponent,
+    FormTextAreaComponent,
+
     //#endregion
 
     //#region SHARED PIPES
+
     SafeHtmlPipe
+
     //#endregion
   ],
   imports: [
@@ -65,12 +83,16 @@ const appInitializers: Provider = [
     FormsModule
   ],
   providers: [
-    //#region Interceptors
+    //#region INTERCEPTORS
+
     httpInterceptors,
+
     //#endregion
 
-    //#region Initializers
+    //#region INITIALIZERS
+
     appInitializers
+
     //#endregion
   ],
   bootstrap: [LayoutComponent]

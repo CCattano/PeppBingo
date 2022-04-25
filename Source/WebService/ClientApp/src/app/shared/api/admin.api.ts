@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { tap } from 'rxjs/operators';
+import { BoardTileDto } from '../dtos/board-tile.dto';
 import { BoardDto } from '../dtos/board.dto';
 import { UserDto } from '../dtos/user.dto';
 
@@ -57,7 +58,6 @@ export class AdminApi {
 
   //#region Admin Game Data Endpoints
 
-
   /**
    * Create a new bingo board
    * @param board
@@ -78,7 +78,7 @@ export class AdminApi {
   }
 
   /**
-   * Updates and existing board with new information
+   * Updates an existing board with new information
    * @param board
    */
   public async updateBoard(board: BoardDto): Promise<BoardDto> {
@@ -87,10 +87,46 @@ export class AdminApi {
       .toPromise();
   }
 
-  private _convertDateStringsToDates(board: BoardDto): void {
-    if (!board) return;
-    board.createdDateTime = new Date((board.createdDateTime as any as string).endsWith('Z') ? board.createdDateTime : board.createdDateTime + 'Z');
-    board.modDateTime = new Date((board.modDateTime as any as string).endsWith('Z') ? board.modDateTime : board.modDateTime + 'Z');
+  /**
+   * Create a new board tile for the board specified
+   * @param tile
+   */
+  public async createNewBoardTile(boardID: number, tile: BoardTileDto): Promise<BoardTileDto> {
+    return await this._http.post<BoardTileDto>(`Admin/CreateBoardTile?boardID=${boardID}`, tile)
+      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .toPromise();
+  }
+
+  /**
+   * Get all board tiles for a given board
+   * @param boardID
+   */
+  public async getTilesForBoard(boardID: number): Promise<BoardTileDto[]> {
+    return await this._http.get<BoardTileDto[]>(`Admin/Tiles?boardID=${boardID}`)
+      .pipe(tap(tiles => tiles?.forEach(tile => this._convertDateStringsToDates(tile))))
+      .toPromise();
+  }
+
+  /**
+   * Updates an existing board tile with new information
+   * @param tileZ
+   */
+  public async updateBoardTile(tile: BoardTileDto, showLoader: boolean = false): Promise<BoardTileDto> {
+    return this._http.put<BoardTileDto>('Admin/UpdateBoardTile', tile)
+      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .toPromise();
+  }
+
+  private _convertDateStringsToDates(gameData: BoardDto | BoardTileDto): void {
+    if (!gameData) return;
+    gameData.createdDateTime =
+      new Date((gameData.createdDateTime as any as string).endsWith('Z')
+        ? gameData.createdDateTime
+        : gameData.createdDateTime + 'Z');
+    gameData.modDateTime =
+      new Date((gameData.modDateTime as any as string).endsWith('Z')
+        ? gameData.modDateTime
+        : gameData.modDateTime + 'Z');
   }
   //#endregion
 }

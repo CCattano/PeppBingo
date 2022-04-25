@@ -15,6 +15,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers.Translators
         {
             this.RegisterTranslator<UserBM, UserBE, UserBM_UserBE>();
             this.RegisterTranslator<BoardBM, BoardBE, BoardBM_BoardBE>();
+            this.RegisterTranslator<BoardTileBM, BoardTileBE, BoardTileBM_BoardTileBE>();
         }
     }
 }

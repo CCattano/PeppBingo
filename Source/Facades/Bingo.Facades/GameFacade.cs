@@ -112,6 +112,14 @@ namespace Pepp.Web.Apps.Bingo.Facades
         public async Task<BoardTileBE> UpdateBoardTile(BoardTileBE boardTileBE)
         {
             BoardTileEntity boardTileEntity = await _dataSvc.Game.BoardTileRepo.GetBoardTile(boardTileBE.TileID);
+            /*
+             * The boardID is not a property directly exposed on the front end
+             * We have it thanks to the DB
+             * And we should persist it on BEs in updates
+             * So we're setting it on BE here so when the translator runs
+             * The BE sets the boardID we gave it on the entity that goes to the Db
+             */
+            boardTileBE.BoardID = boardTileEntity.BoardID;
             if (boardTileEntity == null)
                 throw new WebException(HttpStatusCode.BadRequest, "Could not update board tile");
             boardTileEntity = _mapper.Map(boardTileBE, boardTileEntity);

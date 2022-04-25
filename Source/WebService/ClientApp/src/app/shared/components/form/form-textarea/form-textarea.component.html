@@ -1,0 +1,9 @@
+<label for="formCtrl" class="form-label form-label-sm float-start">{{label}}</label>
+<textarea id="formCtrl"
+       class="form-control form-control-sm"
+       [formControl]="control"
+       [placeholder]="placeholder">
+</textarea>
+<div *ngIf="control.touched && !control.valid" class="error text-start">
+  {{errorMsg}}
+</div>

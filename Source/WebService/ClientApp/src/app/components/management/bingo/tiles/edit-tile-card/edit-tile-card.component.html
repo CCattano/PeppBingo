@@ -1,0 +1,70 @@
+<div class="card bg-dark border-light">
+  <div class="card-header border-light">
+    <span class="float-start">
+      <ng-toggle class="rounded-pill"
+                 onColor="success"
+                 onText="On"
+                 offColor="danger"
+                 offText="Off"
+                 handleColor="light"
+                 size="sm"
+                 [ngModel]="_tileForm.controls.isActive.value"
+                 (ngModelChange)="_tileForm.controls.isActive.setValue($event)">
+        <input type="checkbox"
+               [ngModel]="_tileForm.controls.isActive.value"
+               (ngModelChange)="_tileForm.controls.isActive.setValue($event)" />
+      </ng-toggle>
+    </span>
+    <span class="float-end">
+      <fa-icon [icon]="icons.faSave"
+               class="pointer text-success fs-4"
+               ngbTooltip="Save Changes"
+               placement="auto"
+               (click)="_onSaveClick()">
+      </fa-icon>
+      <fa-icon [icon]="icons.faTrash"
+               class="pointer text-danger fs-4 ms-4"
+               ngbTooltip="Discard Changes"
+               placement="auto"
+               (click)="_onDiscardClick()">
+      </fa-icon>
+    </span>
+  </div>
+  <div class="card-body border-light m-3 pb-4 text-center">
+    <form-textarea [control]="_tileForm.controls.text" label="Tile Text" placeholder="Add tile text here..."></form-textarea>
+  </div>
+  <!-- Keeping this here with visibility: hidden for height consistency -->
+  <ul class="list-group list-group-flush border-top-0">
+    <li class="list-group-item bg-dark text-light p-0 px-2">
+      <fa-icon [icon]="icons.faEdit" class="pointer float-end fs-4 invisible"></fa-icon>
+    </li>
+  </ul>
+  <div class="card-footer border-light">
+    <div class="row">
+      <div class="col-6 my-1">
+        <div class="detail-container">
+          <label class="detail-label">Created By</label>
+          <label>{{tile.createdByName}}</label>
+        </div>
+      </div>
+      <div class="col-6 my-1">
+        <div class="detail-container">
+          <label class="detail-label">Created</label>
+          <label>{{tile.createdDateTime | date:'short'}}</label>
+        </div>
+      </div>
+      <div class="col-6 my-1">
+        <div class="detail-container">
+          <label class="detail-label">Last Modified By</label>
+          <label>{{tile.modByName}}</label>
+        </div>
+      </div>
+      <div class="col-6 my-1">
+        <div class="detail-container">
+          <label class="detail-label">Last Modified</label>
+          <label>{{tile.modDateTime | date:'short'}}</label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,24 @@ BEGIN
 		WHERE
 			[TileID] = @TileID;
 
+		-- When a tile has been updated update the 
+		-- Tile Count for its associated board to ensure parity
+		DECLARE @BoardID int = (SELECT TOP (1) BoardID FROM game.BoardTiles WHERE TileID = @TileID);
+		UPDATE
+			game.Boards
+		SET
+			TileCount = (
+				SELECT
+					COUNT(*)
+				FROM
+					game.BoardTiles
+				WHERE
+					BoardID = @BoardID
+					AND IsActive = 1
+			)
+		WHERE
+			BoardID = @BoardID
+
 		COMMIT TRANSACTION
 	END TRY
 	BEGIN CATCH

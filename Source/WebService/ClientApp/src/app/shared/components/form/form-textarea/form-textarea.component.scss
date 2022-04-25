@@ -1,0 +1,13 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+.form-label-sm {
+  font-size: .75rem;
+}
+
+.error {
+  width: 100%;
+  margin-top: .25rem;
+  font-size: .75em;
+  color: $danger;
+}

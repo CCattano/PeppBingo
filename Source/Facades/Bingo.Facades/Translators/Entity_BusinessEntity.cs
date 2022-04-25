@@ -28,6 +28,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators
 
             #region Game Translators
             this.RegisterTranslator<BoardEntity, BoardBE, BoardEntity_BoardBE>();
+            this.RegisterTranslator<BoardTileEntity, BoardTileBE, BoardTileEntity_BoardTileBE>();
             #endregion
         }
     }

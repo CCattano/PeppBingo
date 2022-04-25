@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { faPlusCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { AdminApi } from '../../../../shared/api/admin.api';
-import { UserApi } from '../../../../shared/api/user.api';
 import { BoardDto } from '../../../../shared/dtos/board.dto';
 import { UserDto } from '../../../../shared/dtos/user.dto';
-import { BoardVM } from './viewmodels/board.viewmodel';
+import { BoardVM } from '../viewmodel/board-data.viewmodel';
 
 @Component({
   templateUrl: './bingo-board-add-edit.component.html',

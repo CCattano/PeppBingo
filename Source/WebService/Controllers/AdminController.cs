@@ -117,11 +117,11 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BoardTileBM>> CreateBoardTile([FromBody] BoardTileBM newTile)
+        public async Task<ActionResult<BoardTileBM>> CreateBoardTile([FromQuery] int boardID, [FromBody] BoardTileBM newTile)
         {
             UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Board Tiles");
             BoardTileBE newBoardTileBE = _mapper.Map<BoardTileBE>(newTile);
-            BoardTileBE boardTileBE = await _gameAdapter.CreateBoardTile(requestingUser.UserID, newBoardTileBE);
+            BoardTileBE boardTileBE = await _gameAdapter.CreateBoardTile(requestingUser.UserID, boardID, newBoardTileBE);
             BoardTileBM boardTileBM = _mapper.Map<BoardTileBM>(boardTileBE);
             return boardTileBM;
         }

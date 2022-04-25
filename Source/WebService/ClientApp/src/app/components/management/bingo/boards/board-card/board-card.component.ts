@@ -1,7 +1,8 @@
 import { Component, Input, TemplateRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { faArrowCircleRight, faEdit, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
-import { BoardVM } from '../viewmodels/board.viewmodel';
+import { BoardVM } from '../../viewmodel/board-data.viewmodel';
 
 @Component({
   selector: 'app-board-card',
@@ -15,7 +16,10 @@ export class BoardCardComponent {
   @Input()
   public board: BoardVM;
 
-  constructor(private _modalService: NgbModal) {
+  constructor(
+    private _router: Router,
+    private _modalService: NgbModal
+  ) {
   }
 
   /**
@@ -32,6 +36,16 @@ export class BoardCardComponent {
    */
   public _onEditBoardClick(): void {
     this.board.editing = true;
+  }
+
+  public _onEditTilesClick(): void {
+    this._router.navigate([
+      `/admin/bingo/board/${this.board.boardID}/tiles/add-edit`
+    ], {
+      state: {
+        boardName: this.board.name
+      }
+    });
   }
 
   /**

@@ -1,11 +1,10 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { BoardVM } from '../viewmodels/board.viewmodel';
-import { EditBoardForm } from './edit-board.form';
 import { faSave, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { AdminApi } from '../../../../../shared/api/admin.api';
 import { BoardDto } from '../../../../../shared/dtos/board.dto';
-import { TokenService } from '../../../../../shared/service/token.service';
 import { ToastService } from '../../../../../shared/service/toast.service';
+import { BoardVM } from '../../viewmodel/board-data.viewmodel';
+import { EditBoardForm } from './edit-board.form';
 
 @Component({
   selector: 'app-edit-board-card',
@@ -74,7 +73,8 @@ export class EditBoardCardComponent implements OnInit {
       this._boardForm.form.markAllAsTouched();
       return;
     }
-    if (this._boardForm.form.pristine) return;
+    if (this._boardForm.form.pristine)
+      this.board.editing = false;
     let newBoard: BoardDto;
     if (this.board.isNew) {
       const boardToCreate: BoardDto = new BoardDto();
@@ -90,7 +90,8 @@ export class EditBoardCardComponent implements OnInit {
       newBoard = await this._updateBoard(boardToUpdate);
     }
     if (!newBoard) return;
-    Object.keys(newBoard).forEach((key: string) => (this.board as any)[key] = (newBoard as any)[key]);
+    Object.keys(newBoard).forEach((key: string) =>
+      (this.board as any)[key] = (newBoard as any)[key]);
     this.board.isNew = false;
     this.board.editing = false;
     this.saveSuccess.emit(this.index);
