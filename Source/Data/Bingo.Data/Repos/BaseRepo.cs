@@ -72,6 +72,18 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
             await conn.CloseAsync();
         }
 
+        protected virtual async Task Delete(string sproc, List<SqlParameter> sprocParams)
+        {
+            using SqlConnection conn = _dataSvc.GetConnection();
+            await conn.OpenAsync();
+            using SqlCommand cmd = conn.CreateCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = sproc;
+            cmd.Parameters.AddRange(sprocParams.ToArray());
+            await cmd.ExecuteNonQueryAsync();
+            await conn.CloseAsync();
+        }
+
         private static List<T> ParseQueryData<T>(DataTable data) where T : new()
         {
             if (data.Rows.Count == 0)

@@ -36,6 +36,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
         /// <param name="entity"></param>
         /// <returns></returns>
         Task UpdateBoard(BoardEntity entity);
+        /// <summary>
+        /// Delete Board information in the table
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task DeleteBoard(int boardID);
     }
 
     public class BoardRepo : BaseRepo, IBoardRepo
@@ -142,12 +148,28 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             entity.ModDateTime = DateTime.UtcNow;
         }
 
+        public async Task DeleteBoard(int boardID)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardEntity.BoardID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = boardID
+                }
+            };
+
+            await base.Delete(Sprocs.DeleteBoardByBoardID, @params);
+        }
+
         private struct Sprocs
         {
             public const string InsertBoard = "game.usp_INSERT_Board";
             public const string GetBoardByBoardID = "game.usp_SELECT_Board_ByBoardID";
             public const string GetAllBoards = "game.usp_SELECT_AllBoards";
             public const string UpdateBoard = "game.usp_UPDATE_Board";
+            public const string DeleteBoardByBoardID = "game.usp_DELETE_Board_ByBoardID";
         }
     }
 }

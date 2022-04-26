@@ -37,6 +37,18 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
         /// <param name="entity"></param>
         /// <returns></returns>
         Task UpdateBoardTile(BoardTileEntity entity);
+        /// <summary>
+        /// Delete Board Tile information in the table
+        /// </summary>
+        /// <param name="tileID"></param>
+        /// <returns></returns>
+        Task DeleteBoardTile(int tileID);
+        /// <summary>
+        /// Delete Board Tile information in the table
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task DeleteAllBoardTilesForBoard(int boardID);
     }
 
     public class BoardTileRepo : BaseRepo, IBoardTileRepo
@@ -159,12 +171,45 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             entity.ModDateTime = DateTime.UtcNow;
         }
 
+        public async Task DeleteBoardTile(int tileID)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardTileEntity.TileID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = tileID
+                }
+            };
+
+            await base.Delete(Sprocs.DeleteBoardTileByTileID, @params);
+        }
+
+        public async Task DeleteAllBoardTilesForBoard(int boardID)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(BoardTileEntity.BoardID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = boardID
+                }
+            };
+
+            await base.Delete(Sprocs.DeleteBoardTilesByBoardID, @params);
+        }
+
         private struct Sprocs
         {
             public const string InsertBoardTile = "game.usp_INSERT_BoardTile";
             public const string GetTileByTileID = "game.usp_SELECT_BoardTile_ByTileID";
             public const string GetAllTilesByBoardID = "game.usp_SELECT_BoardTiles_ByBoardID";
             public const string UpdateBoardTile = "game.usp_UPDATE_BoardTile";
+            public const string DeleteBoardTileByTileID = "game.usp_DELETE_BoardTile_ByTileID";
+            public const string DeleteBoardTilesByBoardID = "game.usp_DELETE_BoardTiles_ByBoardID";
+            //
         }
     }
 }

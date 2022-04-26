@@ -34,6 +34,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <returns></returns>
         Task<BoardBE> UpdateBoard(BoardBE boardBE);
         /// <summary>
+        /// Deletes an existing board, completely removing it from the Db
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task DeleteBoard(int boardID);
+        /// <summary>
         /// Inserts board tile data into the Boards table
         /// </summary>
         /// <param name="newTile"></param>
@@ -50,6 +56,19 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <param name="boardTileBE"></param>
         /// <returns></returns>
         Task<BoardTileBE> UpdateBoardTile(BoardTileBE boardTileBE);
+        /// <summary>
+        /// Deletes an existing board tile, completely removing it from the Db
+        /// </summary>
+        /// <param name="tileID"></param>
+        /// <returns></returns>
+        Task DeleteBoardTile(int tileID);
+        /// <summary>
+        /// Deletes an existing board tiles for a specified board,
+        /// completely removing them from the Db
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task DeleteAllBoardTilesForBoard(int boardID);
     }
 
     /// <inheritdoc cref="IGameFacade"/>
@@ -92,6 +111,11 @@ namespace Pepp.Web.Apps.Bingo.Facades
             return updatedBoard;
         }
 
+        public async Task DeleteBoard(int boardID)
+        {
+            await _dataSvc.Game.BoardRepo.DeleteBoard(boardID);
+        }
+
         public async Task<BoardTileBE> CreateBoardTile(BoardTileBE newTile)
         {
             BoardTileEntity tileEntity = _mapper.Map<BoardTileEntity>(newTile);
@@ -126,6 +150,16 @@ namespace Pepp.Web.Apps.Bingo.Facades
             await _dataSvc.Game.BoardTileRepo.UpdateBoardTile(boardTileEntity);
             BoardTileBE updatedBoard = _mapper.Map<BoardTileBE>(boardTileEntity);
             return updatedBoard;
+        }
+
+        public async Task DeleteBoardTile(int tileID)
+        {
+            await _dataSvc.Game.BoardTileRepo.DeleteBoardTile(tileID);
+        }
+
+        public async Task DeleteAllBoardTilesForBoard(int boardID)
+        {
+            await _dataSvc.Game.BoardTileRepo.DeleteAllBoardTilesForBoard(boardID);
         }
     }
 }

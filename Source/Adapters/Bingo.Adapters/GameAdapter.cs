@@ -31,6 +31,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <returns></returns>
         Task<BoardBE> UpdateBoard(int userID, BoardBE boardBE);
         /// <summary>
+        /// Delete a board and all the tiles associated with it
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task DeleteBoard(int boardID);
+        /// <summary>
         /// Create a new board tile for a bingo board
         /// </summary>
         /// <param name="userID"></param>
@@ -55,6 +61,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="boardTileBE"></param>
         /// <returns></returns>
         Task<BoardTileBE> UpdateBoardTile(int userID, BoardTileBE boardTileBE);
+        /// <summary>
+        /// Delete a board tile
+        /// </summary>
+        /// <param name="tileID"></param>
+        /// <returns></returns>
+        Task DeleteBoardTile(int tileID);
     }
 
     /// <inheritdoc cref="IGameAdapter"/>
@@ -84,6 +96,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             return updatedBoard;
         }
 
+        public async Task DeleteBoard(int boardID)
+        {
+            await _facade.DeleteAllBoardTilesForBoard(boardID);
+            await _facade.DeleteBoard(boardID);
+        }
+
         public async Task<List<BoardTileBE>> GetAllBoardTiles(int boardID)
         {
             List<BoardTileBE> boardTileBEs = await _facade.GetAllBoardTiles(boardID);
@@ -110,6 +128,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             boardTileBE.ModBy = userID;
             BoardTileBE updatedBoardTile = await _facade.UpdateBoardTile(boardTileBE);
             return updatedBoardTile;
+        }
+
+        public async Task DeleteBoardTile(int tileID)
+        {
+            await _facade.DeleteBoardTile(tileID);
         }
     }
 }

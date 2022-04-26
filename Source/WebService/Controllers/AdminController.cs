@@ -109,11 +109,18 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpPut]
         public async Task<ActionResult<BoardBM>> UpdateBoard([FromBody] BoardBM board)
         {
-            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot modify Boards");
             BoardBE boardBE = _mapper.Map<BoardBE>(board);
             BoardBE updatedBoardBE = await _gameAdapter.UpdateBoard(requestingUser.UserID, boardBE);
             BoardBM boardBM = _mapper.Map<BoardBM>(updatedBoardBE);
             return Ok(boardBM);
+        }
+
+        [HttpDelete]
+        public async Task DeleteBoard([FromQuery] int boardID)
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot delete Boards");
+            await _gameAdapter.DeleteBoard(boardID);
         }
 
         [HttpPost]
@@ -138,13 +145,19 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpPut]
         public async Task<ActionResult<BoardTileBM>> UpdateBoardTile([FromBody] BoardTileBM boardTile)
         {
-            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Boards");
+            UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot modify Board Tiles");
             BoardTileBE boardTileBE = _mapper.Map<BoardTileBE>(boardTile);
             BoardTileBE updatedBoardTileBE = await _gameAdapter.UpdateBoardTile(requestingUser.UserID, boardTileBE);
             BoardTileBM boardTileBM = _mapper.Map<BoardTileBM>(updatedBoardTileBE);
             return Ok(boardTileBM);
         }
 
+        [HttpDelete]
+        public async Task DeleteBoardTile([FromQuery] int tileID)
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot delete Board Tiles");
+            await _gameAdapter.DeleteBoardTile(tileID);
+        }
         #endregion
 
         private async Task<UserBE> ConfirmIsAdmin(string rejectionMsg)
