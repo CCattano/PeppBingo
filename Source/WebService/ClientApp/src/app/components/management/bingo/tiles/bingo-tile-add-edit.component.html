@@ -14,12 +14,13 @@
     <app-tile-card *ngIf="!tile.editing"
                    [tile]="tile"
                    [index]="i"
-                   (saveSuccess)="_onSaveSuccess($event)">
+                   (saveSuccess)="_onSaveSuccess($event)"
+                   (deleteSuccess)="_onDeleteSuccess($event)">
     </app-tile-card>
     <app-edit-tile-card *ngIf="tile.editing"
                         [tile]="tile"
                         [index]="i"
-                        [boardID]="_boardID"
+                        [boardIdForCreate]="_boardID"
                         (saveSuccess)="_onSaveSuccess($event)"
                         (cancelClick)="_onCancelClick($event)">
     </app-edit-tile-card>

@@ -13,11 +13,30 @@ AS
 BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION;
-		
+
+		DECLARE @BoardID int = (SELECT TOP(1) BoardID FROM game.BoardTiles WHERE TileID = @TileID);
+
 		DELETE FROM
 			game.BoardTiles
 		WHERE
 			TileID = @TileID;
+
+		-- Now that a new tile has been deleted for a board
+		-- We need to update that board's tile count
+		UPDATE
+			game.Boards
+		SET
+			TileCount = (
+				SELECT
+					COUNT(*)
+				FROM
+					game.BoardTiles
+				WHERE
+					BoardID = @BoardID
+					AND IsActive = 1
+			)
+		WHERE
+			BoardID = @BoardID;
 
 		COMMIT TRANSACTION;
 	END TRY

@@ -9,12 +9,12 @@
                (click)="_onEditBoardClick()">
       </fa-icon>
     </span>
-    <span class="float-end" (click)="_onEditTilesClick()">
+    <span class="float-end pointer"
+          ngbTooltip="Edit Board Tiles"
+          placement="auto"
+          (click)="_onEditTilesClick()">
       <span>{{board.tileCount}} Tile{{board.tileCount === 1 ? '' : 's'}}</span>
-      <fa-icon [icon]="icons.faArrowCircleRight"
-               class="pointer fs-4 ms-2"
-               ngbTooltip="Edit Board Tiles"
-               placement="auto">
+      <fa-icon [icon]="icons.faArrowCircleRight" class="fs-4 ms-2">
       </fa-icon>
     </span>
   </h5>
@@ -68,7 +68,7 @@
   <div class="modal-body bg-dark text-center">
     <label>
       Are you sure you want to permanently delete the
-      <strong><u>{{board.name}}</u></strong> board?
+      <strong><u>{{board.name}}</u></strong> board and <strong><u>all of its tiles</u></strong>?
       <br />
       <br />
       This is a <strong><u>permanent</u></strong> and <strong><u>irreversible</u></strong> action.

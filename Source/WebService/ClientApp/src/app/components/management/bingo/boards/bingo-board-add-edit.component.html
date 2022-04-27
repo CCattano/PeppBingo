@@ -8,7 +8,11 @@
   </h4>
   <div>
     <ng-container *ngFor="let board of _boards; let i = index;">
-      <app-board-card *ngIf="!board.editing" [board]="board"></app-board-card>
+      <app-board-card *ngIf="!board.editing"
+                      [board]="board"
+                      [index]="i"
+                      (deleteSuccess)="_onDeleteSuccess($event)">
+      </app-board-card>
       <app-edit-board-card *ngIf="board.editing"
                            [board]="board"
                            [index]="i"

@@ -1,7 +1,9 @@
-import { Component, Input, TemplateRef } from '@angular/core';
+import { Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { faArrowCircleRight, faEdit, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
+import { AdminApi } from '../../../../../shared/api/admin.api';
+import { ToastService } from '../../../../../shared/service/toast.service';
 import { BoardVM } from '../../viewmodel/board-data.viewmodel';
 
 @Component({
@@ -16,9 +18,25 @@ export class BoardCardComponent {
   @Input()
   public board: BoardVM;
 
+  /**
+   * The index of the board who's info we are displaying in the template
+   */
+  @Input()
+  public index: number;
+
+  /**
+   * Event emitted when a delete has occurred successfully
+   *
+   * Emits the index of the tile that has just been removed successfully
+   */
+  @Output()
+  public readonly deleteSuccess: EventEmitter<number> = new EventEmitter<number>();
+
   constructor(
     private _router: Router,
-    private _modalService: NgbModal
+    private _adminApi: AdminApi,
+    private _modalService: NgbModal,
+    private _toastService: ToastService
   ) {
   }
 
@@ -63,10 +81,13 @@ export class BoardCardComponent {
       size: 'lg'
     } as NgbModalOptions);
     const affirmativeResponse: boolean = await modalRef.result;
-    if (affirmativeResponse) {
-      alert('Delete goes here');
-    } else {
-      alert('The board lives to die another day');
-    }
+    if (affirmativeResponse)
+      await this._adminApi.deleteBoard(this.board.boardID)
+        .then(() => this.deleteSuccess.emit(this.index))
+        .catch(() => this._toastService.showDangerToast({
+          header: 'An error occurred',
+          body: 'Board could not be deleted. Please try again.',
+          ttlMs: 3000
+        }));
   }
 }

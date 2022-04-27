@@ -87,6 +87,10 @@ export class AdminApi {
       .toPromise();
   }
 
+  public async deleteBoard(boardID: number): Promise<void> {
+    return this._http.delete<null>(`Admin/DeleteBoard?boardID=${boardID}`).toPromise();
+  }
+
   /**
    * Create a new board tile for the board specified
    * @param tile
@@ -115,6 +119,14 @@ export class AdminApi {
     return this._http.put<BoardTileDto>('Admin/UpdateBoardTile', tile)
       .pipe(tap(board => this._convertDateStringsToDates(board)))
       .toPromise();
+  }
+
+  /**
+   * Deletes a board tile with the given tileID
+   * @param tileID
+   */
+  public async deleteBoardTile(tileID: number): Promise<void> {
+    return this._http.delete<null>(`Admin/DeleteBoardTile?tileID=${tileID}`).toPromise();
   }
 
   private _convertDateStringsToDates(gameData: BoardDto | BoardTileDto): void {

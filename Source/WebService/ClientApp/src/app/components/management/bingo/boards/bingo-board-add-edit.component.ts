@@ -72,6 +72,14 @@ export class BingoBoardAddEditComponent implements OnInit {
   }
 
   /**
+   * Event handler for when a board has been deleted from the template
+   * @param index
+   */
+  public _onDeleteSuccess(index: number) {
+    this._boards.splice(index, 1);
+  }
+
+  /**
    * Event handler for when a user cancels changes to a board
    *
    * Checks if the board that changes were canceled for was a new

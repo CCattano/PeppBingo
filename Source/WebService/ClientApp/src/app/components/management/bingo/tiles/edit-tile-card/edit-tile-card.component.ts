@@ -28,7 +28,7 @@ export class EditTileCardComponent implements OnInit {
    * The ID of the board this tile is for
    */
   @Input()
-  public boardID: number;
+  public boardIdForCreate: number;
 
   /**
    * Event emitted when changes are canceled.
@@ -114,7 +114,7 @@ export class EditTileCardComponent implements OnInit {
   }
 
   private async _createTile(tile: BoardTileDto): Promise<BoardTileDto> {
-    return await this._adminApi.createNewBoardTile(this.boardID, tile).catch(() => {
+    return await this._adminApi.createNewBoardTile(this.boardIdForCreate, tile).catch(() => {
       this._toastService.showDangerToast({
         header: 'An Error Occurred!',
         body: 'We couldn\'t create your tile. Please try again.',

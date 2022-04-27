@@ -30,6 +30,14 @@ export class TileCardComponent {
   public readonly saveSuccess: EventEmitter<number> = new EventEmitter<number>();
 
   /**
+   * Event emitted when a delete has occurred successfully
+   *
+   * Emits the index of the tile that has just been removed successfully
+   */
+  @Output()
+  public readonly deleteSuccess: EventEmitter<number> = new EventEmitter<number>();
+
+  /**
    * Fontawesome icons used in the template
    */
   public readonly icons: { [icon: string]: IconDefinition; } = {
@@ -79,9 +87,13 @@ export class TileCardComponent {
     } as NgbModalOptions);
     const affirmativeResponse: boolean = await modalRef.result;
     if (affirmativeResponse) {
-      alert('Delete goes here');
-    } else {
-      alert('The board lives to die another day');
+      await this._adminApi.deleteBoardTile(this.tile.tileID)
+        .then(() => this.deleteSuccess.emit(this.index))
+        .catch(() => this._toastService.showDangerToast({
+          header: 'An error occurred',
+          body: 'Tile could not be deleted. Please try again.',
+          ttlMs: 3000
+        }));
     }
   }
 }

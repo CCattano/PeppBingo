@@ -79,6 +79,14 @@ export class BingoTileAddEditComponent implements OnInit {
   }
 
   /**
+   * Event handler for when a tile has been deleted from the template
+   * @param index
+   */
+  public _onDeleteSuccess(index: number) {
+    this._tiles.splice(index, 1);
+  }
+
+  /**
    * Event handler for the cancel click event fired from cards being edited
    *
    * If the tile was new and changes were canceled removes the tile from the list
