@@ -1,0 +1,29 @@
+<div class="d-flex flex-row mt-5">
+  <div class="d-flex flex-column mx-auto">
+    <label class="float-label">Active Board</label>
+    <div *ngIf="!_editingActiveBoard" class="d-flex flex-row">
+      <h4>{{_activeBoard?.name}}</h4>
+      <fa-icon [icon]="icons.faEdit"
+               class="pointer float-end fs-5 ms-3"
+               ngbTooltip="Change active board"
+               placement="auto"
+               (click)="_onChangeActiveBoardClick()">
+      </fa-icon>
+    </div>
+    <div *ngIf="_editingActiveBoard" class="d-flex flex-column justify-content-between">
+      <select class="form-select form-select-lg pointer my-1"
+              [(ngModel)]="_newActiveBoard">
+        <option *ngFor="let board of _boards"
+                [ngValue]="board"
+                [selected]="_activeBoard.boardID === board.boardID"
+                class="text-dark">
+          {{board.name}}
+        </option>
+      </select>
+      <div class="d-flex flex-row justify-content-center my-1">
+        <button class="btn btn-success mx-1" (click)="_onSaveNewBoardClick()">Save</button>
+        <button class="btn btn-outline-secondary mx-1" (click)="_onCancelNewBoardClick()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>

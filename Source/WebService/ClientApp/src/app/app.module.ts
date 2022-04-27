@@ -15,6 +15,7 @@ import { EditBoardCardComponent } from './components/management/bingo/boards/edi
 import { BingoTileAddEditComponent } from './components/management/bingo/tiles/bingo-tile-add-edit.component';
 import { EditTileCardComponent } from './components/management/bingo/tiles/edit-tile-card/edit-tile-card.component';
 import { TileCardComponent } from './components/management/bingo/tiles/tile-card/tile-card.component';
+import { LiveControlsComponent } from './components/management/live-controls/live-controls.component';
 import { FormInputComponent } from './shared/components/form/form-input/form-input.component';
 import { FormTextAreaComponent } from './shared/components/form/form-textarea/form-textarea.component';
 import { LayoutComponent } from './shared/components/layout/layout.component';
@@ -53,6 +54,9 @@ const appInitializers: Provider = [
     BingoTileAddEditComponent,
     TileCardComponent,
     EditTileCardComponent,
+
+    // -- Live Controls
+    LiveControlsComponent,
 
     //#endregion
 

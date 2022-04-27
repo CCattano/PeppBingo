@@ -5,6 +5,7 @@ import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
 import { BingoBoardAddEditComponent } from './components/management/bingo/boards/bingo-board-add-edit.component';
 import { BingoTileAddEditComponent } from './components/management/bingo/tiles/bingo-tile-add-edit.component';
+import { LiveControlsComponent } from './components/management/live-controls/live-controls.component';
 import { AdminAuthGuard } from './shared/middleware/authguards/admin.authguard';
 import { CommonAuthGuard } from './shared/middleware/authguards/common.authguard';
 
@@ -14,7 +15,8 @@ const routes: Routes = [
   { path: 'login', component: LoginComponent, pathMatch: 'full', canActivate: [CommonAuthGuard] },
   { path: 'admin/mods/add-edit', pathMatch: 'full', component: AddEditAdminComponent, canActivate: [AdminAuthGuard] },
   { path: 'admin/bingo/add-edit', pathMatch: 'full', component: BingoBoardAddEditComponent, canActivate: [AdminAuthGuard] },
-  { path: 'admin/bingo/board/:boardID/tiles/add-edit', pathMatch: 'full', component: BingoTileAddEditComponent, canActivate: [AdminAuthGuard] }
+  { path: 'admin/bingo/board/:boardID/tiles/add-edit', pathMatch: 'full', component: BingoTileAddEditComponent, canActivate: [AdminAuthGuard] },
+  { path: 'admin/bingo/live-controls', pathMatch: 'full', component: LiveControlsComponent, canActivate: [AdminAuthGuard] }
 ];
 
 @NgModule({

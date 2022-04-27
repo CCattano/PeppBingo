@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { delay, tap } from 'rxjs/operators';
 import { BoardTileDto } from '../dtos/board-tile.dto';
 import { BoardDto } from '../dtos/board.dto';
 import { UserDto } from '../dtos/user.dto';
@@ -66,6 +67,19 @@ export class AdminApi {
     return await this._http.post<BoardDto>('Admin/CreateBoard', board)
       .pipe(tap(board => this._convertDateStringsToDates(board)))
       .toPromise();
+  }
+
+  /**
+   * Get the boardID of the currently active board from the server
+   */
+  public async getActiveBoardID(): Promise<number> {
+    // TODO: Impl real http req
+    return await of(2).pipe(delay(this.randomDelay())).toPromise();
+  }
+
+  public async updateActiveBoard(boardID: number): Promise<void> {
+    // TODO: Impl real http req
+    return await of(null).pipe(delay(this.randomDelay())).toPromise();
   }
 
   /**
@@ -139,6 +153,13 @@ export class AdminApi {
       new Date((gameData.modDateTime as any as string).endsWith('Z')
         ? gameData.modDateTime
         : gameData.modDateTime + 'Z');
+  }
+
+  /**
+   * Temp
+   */
+  private randomDelay(): number {
+    return Math.floor(Math.random() * (750 - 250 + 1)) + 250;
   }
   //#endregion
 }
