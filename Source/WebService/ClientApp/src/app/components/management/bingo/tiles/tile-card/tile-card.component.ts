@@ -90,9 +90,9 @@ export class TileCardComponent {
       await this._adminApi.deleteBoardTile(this.tile.tileID)
         .then(() => this.deleteSuccess.emit(this.index))
         .catch(() => this._toastService.showDangerToast({
-          header: 'An error occurred',
+          header: 'An Error Occurred',
           body: 'Tile could not be deleted. Please try again.',
-          ttlMs: 3000
+          ttlMs: 5000
         }));
     }
   }

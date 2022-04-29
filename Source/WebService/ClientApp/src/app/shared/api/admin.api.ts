@@ -73,13 +73,15 @@ export class AdminApi {
    * Get the boardID of the currently active board from the server
    */
   public async getActiveBoardID(): Promise<number> {
-    // TODO: Impl real http req
-    return await of(2).pipe(delay(this.randomDelay())).toPromise();
+    return await this._http.get<number>('Admin/Live/GetActiveBoardID').toPromise();
   }
 
-  public async updateActiveBoard(boardID: number): Promise<void> {
-    // TODO: Impl real http req
-    return await of(null).pipe(delay(this.randomDelay())).toPromise();
+  /**
+   * Set ID of the board players should be playing with
+   * @param activeBoardID
+   */
+  public async setActiveBoardID(activeBoardID: number): Promise<void> {
+    return await this._http.put<null>(`Admin/Live/SetActiveBoardID?activeBoardID=${activeBoardID}`, null).toPromise();
   }
 
   /**

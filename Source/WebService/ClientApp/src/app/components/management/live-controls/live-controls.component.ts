@@ -1,7 +1,9 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { faEdit, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { AdminApi } from '../../../shared/api/admin.api';
 import { BoardDto } from '../../../shared/dtos/board.dto';
+import { ToastService } from '../../../shared/service/toast.service';
 
 @Component({
   templateUrl: './live-controls.component.html',
@@ -38,7 +40,10 @@ export class LiveControlsComponent implements OnInit {
     'faEdit': faEdit,
   };
 
-  constructor(private _adminApi: AdminApi) {
+  constructor(
+    private _adminApi: AdminApi,
+    private _toastService: ToastService
+  ) {
   }
 
   /**
@@ -47,7 +52,8 @@ export class LiveControlsComponent implements OnInit {
   public async ngOnInit(): Promise<void> {
     this._boards = await this._adminApi.getAllBoards();
     const activeBoardID: number = await this._adminApi.getActiveBoardID();
-    this._activeBoard = this._newActiveBoard = this._boards.find(board => board.boardID === activeBoardID);
+    if (activeBoardID)
+      this._activeBoard = this._newActiveBoard = this._boards.find(board => board.boardID === activeBoardID);
   }
 
   /**
@@ -55,6 +61,10 @@ export class LiveControlsComponent implements OnInit {
    * active board edit icon in the template
    */
   public _onChangeActiveBoardClick(): void {
+    if (!this._activeBoard)
+      this._newActiveBoard =
+        this._boards
+          .sort((a, b) => a.createdDateTime > b.createdDateTime ? 1 : -1)[0];
     this._editingActiveBoard = true;
   }
 
@@ -63,8 +73,13 @@ export class LiveControlsComponent implements OnInit {
    * new board button in the template
    */
   public async _onSaveNewBoardClick(): Promise<void> {
-    await this._adminApi.updateActiveBoard(this._newActiveBoard.boardID)
-      .then(() => this._activeBoard = this._newActiveBoard);
+    await this._adminApi.setActiveBoardID(this._newActiveBoard.boardID)
+      .then(() => this._activeBoard = this._newActiveBoard)
+      .catch((response: HttpErrorResponse) => this._toastService.showDangerToast({
+        header: 'An Error Occurred',
+        body: response.error,
+        ttlMs: 5000
+      }));
     this._editingActiveBoard = false;
   }
 

@@ -2,7 +2,7 @@
   <div class="d-flex flex-column mx-auto">
     <label class="float-label">Active Board</label>
     <div *ngIf="!_editingActiveBoard" class="d-flex flex-row">
-      <h4>{{_activeBoard?.name}}</h4>
+      <h4>{{_activeBoard?.name || 'No Board Selected'}}</h4>
       <fa-icon [icon]="icons.faEdit"
                class="pointer float-end fs-5 ms-3"
                ngbTooltip="Change active board"
@@ -13,9 +13,9 @@
     <div *ngIf="_editingActiveBoard" class="d-flex flex-column justify-content-between">
       <select class="form-select form-select-lg pointer my-1"
               [(ngModel)]="_newActiveBoard">
-        <option *ngFor="let board of _boards"
+        <option *ngFor="let board of _boards; let i = index"
                 [ngValue]="board"
-                [selected]="_activeBoard.boardID === board.boardID"
+                [selected]="(_activeBoard && _activeBoard.boardID === board.boardID) || (!_activeBoard && !_newActiveBoard && _newActiveBoard.boardID === board.boardID)"
                 class="text-dark">
           {{board.name}}
         </option>

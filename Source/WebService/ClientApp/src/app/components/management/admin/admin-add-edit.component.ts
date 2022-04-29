@@ -150,14 +150,14 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
             this._toastService.showSuccessToast({
               header: 'Success!',
               body: 'Admin permissions were revoked successfully',
-              ttlMs: 3000
+              ttlMs: 5000
             });
           })
           .catch(() => this._toastService.showDangerToast({
             header: 'Error!',
             body: 'An error occurred trying to update the ' +
                   'user\'s permissions. Please try again.',
-            ttlMs: 3000
+            ttlMs: 5000
           }));
     await this._openModal(index, content, affirmativeAction);
   }
@@ -176,13 +176,13 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
             this._toastService.showSuccessToast({
               header: 'Success!',
               body: 'New Admin was added successfully!',
-              ttlMs: 3000
+              ttlMs: 5000
             });
           })
           .catch(() => this._toastService.showDangerToast({
             header: 'Error!',
             body: 'New Admin could not be added. Please try again.',
-            ttlMs: 3000
+            ttlMs: 5000
           }));
     await this._openModal(index, content, affirmativeAction);
   }

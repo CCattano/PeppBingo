@@ -11,6 +11,7 @@ using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
+using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
 using Pepp.Web.Apps.Bingo.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Controllers.Translators;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
@@ -50,6 +51,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region MANAGERS
             services.AddScoped<ITokenManager, TokenManager>();
+            services.AddSingleton<ILiveControlsManager, LiveControlsManager>();
             #endregion
 
             #region FACADES
@@ -132,7 +134,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();

@@ -110,7 +110,7 @@ export class EditBoardCardComponent implements OnInit {
       this._toastService.showDangerToast({
         header: 'An Error Occurred!',
         body: 'We couldn\'t create your board. Please try again.',
-        ttlMs: 3000
+        ttlMs: 5000
       });
       return null;
     });
@@ -121,7 +121,7 @@ export class EditBoardCardComponent implements OnInit {
       this._toastService.showDangerToast({
         header: 'An Error Occurred!',
         body: 'We couldn\'t update this board. Please try again.',
-        ttlMs: 3000
+        ttlMs: 5000
       });
       return null;
     });

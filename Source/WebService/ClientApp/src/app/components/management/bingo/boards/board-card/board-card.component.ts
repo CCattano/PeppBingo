@@ -85,9 +85,9 @@ export class BoardCardComponent {
       await this._adminApi.deleteBoard(this.board.boardID)
         .then(() => this.deleteSuccess.emit(this.index))
         .catch(() => this._toastService.showDangerToast({
-          header: 'An error occurred',
+          header: 'An Error Occurred',
           body: 'Board could not be deleted. Please try again.',
-          ttlMs: 3000
+          ttlMs: 5000
         }));
   }
 }
