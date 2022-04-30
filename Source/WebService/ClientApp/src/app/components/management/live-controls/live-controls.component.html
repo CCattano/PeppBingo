@@ -5,7 +5,8 @@
       <h4>{{_activeBoard?.name || 'No Board Selected'}}</h4>
       <fa-icon [icon]="icons.faEdit"
                class="pointer float-end fs-5 ms-3"
-               ngbTooltip="Change active board"
+               [class.disabled]="!_boards?.length"
+               ngbTooltip="{{(!_boards?.length) ? 'At least 1 board needs 25 tiles to be selectable' : 'Change active board'}}"
                placement="auto"
                (click)="_onChangeActiveBoardClick()">
       </fa-icon>

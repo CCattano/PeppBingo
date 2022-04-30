@@ -1,4 +1,12 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
 .float-label {
   font-size: .75rem;
   float: left;
+}
+
+.disabled {
+  color: $secondary;
+  cursor: not-allowed;
 }

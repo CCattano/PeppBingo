@@ -51,7 +51,7 @@ export class LiveControlsComponent implements OnInit {
    */
   public async ngOnInit(): Promise<void> {
     this._boards = await this._adminApi.getAllBoards();
-    this._boards = this._boards.filter(board => board.tileCount < 25);
+    this._boards = this._boards.filter(board => board.tileCount >= 25);
     const activeBoardID: number = await this._adminApi.getActiveBoardID();
     if (activeBoardID)
       this._activeBoard = this._newActiveBoard = this._boards.find(board => board.boardID === activeBoardID);
@@ -62,6 +62,7 @@ export class LiveControlsComponent implements OnInit {
    * active board edit icon in the template
    */
   public _onChangeActiveBoardClick(): void {
+    if (!this._boards?.length) return;
     if (!this._activeBoard)
       this._newActiveBoard =
         this._boards
