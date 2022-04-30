@@ -13,6 +13,10 @@ namespace Pepp.Web.Apps.Bingo.BusinessModels.Game
         /// </summary>
         public string Text { get; set; }
         /// <summary>
+        /// Flag indicating if this tile is to be used as the center tile on the bingo board
+        /// </summary>
+        public bool IsFreeSpace { get; set; }
+        /// <summary>
         /// Flag indicating if this tile is enabled for use in bingo games
         /// </summary>
         public bool IsActive { get; set; }

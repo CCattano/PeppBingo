@@ -11,6 +11,7 @@ CREATE PROCEDURE game.usp_INSERT_BoardTile
 	@TileID int OUTPUT,
 	@BoardID int,
 	@Text varchar(50),
+	@IsFreeSpace bit,
 	@IsActive bit,
 	@CreatedBy int,
 	@ModBy int
@@ -19,11 +20,21 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 
+		-- Can only have one free space
+		IF @IsFreeSpace = 1
+			UPDATE
+				game.BoardTiles
+			SET
+				IsFreeSpace = 0
+			WHERE
+				BoardID = @BoardID
+				AND IsFreeSpace = 1
+
 		INSERT INTO
 			[game].[BoardTiles]
-           ([BoardID], [Text], [IsActive], [CreatedBy], [ModBy])
+           ([BoardID], [Text], [IsFreeSpace], [IsActive], [CreatedBy], [ModBy])
 		VALUES
-			(@BoardID, @Text, @IsActive, @CreatedBy, @ModBy)
+			(@BoardID, @Text, @IsFreeSpace, @IsActive, @CreatedBy, @ModBy)
 
 		SET @TileID = SCOPE_IDENTITY();
 

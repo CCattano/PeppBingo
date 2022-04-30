@@ -1,5 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { faEdit, faSave, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged, map, skip, tap } from 'rxjs/operators';
 import { AdminApi } from '../../../../../shared/api/admin.api';
 import { BoardTileDto } from '../../../../../shared/dtos/board-tile.dto';
 import { ToastService } from '../../../../../shared/service/toast.service';
@@ -11,7 +13,7 @@ import { EditTileForm } from './edit-tile.form';
   templateUrl: './edit-tile-card.component.html',
   styleUrls: ['../shared-tile-styles.scss']
 })
-export class EditTileCardComponent implements OnInit {
+export class EditTileCardComponent implements OnInit, OnDestroy {
   /**
    * The tile to be edited by this component
    */
@@ -60,6 +62,9 @@ export class EditTileCardComponent implements OnInit {
     'faTrash': faTrash
   };
 
+  private _isFreeSpaceSource: Subject<boolean> = new Subject<boolean>();
+  private _isFreeSpaceSub: Subscription;
+
   constructor(
     private _adminApi: AdminApi,
     private _toastService: ToastService
@@ -70,7 +75,16 @@ export class EditTileCardComponent implements OnInit {
    * @inheritdoc
    */
   public ngOnInit(): void {
+    this._isFreeSpaceSub = this._initFreeSpaceTogglePipeline().subscribe();
     this._tileForm.form.reset(this.tile);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public ngOnDestroy(): void {
+    this._isFreeSpaceSub?.unsubscribe();
+    this._isFreeSpaceSub = null;
   }
 
   /**
@@ -82,17 +96,19 @@ export class EditTileCardComponent implements OnInit {
       return;
     }
     if (this._tileForm.form.pristine)
-      this.tile.editing = false;;
+      this.tile.editing = false;
     let newTile: BoardTileDto;
     if (this.tile.isNew) {
       const tileToCreate: BoardTileDto = new BoardTileDto();
       tileToCreate.text = this._tileForm.controls.text.value;
+      tileToCreate.isFreeSpace = this._tileForm.controls.isFreeSpace.value;
       tileToCreate.isActive = this._tileForm.controls.isActive.value;
       newTile = await this._createTile(tileToCreate);
     } else {
       const tileToCreate: BoardTileDto = {
         ...this.tile,
         text: this._tileForm.controls.text.value,
+        isFreeSpace: this._tileForm.controls.isFreeSpace.value,
         isActive: this._tileForm.controls.isActive.value
       };
       newTile = await this._updateTile(tileToCreate);
@@ -111,6 +127,27 @@ export class EditTileCardComponent implements OnInit {
   public _onDiscardClick(): void {
     this.tile.editing = false;
     this.cancelClick.emit(this.index);
+  }
+
+  public _onFreeSpaceToggle(targetState: boolean): void {
+    this._isFreeSpaceSource.next(targetState);
+  }
+
+  /**
+   * Pipeline that handles the state change for isFreeSpace toggle
+   */
+  private _initFreeSpaceTogglePipeline(): Observable<void> {
+    return this._isFreeSpaceSource.asObservable().pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      skip(1),
+      tap((targetState: boolean) => {
+        this._tileForm.controls.isFreeSpace.setValue(targetState);
+        this._tileForm.controls.isFreeSpace.markAsTouched();
+        this._tileForm.controls.isFreeSpace.markAsDirty();
+      }),
+      map(() => null)
+    )
   }
 
   private async _createTile(tile: BoardTileDto): Promise<BoardTileDto> {

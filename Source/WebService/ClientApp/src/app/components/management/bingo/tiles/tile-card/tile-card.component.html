@@ -28,16 +28,32 @@
   <div class="card-body border-light m-5 text-center">
     {{tile.text}}
   </div>
-  <ul class="list-group list-group-flush border-top-0">
-    <li class="list-group-item bg-dark text-light p-0 px-2">
-      <fa-icon [icon]="icons.faEdit"
-               class="pointer float-end fs-4"
-               ngbTooltip="Edit Tile Details"
-               placement="auto"
-               (click)="_onEditTileClick()">
-      </fa-icon>
-    </li>
-  </ul>
+  <div class="d-flex flex-row justify-content-between">
+    <ul class="list-group list-group-flush border-top-0">
+      <li class="list-group-item bg-dark text-danger p-0 px-2">
+        <fa-icon *ngIf="tile.isFreeSpace"
+                 [icon]="icons.faCircle"
+                 class="float-end fs-4"
+                 popoverTitle="Free Space!"
+                 ngbPopover="This is the free-space tile for this board"
+                 popoverClass="popover-dark"
+                 triggers="mouseenter:mouseleave"
+                 placement="auto"
+                 container="body">
+        </fa-icon>
+      </li>
+    </ul>
+    <ul class="list-group list-group-flush border-top-0">
+      <li class="list-group-item bg-dark text-light p-0 px-2">
+        <fa-icon [icon]="icons.faEdit"
+                 class="pointer float-end fs-4"
+                 ngbTooltip="Edit Tile Details"
+                 placement="auto"
+                 (click)="_onEditTileClick()">
+        </fa-icon>
+      </li>
+    </ul>
+  </div>
   <div class="card-footer border-light">
     <div class="row">
       <div class="col-6 my-1">

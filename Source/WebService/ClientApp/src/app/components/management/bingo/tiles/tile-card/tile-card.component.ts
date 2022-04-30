@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, TemplateRef } from '@angular/core';
-import { faEdit, faPlusCircle, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { faCircle, faEdit, faPlusCircle, faTrash, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { NgbModal, NgbModalOptions } from '@ng-bootstrap/ng-bootstrap';
 import { AdminApi } from '../../../../../shared/api/admin.api';
 import { BoardTileDto } from '../../../../../shared/dtos/board-tile.dto';
@@ -43,7 +43,8 @@ export class TileCardComponent {
   public readonly icons: { [icon: string]: IconDefinition; } = {
     'faPlusCircle': faPlusCircle,
     'faEdit': faEdit,
-    'faTrash': faTrash
+    'faTrash': faTrash,
+    'faCircle': faCircle
   };
 
   constructor(

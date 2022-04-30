@@ -81,6 +81,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
                 },
                 new SqlParameter()
                 {
+                    ParameterName = $"@{nameof(BoardTileEntity.IsFreeSpace)}",
+                    SqlDbType = SqlDbType.Bit,
+                    Value = entity.IsFreeSpace
+                },
+                new SqlParameter()
+                {
                     ParameterName = $"@{nameof(BoardTileEntity.IsActive)}",
                     SqlDbType = SqlDbType.Bit,
                     Value = entity.IsActive
@@ -156,6 +162,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
                 },
                 new SqlParameter()
                 {
+                    ParameterName = $"@{nameof(BoardTileEntity.IsFreeSpace)}",
+                    SqlDbType = SqlDbType.Bit,
+                    Value = entity.IsFreeSpace
+                },
+                new SqlParameter()
+                {
                     ParameterName = $"@{nameof(BoardTileEntity.IsActive)}",
                     SqlDbType = SqlDbType.Bit,
                     Value = entity.IsActive
@@ -209,7 +221,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             public const string UpdateBoardTile = "game.usp_UPDATE_BoardTile";
             public const string DeleteBoardTileByTileID = "game.usp_DELETE_BoardTile_ByTileID";
             public const string DeleteBoardTilesByBoardID = "game.usp_DELETE_BoardTiles_ByBoardID";
-            //
         }
     }
 }

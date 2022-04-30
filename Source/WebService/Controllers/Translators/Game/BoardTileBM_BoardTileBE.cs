@@ -11,6 +11,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers.Translators.Game
             BoardTileBM result = destination ?? new();
             result.TileID = source.TileID;
             result.Text = source.Text;
+            result.IsFreeSpace = source.IsFreeSpace;
             result.IsActive = source.IsActive;
             result.CreatedDateTime = source.CreatedDateTime;
             result.CreatedBy = source.CreatedBy;
@@ -24,6 +25,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers.Translators.Game
             BoardTileBE result = destination ?? new();
             result.TileID = source.TileID;
             result.Text = source.Text;
+            result.IsFreeSpace = source.IsFreeSpace;
             result.IsActive = source.IsActive;
             result.CreatedDateTime = source.CreatedDateTime;
             result.CreatedBy = source.CreatedBy;

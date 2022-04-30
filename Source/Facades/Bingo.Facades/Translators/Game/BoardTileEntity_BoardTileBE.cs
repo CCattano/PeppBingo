@@ -14,6 +14,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
             // Passed up and used in Create only, not used by Update
             result.BoardID = source.BoardID;
             result.Text = source.Text;
+            result.IsFreeSpace = source.IsFreeSpace;
             result.IsActive = source.IsActive;
             //result.CreatedDateTime = source.CreatedDateTime;
             // Passed up and used in Create only, not used by Update
@@ -29,6 +30,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Game
             result.TileID = source.TileID;
             result.BoardID = source.BoardID;
             result.Text = source.Text;
+            result.IsFreeSpace = source.IsFreeSpace;
             result.IsActive = source.IsActive;
             result.CreatedDateTime = source.CreatedDateTime;
             result.CreatedBy = source.CreatedBy;

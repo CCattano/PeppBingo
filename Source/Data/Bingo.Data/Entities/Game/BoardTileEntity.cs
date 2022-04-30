@@ -17,6 +17,10 @@ namespace Pepp.Web.Apps.Bingo.Data.Entities.Game
         /// </summary>
         public string Text;
         /// <summary>
+        /// Flag indicating if this tile is to be used as the center tile on the bingo board
+        /// </summary>
+        public bool IsFreeSpace;
+        /// <summary>
         /// Flag indicating if this tile is enabled for use in bingo games
         /// </summary>
         public bool IsActive;

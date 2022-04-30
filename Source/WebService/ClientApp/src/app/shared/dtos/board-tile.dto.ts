@@ -8,6 +8,10 @@ export class BoardTileDto {
    */
   public text: string;
   /**
+   * Flag indicating if this tile is to be used as the center tile on the bingo board
+   */
+  public isFreeSpace: boolean
+  /**
    * Flag indicating if this tile is enabled for use in bingo games
    */
   public isActive: boolean;

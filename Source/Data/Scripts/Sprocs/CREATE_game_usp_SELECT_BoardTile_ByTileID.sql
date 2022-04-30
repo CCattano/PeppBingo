@@ -17,6 +17,7 @@ BEGIN
 		[TileID],
 		[BoardID],
 		[Text],
+		[IsFreeSpace],
 		[IsActive],
 		[CreatedDateTime],
 		[CreatedBy],

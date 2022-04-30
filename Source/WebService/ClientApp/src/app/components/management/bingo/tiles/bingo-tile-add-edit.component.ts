@@ -76,6 +76,9 @@ export class BingoTileAddEditComponent implements OnInit {
 
     changedTile.createdByName = this._displayNamesById.get(changedTile.createdBy);
     changedTile.modByName = this._displayNamesById.get(changedTile.modBy);
+
+    if (changedTile.isFreeSpace)
+      this._tiles.forEach(tile => tile.isFreeSpace = tile.tileID === changedTile.tileID);
   }
 
   /**
@@ -100,6 +103,7 @@ export class BingoTileAddEditComponent implements OnInit {
   private _addEmptyTile(): void {
     const newTile: BoardTileVM = {
       isActive: true,
+      isFreeSpace: false,
       createdByName: 'You',
       modByName: 'You',
       createdDateTime: new Date(new Date().toISOString()),

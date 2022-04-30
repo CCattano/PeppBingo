@@ -33,10 +33,21 @@
   <div class="card-body border-light m-3 pb-4 text-center">
     <form-textarea [control]="_tileForm.controls.text" label="Tile Text" placeholder="Add tile text here..."></form-textarea>
   </div>
-  <!-- Keeping this here with visibility: hidden for height consistency -->
   <ul class="list-group list-group-flush border-top-0">
-    <li class="list-group-item bg-dark text-light p-0 px-2">
-      <fa-icon [icon]="icons.faEdit" class="pointer float-end fs-4 invisible"></fa-icon>
+    <li class="list-group-item bg-dark text-light text-end p-0 px-2">
+      <ng-toggle class="rounded-pill mb-1"
+                 onColor="success"
+                 onText="Free"
+                 offColor="danger"
+                 offText="Free"
+                 handleColor="light"
+                 size="sm"
+                 [ngModel]="_tileForm.controls.isFreeSpace.value"
+                 (ngModelChange)="_onFreeSpaceToggle($event)">
+        <input type="checkbox"
+               [ngModel]="_tileForm.controls.isFreeSpace.value"
+               (ngModelChange)="_onFreeSpaceToggle($event)" />
+      </ng-toggle>
     </li>
   </ul>
   <div class="card-footer border-light">
