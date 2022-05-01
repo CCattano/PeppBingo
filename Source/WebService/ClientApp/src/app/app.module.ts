@@ -7,6 +7,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgToggleModule } from '@nth-cloud/ng-toggle';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { BingoGameComponent } from './components/game/bingo-game.component';
 import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
 import { BingoBoardAddEditComponent } from './components/management/bingo/boards/bingo-board-add-edit.component';
@@ -57,6 +58,9 @@ const appInitializers: Provider = [
 
     // -- Live Controls
     LiveControlsComponent,
+
+    // -- Bingo Game
+    BingoGameComponent,
 
     //#endregion
 

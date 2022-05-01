@@ -2,6 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { faEdit, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { AdminApi } from '../../../shared/api/admin.api';
+import { GameApi } from '../../../shared/api/game.api';
 import { BoardDto } from '../../../shared/dtos/board.dto';
 import { ToastService } from '../../../shared/service/toast.service';
 
@@ -42,6 +43,7 @@ export class LiveControlsComponent implements OnInit {
 
   constructor(
     private _adminApi: AdminApi,
+    private _gameApi: GameApi,
     private _toastService: ToastService
   ) {
   }
@@ -52,7 +54,7 @@ export class LiveControlsComponent implements OnInit {
   public async ngOnInit(): Promise<void> {
     this._boards = await this._adminApi.getAllBoards();
     this._boards = this._boards.filter(board => board.tileCount >= 25);
-    const activeBoardID: number = await this._adminApi.getActiveBoardID();
+    const activeBoardID: number = await this._gameApi.getActiveBoardID();
     if (activeBoardID)
       this._activeBoard = this._newActiveBoard = this._boards.find(board => board.boardID === activeBoardID);
   }

@@ -9,12 +9,10 @@ using System.Threading.Tasks;
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 {
     [Route("[controller]/[action]")]
-    public class UserController : BaseController<IUserAdapter>
+    public class UserController : BaseController<IMapper, IUserAdapter>
     {
-        private readonly IMapper _mapper;
-        public UserController(IMapper mapper, IUserAdapter adapter) : base(adapter)
+        public UserController(IMapper mapper, IUserAdapter adapter) : base(mapper, adapter)
         {
-            _mapper = mapper;
         }
 
         [TokenRequired]
@@ -23,7 +21,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         {
             string token = base.TryGetAccessTokenFromRequestHeader();
             UserBE userBE = await base.Adapter.GetUser(token);
-            UserBM userBM = _mapper.Map<UserBM>(userBE);
+            UserBM userBM = base.Mapper.Map<UserBM>(userBE);
             return userBM;
         }
     }

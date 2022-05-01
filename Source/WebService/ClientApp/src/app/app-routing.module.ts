@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { BingoGameComponent } from './components/game/bingo-game.component';
 import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
 import { BingoBoardAddEditComponent } from './components/management/bingo/boards/bingo-board-add-edit.component';
@@ -16,7 +17,8 @@ const routes: Routes = [
   { path: 'admin/mods/add-edit', pathMatch: 'full', component: AddEditAdminComponent, canActivate: [AdminAuthGuard] },
   { path: 'admin/bingo/add-edit', pathMatch: 'full', component: BingoBoardAddEditComponent, canActivate: [AdminAuthGuard] },
   { path: 'admin/bingo/board/:boardID/tiles/add-edit', pathMatch: 'full', component: BingoTileAddEditComponent, canActivate: [AdminAuthGuard] },
-  { path: 'admin/bingo/live-controls', pathMatch: 'full', component: LiveControlsComponent, canActivate: [AdminAuthGuard] }
+  { path: 'admin/bingo/live-controls', pathMatch: 'full', component: LiveControlsComponent, canActivate: [AdminAuthGuard] },
+  { path: 'game/bingo/play', pathMatch: 'full', component: BingoGameComponent, canActivate: [CommonAuthGuard] }
 ];
 
 @NgModule({

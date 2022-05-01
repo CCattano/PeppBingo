@@ -13,7 +13,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         }
 
         /// <summary>
-        /// Endpoint called by Twitch to provide the access_code of 
+        /// Endpoint called by Twitch to provide the access_code of
         /// a user who has authorized us to fetch their user data
         /// </summary>
         /// <param name="code">

@@ -23,6 +23,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <returns></returns>
         Task<BoardBE> CreateBoard(BoardBE newBoard);
         /// <summary>
+        /// Fetches a board with the <paramref name="boardID"/> provided
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task<BoardBE> GetBoard(int boardID);
+        /// <summary>
         /// Fetches all board maintained by admins in the application
         /// </summary>
         /// <returns></returns>
@@ -87,6 +93,14 @@ namespace Pepp.Web.Apps.Bingo.Facades
         {
             BoardEntity boardEntity = _mapper.Map<BoardEntity>(newBoard);
             await _dataSvc.Game.BoardRepo.InsertBoard(boardEntity);
+            BoardBE boardBE = _mapper.Map<BoardBE>(boardEntity);
+            return boardBE;
+        }
+
+        public async Task<BoardBE> GetBoard(int boardID)
+        {
+            BoardEntity boardEntity =
+                await _dataSvc.Game.BoardRepo.GetBoard(boardID);
             BoardBE boardBE = _mapper.Map<BoardBE>(boardEntity);
             return boardBE;
         }

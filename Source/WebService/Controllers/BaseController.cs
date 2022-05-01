@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using Pepp.Web.Apps.Bingo.Infrastructure;
 using Pepp.Web.Apps.Bingo.Managers;
@@ -12,6 +13,18 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         protected readonly TAdapter Adapter;
 
         protected BaseController(TAdapter adapter) : base() => Adapter = adapter;
+    }
+
+    public abstract class BaseController<TMapper, TAdapter> : BaseController
+    {
+        protected readonly TMapper Mapper;
+        protected readonly TAdapter Adapter;
+
+        protected BaseController(TMapper mapper, TAdapter adapter)
+        {
+            Mapper = mapper;
+            Adapter = adapter;
+        }
     }
 
     public abstract class BaseController : Controller

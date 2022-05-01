@@ -1,0 +1,42 @@
+<!-- No board display -->
+<div *ngIf="_noActiveBoard" class="centerOnPage w-100 text-center">
+  <h1>Mods haven't set a board to play with yet.</h1>
+  <br />
+  <h1>Tell 'em to get off their lazy butts and get with the program.</h1>
+  <br />
+  <h6>(This page will automagically update once a board to play with has been selected, so just sit tight.)</h6>
+</div>
+<ng-container *ngIf="!_noActiveBoard">
+  <!-- Desktop Bingo Board -->
+  <div *ngIf="_currBreakpoint >= breakpointsEnum.md">
+    full size card
+    <button class="btn btn-info">Reset Card</button>
+  </div>
+  <!--Mobile Bingo Board -->
+  <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md">
+    <div class="grid">
+      <ng-container *ngFor="let rows of _board" class="row">
+        <div *ngFor="let col of rows" class="gridCell">
+          <span class="gridCellContent"
+                [class.mobileIsSelected]="col.isSelected">
+          </span>
+        </div>
+      </ng-container>
+    </div>
+    <button class="btn btn-info mt-2" (click)="_onResetBoardClick()">
+      Reset Card
+    </button>
+    <div *ngFor="let rows of _board; let ri = index" class="my-2">
+      <h5>Row {{ri + 1}}</h5>
+      <ul class="list-group">
+        <li *ngFor="let col of rows; let ci = index"
+            class="list-group-item text-light border border-light"
+            [class.bg-dark]="!col.isSelected"
+            [class.bg-danger]="col.isSelected"
+            (click)="_onMobileTileListClick(col)">
+          {{col.text}}
+        </li>
+      </ul>
+    </div>
+  </ng-container>
+</ng-container>

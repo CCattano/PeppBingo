@@ -19,6 +19,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <returns></returns>
         Task<BoardBE> CreateBoard(int userID, BoardBE newBoard);
         /// <summary>
+        /// Fetches a board with the <paramref name="boardID"/> provided
+        /// </summary>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task<BoardBE> GetBoard(int boardID);
+        /// <summary>
         /// Fetches all board maintained by admins in the application
         /// </summary>
         /// <returns></returns>
@@ -75,6 +81,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         private readonly IGameFacade _facade;
 
         public GameAdapter(IGameFacade facade) => _facade = facade;
+
+        public async Task<BoardBE> GetBoard(int boardID)
+        {
+            BoardBE boardBE = await _facade.GetBoard(boardID);
+            return boardBE;
+        }
 
         public async Task<List<BoardBE>> GetAllBoards()
         {

@@ -70,13 +70,6 @@ export class AdminApi {
   }
 
   /**
-   * Get the boardID of the currently active board from the server
-   */
-  public async getActiveBoardID(): Promise<number> {
-    return await this._http.get<number>('Admin/Live/GetActiveBoardID').toPromise();
-  }
-
-  /**
    * Set ID of the board players should be playing with
    * @param activeBoardID
    */
