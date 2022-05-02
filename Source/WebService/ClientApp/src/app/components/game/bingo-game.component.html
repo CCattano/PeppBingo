@@ -14,7 +14,7 @@
         <div *ngFor="let col of rows"
              class="gridCell pointer"
              (click)="_onTileClick(col)">
-          <div [class.desktopIsSelected]="col.isSelected">
+          <div [class.isSelected]="col.isSelected">
             <span class="gridCellContent">
               {{col.text}}
             </span>
@@ -32,26 +32,31 @@
   <!--Mobile Bingo Board -->
   <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md && !_isMobileLandscape">
     <div class="grid">
-      <ng-container *ngFor="let rows of _board" class="row">
-        <div *ngFor="let col of rows" class="gridCell">
-          <span class="gridCellContent"
-                [class.mobileIsSelected]="col.isSelected">
-          </span>
+      <ng-container *ngFor="let rows of _board; let dri = index;" class="row">
+        <div *ngFor="let col of rows; let dci = index;" class="gridCell">
+          <div [class.isSelected]="col.isSelected">
+            <span class="gridCellContent">
+              {{(5 * dri) + (dci + 1)}}
+            </span>
+          </div>
         </div>
       </ng-container>
+      <button class="btn btn-outline-warning mt-2 me-auto" (click)="_onResetBoardClick()">
+        Reset Card
+      </button>
+      <button class="btn btn-outline-warning mt-2 ms-auto">
+        Screenshot
+      </button>
     </div>
-    <button class="btn btn-info mt-2" (click)="_onResetBoardClick()">
-      Reset Card
-    </button>
     <div *ngFor="let rows of _board; let ri = index" class="my-2">
       <h5>Row {{ri + 1}}</h5>
       <ul class="list-group">
         <li *ngFor="let col of rows; let ci = index"
             class="list-group-item text-light border border-light"
             [class.bg-dark]="!col.isSelected"
-            [class.bg-danger]="col.isSelected"
+            [class.selectedBg]="col.isSelected"
             (click)="_onTileClick(col)">
-          {{col.text}}
+          {{(5 * ri) + (ci + 1)}}. {{col.text}}
         </li>
       </ul>
     </div>
