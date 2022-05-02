@@ -97,6 +97,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public _onTileClick(selectedTile: GameTileVM): void {
     selectedTile.isSelected = !selectedTile.isSelected;
+    this._checkForWinCondition();
   }
 
   /**
@@ -145,6 +146,12 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private _makeBoard(): void {
     const tiles: GameTileDto[] = this._tiles.slice(0);
+    // Shuffle the array befor grabbing
+    // random items out of it for the board
+    for (let i: number = tiles.length - 1; i > 0; i--) {
+      const j: number = Math.floor(Math.random() * (i + 1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
     this._board = [];
     for (let row: number = 0; row < 5; row++) {
       this._board[row] = [];
@@ -157,7 +164,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
           continue;
         }
         const randomIndex: number =
-          Math.floor(Math.random() * (tiles.length - 1));
+          Math.floor(Math.random() * (tiles.length));
         const tile: GameTileDto = tiles.splice(randomIndex, 1).shift();
         this._board[row].push({
           ...tile,
@@ -201,6 +208,44 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       }),
       map(() => null)
     );
+  }
+
+  private _checkForWinCondition() {
+    //Check all rows, columns, and diagonals
+    let topLToBottomRDiagCount = 0;
+    let bottomLToTopRDiagCount = 0;
+    let blttrRow = 0;
+    let blttrCol = 4;
+    for (let row = 0; row < 5; row++) {
+      let selectedRowCount = 0;
+      let selectedColCount = 0;
+      //check all columns for this row
+      for (let col = 0; col < 5; col++) {
+        //horizontal check: check all columns for this row
+        if (this._board[row][col].isSelected)
+          selectedRowCount++;
+        //vertical check: check all rows for this column
+        if (this._board[col][row].isSelected)
+          selectedColCount++;
+      }
+      //Check if nested for-loop found winner
+      if (selectedRowCount === 5 || selectedColCount === 5) {
+        alert("You've Won!");
+        return;
+      }
+      //check top-left to bottom-right diag coordinate
+      if (this._board[row][row].isSelected)
+        topLToBottomRDiagCount++;
+
+      if (this._board[blttrRow][blttrCol].isSelected)
+        bottomLToTopRDiagCount++;
+
+      blttrRow++;
+      blttrCol--;
+    }
+    //If no rows or cols had 5 in a row check diagonals
+    if (topLToBottomRDiagCount === 5 || bottomLToTopRDiagCount === 5)
+      alert("You've Won!");
   }
   //#endregion
 }
