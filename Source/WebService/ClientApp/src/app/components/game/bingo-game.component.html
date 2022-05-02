@@ -8,12 +8,29 @@
 </div>
 <ng-container *ngIf="!_noActiveBoard">
   <!-- Desktop Bingo Board -->
-  <div *ngIf="_currBreakpoint >= breakpointsEnum.md">
-    full size card
-    <button class="btn btn-info">Reset Card</button>
-  </div>
+  <ng-container *ngIf="_currBreakpoint >= breakpointsEnum.md && !_isMobileLandscape">
+    <div class="grid desktop m-auto">
+      <ng-container *ngFor="let rows of _board" class="row">
+        <div *ngFor="let col of rows"
+             class="gridCell pointer"
+             (click)="_onTileClick(col)">
+          <div [class.desktopIsSelected]="col.isSelected">
+            <span class="gridCellContent">
+              {{col.text}}
+            </span>
+          </div>
+        </div>
+      </ng-container>
+      <button class="btn btn-outline-warning mt-2 me-auto" (click)="_onResetBoardClick()">
+        Reset Card
+      </button>
+      <button class="btn btn-outline-warning mt-2 ms-auto">
+        Screenshot
+      </button>
+    </div>
+  </ng-container>
   <!--Mobile Bingo Board -->
-  <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md">
+  <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md && !_isMobileLandscape">
     <div class="grid">
       <ng-container *ngFor="let rows of _board" class="row">
         <div *ngFor="let col of rows" class="gridCell">
@@ -33,10 +50,19 @@
             class="list-group-item text-light border border-light"
             [class.bg-dark]="!col.isSelected"
             [class.bg-danger]="col.isSelected"
-            (click)="_onMobileTileListClick(col)">
+            (click)="_onTileClick(col)">
           {{col.text}}
         </li>
       </ul>
     </div>
   </ng-container>
+  <!-- Mobile Landscape Unsupported Notice -->
+  <div *ngIf="_isMobileLandscape" class="centerOnPage w-100 text-center" style="z-index: -1;">
+    <h1>Mobile Landscape Mode is currently not supported.</h1>
+    <br />
+    <h1>Please rotate your device or play on a different device.</h1>
+    <br />
+    <h6>If you want this functionality please reach out via the feedback page.</h6>
+    <h6>If enough people request support for this I can revisit it.</h6>
+  </div>
 </ng-container>

@@ -63,6 +63,12 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public _currBreakpoint: BreakpointsEnum;
 
+  /**
+   * Bool flag that indicated we are in a mobile
+   * width and in a landscape orientation
+   */
+  public _isMobileLandscape: boolean;
+
   constructor(private _gameApi: GameApi) {
   }
 
@@ -71,6 +77,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public async ngOnInit(): Promise<void> {
     this._currBreakpoint = this._calcViewport();
+    this._isMobileLandscape = this._calcIsMobileLandscape(this._currBreakpoint);
     this._resizeSub = this._initResizeEventPipeline().subscribe();
     await this._getGameData();
   }
@@ -83,18 +90,14 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     this._resizeSub = null;
   }
 
-  //#region Mobile Board Functions
-
   /**
    * Event handler for when a list group item
    * is selected in the mobile bingo board layout
    * @param selectedTile
    */
-  public _onMobileTileListClick(selectedTile: GameTileVM): void {
+  public _onTileClick(selectedTile: GameTileVM): void {
     selectedTile.isSelected = !selectedTile.isSelected;
   }
-
-  //#endregion
 
   /**
    * Event handler for when the reset board button is clicked
@@ -181,6 +184,10 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       return BreakpointsEnum.xs;
   }
 
+  private _calcIsMobileLandscape(breakpoint: BreakpointsEnum): boolean {
+    return breakpoint < BreakpointsEnum.lg && window.matchMedia("(orientation: landscape)").matches;
+  }
+
   private _initResizeEventPipeline(): Observable<void> {
     return this._resizeEvent$.pipe(
       debounceTime(250),
@@ -188,8 +195,10 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       map(() => this._calcViewport()),
       filter((breakpoint: BreakpointsEnum) =>
         this._currBreakpoint !== breakpoint),
-      tap((breakpoint: BreakpointsEnum) =>
-        this._currBreakpoint = breakpoint),
+      tap((breakpoint: BreakpointsEnum) => {
+        this._currBreakpoint = breakpoint;
+        this._isMobileLandscape = this._calcIsMobileLandscape(breakpoint);
+      }),
       map(() => null)
     );
   }
