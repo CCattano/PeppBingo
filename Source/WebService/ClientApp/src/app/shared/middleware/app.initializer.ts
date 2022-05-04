@@ -1,4 +1,7 @@
 import { Injectable, Injector } from '@angular/core';
+import { UserApi } from '../api/user.api';
+import { UserDto } from '../dtos/user.dto';
+import { AdminHub } from '../hubs/admin.hub';
 import { TokenService } from '../service/token.service';
 
 @Injectable({
@@ -6,16 +9,20 @@ import { TokenService } from '../service/token.service';
 })
 export class AppInitializer {
   private _tokenSvc: TokenService;
+  private _userApi: UserApi;
+  private _adminHub: AdminHub;
 
   constructor(injector: Injector) {
     this._tokenSvc = injector.get(TokenService);
+    this._userApi = injector.get(UserApi);
+    this._adminHub = injector.get(AdminHub);
   }
 
   /**
    * Run setup logic for the application on the initial bootstrapping
    * of the framework before the request route resolves
    */
-  public initialize(): void {
+  public async initialize(): Promise<void> {
     let token: string = this._tryGetTokenValueByName(TokenService.authTokenName);
 
     // If we've found a token under the PeppAuthToken workflow
@@ -25,7 +32,6 @@ export class AppInitializer {
     if (token) {
       this._tokenSvc.removeToken(true);
       this._tokenSvc.setToken(token, true);
-      return;
     }
 
     token = this._tryGetTokenValueByName(TokenService.accessTokenName);
@@ -44,6 +50,11 @@ export class AppInitializer {
      * Then we will let the route handling determine there is no token
      * in our auth guard and that will send us to the login page
      */
+    if (this._tokenSvc.haveToken && !this._tokenSvc.tokenIsExpired) {
+      const user: UserDto = await this._userApi.getUser();
+      if (user.isAdmin)
+        await this._adminHub.connect();
+    }
   }
 
   /**

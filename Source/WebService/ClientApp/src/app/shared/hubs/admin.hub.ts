@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
 
+enum AdminEvents {
+  EmitLatestActiveBoardID = 'EmitLatestActiveBoardID',
+  TriggerSetActiveBoardCooldown = 'TriggerSetActiveBoardCooldown'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -22,6 +27,7 @@ export class AdminHub {
         .withAutomaticReconnect()
         .build();
     await this._hubConn.start();
+    this._registerInternalCooldownHandler();
   }
 
   /**
@@ -31,7 +37,7 @@ export class AdminHub {
    * @param handler
    */
   public registerOnLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void) {
-    this._hubConn.on('EmitLatestActiveBoardID', (activeBoardID: number) => handler(activeBoardID));
+    this._hubConn.on(AdminEvents.EmitLatestActiveBoardID, (activeBoardID: number) => handler(activeBoardID));
   }
 
   /**
@@ -40,28 +46,32 @@ export class AdminHub {
    * representhing the latest active board that has been chosen by an admin
    * @param handler
    */
-  public registerOnTriggerSetActiveBoardCooldown(handler: (timeRemaining: number) => void) {
-    debugger;
-    const currentDatetime: Date = new Date();
+  public registerOnTriggerSetActiveBoardCooldown(handler: (timeRemaining?: number) => void) {
+    this._hubConn.off(AdminEvents.TriggerSetActiveBoardCooldown);
     if (this._eventCaptureDatetime) {
+      const currentDatetime: Date = new Date();
       const cooldownExpireTime: Date =
-        new Date(this._eventCaptureDatetime.setSeconds(this._eventCaptureDatetime.getSeconds() + 30));
+        new Date(new Date(this._eventCaptureDatetime).setSeconds(this._eventCaptureDatetime.getSeconds() + 30));
       if (cooldownExpireTime > currentDatetime) {
         const timeRemaining: number =
-          Math.round(Math.abs(this._eventCaptureDatetime.getTime() - currentDatetime.getTime()) / 1000);
+          Math.round(Math.abs(cooldownExpireTime.getTime() - currentDatetime.getTime()) / 1000);
         handler(timeRemaining);
       }
     }
-    this._hubConn.on('TriggerSetActiveBoardCooldown', () => {
+    this._hubConn.on(AdminEvents.TriggerSetActiveBoardCooldown, () => {
       this._eventCaptureDatetime = new Date();
-      handler(null);
+      handler();
     });
   }
 
   public unregisterAllHandlers(): void {
-    this._hubConn.off('EmitLatestActiveBoardID');
-    this._hubConn.off('TriggerSetActiveBoardCooldown');
-    this._hubConn.stop();
-    this._hubConn = null;
+    this._hubConn.off(AdminEvents.EmitLatestActiveBoardID);
+    this._hubConn.off(AdminEvents.TriggerSetActiveBoardCooldown);
+    this._registerInternalCooldownHandler();
+  }
+
+  private _registerInternalCooldownHandler(): void {
+    this._hubConn.on(AdminEvents.TriggerSetActiveBoardCooldown, () =>
+      this._eventCaptureDatetime = new Date());
   }
 }
