@@ -212,10 +212,8 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private _checkForWinCondition() {
     //Check all rows, columns, and diagonals
-    let topLToBottomRDiagCount = 0;
-    let bottomLToTopRDiagCount = 0;
-    let blttrRow = 0;
-    let blttrCol = 4;
+    let topLToBotRDiagCount = 0;
+    let botLToTopRDiagCount = 0;
     for (let row = 0; row < 5; row++) {
       let selectedRowCount = 0;
       let selectedColCount = 0;
@@ -235,16 +233,13 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       }
       //check top-left to bottom-right diag coordinate
       if (this._board[row][row].isSelected)
-        topLToBottomRDiagCount++;
+        topLToBotRDiagCount++;
 
-      if (this._board[blttrRow][blttrCol].isSelected)
-        bottomLToTopRDiagCount++;
-
-      blttrRow++;
-      blttrCol--;
+      if (this._board[Math.abs(row - 4)][row].isSelected)
+        botLToTopRDiagCount++;
     }
     //If no rows or cols had 5 in a row check diagonals
-    if (topLToBottomRDiagCount === 5 || bottomLToTopRDiagCount === 5)
+    if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
       alert("You've Won!");
   }
   //#endregion

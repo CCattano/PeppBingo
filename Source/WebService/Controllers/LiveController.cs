@@ -11,27 +11,32 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 {
     [TokenRequired]
     [Route("Admin/[controller]/[action]")]
-    public class LiveController : BaseController<IUserAdapter>
+    public class LiveController : BaseController
     {
-        private readonly ILiveControlsManager _manager;
+        private readonly IUserAdapter _userAdapter;
+        private readonly ILiveAdapter _liveAdapter;
 
         public LiveController(
-            ILiveControlsManager manager,
-            IUserAdapter adapter
-        ) : base(adapter) => _manager = manager;
+            IUserAdapter userAdapter,
+            ILiveAdapter liveAdapter
+        )
+        {
+            _userAdapter = userAdapter;
+            _liveAdapter = liveAdapter;
+        }
 
         [HttpPut]
         public async Task<ActionResult> SetActiveBoardID([FromQuery] int activeBoardID)
         {
             await ConfirmIsAdmin("Non-Administrators cannot access live controls");
-            _manager.SetActiveBoardID(activeBoardID);
+            await _liveAdapter.SetActiveBoardID(activeBoardID);
             return Ok();
         }
 
         private async Task ConfirmIsAdmin(string rejectionMsg)
         {
             string token = base.TryGetAccessTokenFromRequestHeader();
-            UserBE requestingUser = await base.Adapter.GetUser(token);
+            UserBE requestingUser = await _userAdapter.GetUser(token);
             if (!requestingUser.IsAdmin)
                 throw new WebException(HttpStatusCode.Forbidden, rejectionMsg);
         }

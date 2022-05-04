@@ -29,7 +29,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Managers", "Managers", "{AC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bingo.Managers", "Source\Managers\Bingo.Managers\Bingo.Managers.csproj", "{A607D1FE-E671-4BDA-9B1C-999CC06C93FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bingo.BusinessModels", "Source\BusinessModels\Bingo.BusinessModels\Bingo.BusinessModels.csproj", "{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bingo.BusinessModels", "Source\BusinessModels\Bingo.BusinessModels\Bingo.BusinessModels.csproj", "{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hubs", "Hubs", "{2202444D-539C-4241-A8EB-98884F07C561}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bingo.Hubs", "Source\Hubs\Bingo.Hubs\Bingo.Hubs.csproj", "{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +73,10 @@ Global
 		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +90,7 @@ Global
 		{36438388-65B9-4E11-9231-5718978D75E9} = {C552064E-7D76-4D0B-A374-44E00146B2AC}
 		{A607D1FE-E671-4BDA-9B1C-999CC06C93FC} = {AC03B48C-FF59-47F5-AA16-AC71E2F6EAD5}
 		{CC5BA6F6-A02E-44B5-B078-21997FDFFA25} = {4B149AE0-0E76-4D48-9FBE-384440C86B8F}
+		{E18688AA-59F0-482A-AB23-8CDAF4B0AA9C} = {2202444D-539C-4241-A8EB-98884F07C561}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {95A3D0AD-DA0E-4EDC-8507-63A9C4CAE31E}

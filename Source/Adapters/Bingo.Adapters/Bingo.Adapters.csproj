@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Facades\Bingo.Facades\Bingo.Facades.csproj" />
+    <ProjectReference Include="..\..\Hubs\Bingo.Hubs\Bingo.Hubs.csproj" />
     <ProjectReference Include="..\..\Managers\Bingo.Managers\Bingo.Managers.csproj" />
   </ItemGroup>
 

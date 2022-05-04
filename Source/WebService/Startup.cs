@@ -9,6 +9,7 @@ using Pepp.Web.Apps.Bingo.Adapters.Translators;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
+using Pepp.Web.Apps.Bingo.Hubs;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
@@ -36,6 +37,14 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.AddControllers();
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder => {
+                builder
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials()
+                .WithOrigins("http://localhost:4200");
+            }));
+            services.AddSignalR();
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
             {
@@ -47,6 +56,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddScoped<ITwitchAdapter, TwitchAdapter>();
             services.AddScoped<IUserAdapter, UserAdapter>();
             services.AddScoped<IGameAdapter, GameAdapter>();
+            services.AddScoped<ILiveAdapter, LiveAdapter>();
             #endregion
 
             #region MANAGERS
@@ -146,6 +156,14 @@ namespace Pepp.Web.Apps.Bingo.WebService
             }
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<AdminHub>("/adminHub");
+                endpoints.MapHub<PlayerHub>("/playerHub");
+            });
 
             app.UseEndpoints(endpoints =>
             {

@@ -5,11 +5,17 @@
       <h4>{{_activeBoard?.name || 'No Board Selected'}}</h4>
       <fa-icon [icon]="icons.faEdit"
                class="pointer float-end fs-5 ms-3"
-               [class.disabled]="!_boards?.length"
+               [class.disabled]="_cooldownIsActive || !_boards?.length"
                ngbTooltip="{{(!_boards?.length) ? 'At least 1 board needs 25 tiles to be selectable' : 'Change active board'}}"
                placement="auto"
                (click)="_onChangeActiveBoardClick()">
       </fa-icon>
+    </div>
+    <div [hidden]="!_cooldownIsActive">
+      <div class="d-flex flex-column">
+        <label class="float-label">Board Change Cooldown:</label>
+        <label>{{cooldownTime$ | async}} seconds remaining</label>
+      </div>
     </div>
     <div *ngIf="_editingActiveBoard" class="d-flex flex-column justify-content-between">
       <select class="form-select form-select-lg pointer my-1"
