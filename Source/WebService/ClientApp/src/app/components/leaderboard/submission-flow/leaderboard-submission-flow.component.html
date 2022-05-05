@@ -1,0 +1,68 @@
+<ng-template #leaderboardSubmissionModal let-modal>
+  <ng-container [ngSwitch]="_currentSubmissionStep">
+    <ng-container *ngSwitchCase="submissionStepEnum.ConfirmSubmit">
+      <ng-container *ngTemplateOutlet="confirmSubmit; context: {modal}"></ng-container>
+    </ng-container>
+    <ng-container *ngSwitchCase="submissionStepEnum.AwaitVotes">
+      <ng-container *ngTemplateOutlet="awaitVotes; context: {modal}"></ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>
+
+<ng-template #confirmSubmit let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Bingo! Let's Goaarrr!!</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>You just got a bingo!</label>
+    <br />
+    <br />
+    <label>Do you want to submit this Bingo to increase your leaderboard standing?</label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-success" (click)="_onSubmitBingoRequest()">Submit It!</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">No Thanks</button>
+  </div>
+</ng-template>
+
+<ng-template #awaitVotes let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Now We Play The Waiting Game</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <div>
+      <label>
+        You'll need at least two other goobies to confirm
+        your bingo to increase your leaderboard standing
+      </label>
+      <br />
+      <br />
+      <label>Sit tight while we wait on votes to come in</label>
+      <br />
+      <br />
+      <div class="d-flex flex-column">
+        <div class="d-flex flex-row">
+          <label class="me-2">Approved By:</label>
+          <img *ngFor="let approver of _approvers"
+               [src]="approver.profileImageUri"
+               [ngbTooltip]="approver.displayName"
+               placement="auto"
+               height="50"
+               width="50" />
+        </div>
+        <br />
+        <div class="d-flex flex-row">
+          <label class="me-2">Rejected By:</label>
+          <fa-icon *ngFor="let rejector of _rejectors"
+                   [icon]="icons.faUserCircle"
+                   ngbTooltip="Anonymous"
+                   placement="auto">
+          </fa-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">Cancel Submission</button>
+  </div>
+</ng-template>

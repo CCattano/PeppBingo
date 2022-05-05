@@ -36,7 +36,7 @@ export class AdminHub {
    * representhing the latest active board that has been chosen by an admin
    * @param handler
    */
-  public registerOnLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void) {
+  public registerOnLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void): void {
     this._hubConn.on(AdminEvents.EmitLatestActiveBoardID, (activeBoardID: number) => handler(activeBoardID));
   }
 
@@ -46,7 +46,7 @@ export class AdminHub {
    * representhing the latest active board that has been chosen by an admin
    * @param handler
    */
-  public registerOnTriggerSetActiveBoardCooldown(handler: (timeRemaining?: number) => void) {
+  public registerOnTriggerSetActiveBoardCooldown(handler: (timeRemaining?: number) => void): void {
     this._hubConn.off(AdminEvents.TriggerSetActiveBoardCooldown);
     if (this._eventCaptureDatetime) {
       const currentDatetime: Date = new Date();

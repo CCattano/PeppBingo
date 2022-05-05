@@ -8,6 +8,7 @@ import { NgToggleModule } from '@nth-cloud/ng-toggle';
 import { AppRoutingModule } from './app-routing.module';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { BingoGameComponent } from './components/game/bingo-game.component';
+import { LeaderboardSubmissionFlowComponent } from './components/leaderboard/submission-flow/leaderboard-submission-flow.component';
 import { LoginComponent } from './components/login/login.component';
 import { AddEditAdminComponent } from './components/management/admin/admin-add-edit.component';
 import { BingoBoardAddEditComponent } from './components/management/bingo/boards/bingo-board-add-edit.component';
@@ -61,6 +62,9 @@ const appInitializers: Provider = [
 
     // -- Bingo Game
     BingoGameComponent,
+
+    // -- Leaderboard
+    LeaderboardSubmissionFlowComponent,
 
     //#endregion
 

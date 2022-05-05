@@ -1,9 +1,11 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { fromEvent, Observable, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
 import { GameApi } from '../../shared/api/game.api';
 import { GameTileDto } from '../../shared/dtos/game-tile.dto';
-import { GameTileVM } from './NewFolder/game-tile.viewmodel';
+import { PlayerHub } from '../../shared/hubs/player.hub';
+import { LeaderboardSubmissionFlowComponent } from '../leaderboard/submission-flow/leaderboard-submission-flow.component';
+import { GameTileVM } from './viewmodels/game-tile.viewmodel';
 
 enum BreakpointsEnum {
   xs = 0,
@@ -19,6 +21,8 @@ enum BreakpointsEnum {
   styleUrls: ['./bingo-game.component.scss']
 })
 export class BingoGameComponent implements OnInit, OnDestroy {
+  @ViewChild(LeaderboardSubmissionFlowComponent, { static: true })
+  private readonly _leaderboardSubmissionFlowComponent: LeaderboardSubmissionFlowComponent;
   /**
    * Bool flag indicating an admin has not set an active board to play
    */
@@ -69,13 +73,16 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public _isMobileLandscape: boolean;
 
-  constructor(private _gameApi: GameApi) {
+  constructor(
+    private _gameApi: GameApi,
+    private _playerHub: PlayerHub) {
   }
 
   /**
    * @inheritdoc
    */
   public async ngOnInit(): Promise<void> {
+    await this._registerHubEventHandlers();
     this._currBreakpoint = this._calcViewport();
     this._isMobileLandscape = this._calcIsMobileLandscape(this._currBreakpoint);
     this._resizeSub = this._initResizeEventPipeline().subscribe();
@@ -88,7 +95,10 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this._resizeSub?.unsubscribe();
     this._resizeSub = null;
+    this._playerHub.unregisterAllHandlers();
   }
+
+  //#region UI Event Handlers
 
   /**
    * Event handler for when a list group item
@@ -108,21 +118,34 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     this._makeBoard();
   }
 
+  /**
+   * Event handler for when the user has closed the leaderboard
+   * submission modal whether by complete submission or cancel
+   */
+  public _onLeaderboardSubmissionComplete(): void {
+    // Short-term: Reset board
+    this._makeBoard();
+    // TODO: Long-term: Enable board shuffling for 30s
+    // If board is never shuffled at end of 30s perform shuffle automatically
+  }
+
+  //#endregion
+
   //#region Data Initalization Functions
 
   /**
    * Fetch all data necessary to play a round of bingo
    */
-  private async _getGameData(): Promise<void> {
+  private async _getGameData(activeBodardID: number = null): Promise<void> {
     // Fetch the board to play with first
-    const activeBoardID: number = await this._gameApi.getActiveBoardID();
-    this._noActiveBoard = !activeBoardID;
+    const boardID: number = activeBodardID || await this._gameApi.getActiveBoardID();
+    this._noActiveBoard = !boardID;
     // If a active board hasn't been set yet bail here
     if (this._noActiveBoard) return;
     // If we have a board get its board info and tile info
     await Promise.all([
-      this._getBoardName(activeBoardID),
-      this._getBoardTiles(activeBoardID)
+      this._getBoardName(boardID),
+      this._getBoardTiles(boardID)
     ]);
     // Construct the board to be displayed
     this._makeBoard();
@@ -143,6 +166,8 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   }
 
   //#endregion
+
+  //#region Gameplay Functions
 
   private _makeBoard(): void {
     const tiles: GameTileDto[] = this._tiles.slice(0);
@@ -174,7 +199,43 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     }
   }
 
+  private _checkForWinCondition() {
+    //Check all rows, columns, and diagonals
+    let topLToBotRDiagCount = 0;
+    let botLToTopRDiagCount = 0;
+    for (let row = 0; row < 5; row++) {
+      let selectedRowCount = 0;
+      let selectedColCount = 0;
+      //check all columns for this row
+      for (let col = 0; col < 5; col++) {
+        //horizontal check: check all columns for this row
+        if (this._board[row][col].isSelected)
+          selectedRowCount++;
+        //vertical check: check all rows for this column
+        if (this._board[col][row].isSelected)
+          selectedColCount++;
+      }
+      //Check if nested for-loop found winner
+      if (selectedRowCount === 5 || selectedColCount === 5) {
+        this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal();
+        return;
+      }
+      //check top-left to bottom-right diag coordinate
+      if (this._board[row][row].isSelected)
+        topLToBotRDiagCount++;
+
+      if (this._board[Math.abs(row - 4)][row].isSelected)
+        botLToTopRDiagCount++;
+    }
+    //If no rows or cols had 5 in a row check diagonals
+    if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
+      this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal();
+  }
+
+  //#endregion
+
   //#region Resize Functions
+
   private _calcViewport(): BreakpointsEnum {
     const width: number = document.documentElement.clientWidth;
     if (width >= BreakpointsEnum.xxl)
@@ -210,37 +271,18 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     );
   }
 
-  private _checkForWinCondition() {
-    //Check all rows, columns, and diagonals
-    let topLToBotRDiagCount = 0;
-    let botLToTopRDiagCount = 0;
-    for (let row = 0; row < 5; row++) {
-      let selectedRowCount = 0;
-      let selectedColCount = 0;
-      //check all columns for this row
-      for (let col = 0; col < 5; col++) {
-        //horizontal check: check all columns for this row
-        if (this._board[row][col].isSelected)
-          selectedRowCount++;
-        //vertical check: check all rows for this column
-        if (this._board[col][row].isSelected)
-          selectedColCount++;
-      }
-      //Check if nested for-loop found winner
-      if (selectedRowCount === 5 || selectedColCount === 5) {
-        alert("You've Won!");
-        return;
-      }
-      //check top-left to bottom-right diag coordinate
-      if (this._board[row][row].isSelected)
-        topLToBotRDiagCount++;
+  //#endregion
 
-      if (this._board[Math.abs(row - 4)][row].isSelected)
-        botLToTopRDiagCount++;
-    }
-    //If no rows or cols had 5 in a row check diagonals
-    if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
-      alert("You've Won!");
+  //#region SignalR Functions
+
+  private async _registerHubEventHandlers(): Promise<void> {
+    await this._playerHub.connect();
+    this._playerHub.registerEmitLatestActiveBoardIDHandler(this._onEmitLatestActiveBoardID);
   }
+
+  private _onEmitLatestActiveBoardID = (activeBoardID: number) => {
+    this._getGameData(activeBoardID);
+  };
+
   //#endregion
 }
