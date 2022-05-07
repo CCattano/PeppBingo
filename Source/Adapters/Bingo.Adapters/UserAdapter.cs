@@ -13,7 +13,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <summary>
         /// Fetches a user by the JSON web token provided
         /// </summary>
-        /// <param name="userID"></param>
+        /// <param name="jwt"></param>
         /// <returns></returns>
         Task<UserBE> GetUser(string jwt);
         /// <summary>
@@ -48,10 +48,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <returns></returns>
         Task<List<UserBE>> GetAdminUsers();
+
         /// <summary>
         /// Sets a user's IsAdmin property to the value provided
         /// </summary>
         /// <param name="userID"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
         Task SetAdminPermissionForUser(int userID, bool isAdmin);
     }
