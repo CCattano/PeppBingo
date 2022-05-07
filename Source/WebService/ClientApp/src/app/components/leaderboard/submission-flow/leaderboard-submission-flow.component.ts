@@ -1,7 +1,11 @@
-import { Component, EventEmitter, Output, TemplateRef, ViewChild } from '@angular/core';
-import { faUserCircle, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { UserDto } from '../../../shared/dtos/user.dto';
+import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
+import {faUserCircle, IconDefinition} from '@fortawesome/free-solid-svg-icons';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {UserDto} from '../../../shared/dtos/user.dto';
+import {BingoSubmissionEvent} from '../../../shared/hubs/player/events/bingo-submission.event';
+import {PlayerHub} from '../../../shared/hubs/player/player.hub';
+import {GameTileVM} from '../../../shared/viewmodels/game-tile.viewmodel';
+import {LeaderboardApi} from '../../../shared/api/leaderboard.api';
 
 enum SubmissionStepEnum {
   ConfirmSubmit = 0,
@@ -14,8 +18,11 @@ enum SubmissionStepEnum {
   styleUrls: ['./leaderboard-submission-flow.component.scss']
 })
 export class LeaderboardSubmissionFlowComponent {
-  @ViewChild('leaderboardSubmissionModal', { static: true })
+  @ViewChild('leaderboardSubmissionModal', {static: true})
   private readonly leaderboardSubmissionModalRef: TemplateRef<any>;
+
+  @Input()
+  public board: GameTileVM[][];
 
   @Output()
   public workflowEnd: EventEmitter<void> = new EventEmitter<void>();
@@ -53,8 +60,9 @@ export class LeaderboardSubmissionFlowComponent {
 
   private _modalInstance: NgbModalRef;
 
-  constructor(private _modalService: NgbModal) {
-
+  constructor(private _modalService: NgbModal,
+              private _leaderboardApi: LeaderboardApi,
+              private _playerHub: PlayerHub) {
   }
 
   /**
@@ -78,9 +86,18 @@ export class LeaderboardSubmissionFlowComponent {
    * in which a user decides they do want to submit their bingo board to
    * increase their leaderboard standing
    */
-  public _onSubmitBingoRequest(): void {
-    // TODO: Fire off api req to server to send
-    // down signalR req to all clients to vote on card
+  public async _onSubmitBingoRequest(): Promise<void> {
+    const submission: BingoSubmissionEvent = {
+      submitterConnectionID: this._playerHub.connectionID,
+      userID: undefined, // Provided by server
+      boardTiles: this.board.flatMap((row, ri) => row.map((col, ci) => ({
+        row: ri,
+        column: ci,
+        isSelected: col.isSelected,
+        text: col.text
+      })))
+    }
+    await this._leaderboardApi.submitBingoForLeaderboard(submission);
     this._currentSubmissionStep = SubmissionStepEnum.AwaitVotes;
   }
 

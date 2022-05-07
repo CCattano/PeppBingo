@@ -37,7 +37,7 @@ export class AdminHub {
    * @param handler
    */
   public registerOnLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void): void {
-    this._hubConn.on(AdminEvents.EmitLatestActiveBoardID, (activeBoardID: number) => handler(activeBoardID));
+    this._hubConn.on(AdminEvents.EmitLatestActiveBoardID, handler);
   }
 
   /**

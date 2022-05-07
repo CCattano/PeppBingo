@@ -1,9 +1,9 @@
 <!-- No board display -->
 <div *ngIf="_noActiveBoard" class="centerOnPage w-100 text-center">
   <h1>Mods haven't set a board to play with yet.</h1>
-  <br />
+  <br/>
   <h1>Tell 'em to get off their lazy butts and get with the program.</h1>
-  <br />
+  <br/>
   <h6>(This page will automagically update once a board to play with has been selected, so just sit tight.)</h6>
 </div>
 <ng-container *ngIf="!_noActiveBoard">
@@ -21,12 +21,22 @@
           </div>
         </div>
       </ng-container>
-      <button class="btn btn-outline-warning mt-2 me-auto" (click)="_onResetBoardClick()">
-        Reset Card
-      </button>
-      <button class="btn btn-outline-warning mt-2 ms-auto">
-        Screenshot
-      </button>
+      <div class="d-flex flex-row justify-content-between w-100 mt-3">
+        <button class="btn btn-outline-warning" (click)="_onResetBoardClick()">
+          Reset Card
+        </button>
+        <button type="button"
+                class="btn btn-outline-info position-relative"
+                [disabled]="!_voteRequests.length">
+          Vote
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{_voteRequests.length > 99 ? '99+' : _voteRequests.length}}
+          </span>
+        </button>
+        <button class="btn btn-outline-warning">
+          Screenshot
+        </button>
+      </div>
     </div>
   </ng-container>
   <!--Mobile Bingo Board -->
@@ -64,13 +74,14 @@
   <!-- Mobile Landscape Unsupported Notice -->
   <div *ngIf="_isMobileLandscape" class="centerOnPage w-100 text-center" style="z-index: -1;">
     <h1>Mobile Landscape Mode is currently not supported.</h1>
-    <br />
+    <br/>
     <h1>Please rotate your device or play on a different device.</h1>
-    <br />
+    <br/>
     <h6>If you want this functionality please reach out via the feedback page.</h6>
     <h6>If enough people request support for this I can revisit it.</h6>
   </div>
 </ng-container>
 
-<app-leaderboard-submission-flow (workflowEnd)="_onLeaderboardSubmissionComplete()">
+<app-leaderboard-submission-flow [board]="_board"
+                                 (workflowEnd)="_onLeaderboardSubmissionComplete()">
 </app-leaderboard-submission-flow>

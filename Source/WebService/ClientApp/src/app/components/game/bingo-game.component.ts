@@ -1,11 +1,13 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { fromEvent, Observable, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter, map, tap } from 'rxjs/operators';
-import { GameApi } from '../../shared/api/game.api';
-import { GameTileDto } from '../../shared/dtos/game-tile.dto';
-import { PlayerHub } from '../../shared/hubs/player.hub';
-import { LeaderboardSubmissionFlowComponent } from '../leaderboard/submission-flow/leaderboard-submission-flow.component';
-import { GameTileVM } from './viewmodels/game-tile.viewmodel';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {fromEvent, Observable, Subscription} from 'rxjs';
+import {debounceTime, distinctUntilChanged, filter, map, tap} from 'rxjs/operators';
+import {GameApi} from '../../shared/api/game.api';
+import {GameTileDto} from '../../shared/dtos/game-tile.dto';
+import {PlayerHub} from '../../shared/hubs/player/player.hub';
+import {LeaderboardSubmissionFlowComponent} from '../leaderboard/submission-flow/leaderboard-submission-flow.component';
+import {GameTileVM} from '../../shared/viewmodels/game-tile.viewmodel';
+import {BingoSubmissionEvent} from '../../shared/hubs/player/events/bingo-submission.event';
+import {TokenService} from '../../shared/service/token.service';
 
 enum BreakpointsEnum {
   xs = 0,
@@ -21,7 +23,7 @@ enum BreakpointsEnum {
   styleUrls: ['./bingo-game.component.scss']
 })
 export class BingoGameComponent implements OnInit, OnDestroy {
-  @ViewChild(LeaderboardSubmissionFlowComponent, { static: true })
+  @ViewChild(LeaderboardSubmissionFlowComponent, {static: true})
   private readonly _leaderboardSubmissionFlowComponent: LeaderboardSubmissionFlowComponent;
   /**
    * Bool flag indicating an admin has not set an active board to play
@@ -73,9 +75,15 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public _isMobileLandscape: boolean;
 
-  constructor(
-    private _gameApi: GameApi,
-    private _playerHub: PlayerHub) {
+  /**
+   * Array containing metadata related to another
+   * player's board that has gotten a bingo
+   */
+  public readonly _voteRequests: BingoSubmissionEvent[] = [];
+
+  constructor(private _gameApi: GameApi,
+              private _playerHub: PlayerHub,
+              private _tokenService: TokenService) {
   }
 
   /**
@@ -152,14 +160,11 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   }
 
   private async _getBoardName(activeBoardID: number): Promise<void> {
-    const name: string = await this._gameApi.getBoardNameByID(activeBoardID);
-    this._boardName = name;
+    this._boardName = await this._gameApi.getBoardNameByID(activeBoardID);
   }
 
   private async _getBoardTiles(activeBoardID: number): Promise<void> {
-    const tiles: GameTileDto[] =
-      await this._gameApi.getActiveBoardTilesByBoardID(activeBoardID);
-    this._tiles = tiles;
+    this._tiles = await this._gameApi.getActiveBoardTilesByBoardID(activeBoardID);
     const freeSpaceIdx: number = this._tiles.findIndex(tile => tile.isFreeSpace);
     if (freeSpaceIdx >= 0)
       this._freeSpace = this._tiles.splice(freeSpaceIdx, 1).shift();
@@ -253,7 +258,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   }
 
   private _calcIsMobileLandscape(breakpoint: BreakpointsEnum): boolean {
-    return breakpoint < BreakpointsEnum.lg && window.matchMedia("(orientation: landscape)").matches;
+    return breakpoint < BreakpointsEnum.lg && window.matchMedia('(orientation: landscape)').matches;
   }
 
   private _initResizeEventPipeline(): Observable<void> {
@@ -278,11 +283,26 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   private async _registerHubEventHandlers(): Promise<void> {
     await this._playerHub.connect();
     this._playerHub.registerEmitLatestActiveBoardIDHandler(this._onEmitLatestActiveBoardID);
+    this._playerHub.registerEmitBingoSubmissionHandler(this._onEmitBingoSubmission);
   }
 
-  private _onEmitLatestActiveBoardID = (activeBoardID: number) => {
+  private _onEmitLatestActiveBoardID = (activeBoardID: number): void => {
     this._getGameData(activeBoardID);
   };
+
+  public _onEmitBingoSubmission = (submission: BingoSubmissionEvent): void => {
+    // This Hub event is sent to all users who are NOT the user that initiated the event
+    // We are able to distinguish the initiator by their Hub connection ID
+    // But if that initiator had multiple tabs open they will have different HubConnIDs per tab
+    // So they could receive this event and approve themselves from a separate tab
+    // So we're double-checking here that the UserID of the event
+    // initiator in the submission payload is not the same as the
+    // UserID of the user running the app which we have in our tokenSvc
+    if(this._tokenService.userID === submission.userID)
+      return; // Nice try m8.
+
+    this._voteRequests.push(submission);
+  }
 
   //#endregion
 }
