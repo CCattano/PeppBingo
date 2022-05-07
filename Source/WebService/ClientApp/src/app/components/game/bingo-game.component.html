@@ -7,79 +7,24 @@
   <h6>(This page will automagically update once a board to play with has been selected, so just sit tight.)</h6>
 </div>
 <ng-container *ngIf="!_noActiveBoard">
-  <!-- Desktop Bingo Board -->
-  <ng-container *ngIf="_currBreakpoint >= breakpointsEnum.md && !_isMobileLandscape">
-    <div class="grid desktop m-auto">
-      <ng-container *ngFor="let rows of _board" class="row">
-        <div *ngFor="let col of rows"
-             class="gridCell pointer"
-             (click)="_onTileClick(col)">
-          <div [class.isSelected]="col.isSelected">
-            <span class="gridCellContent">
-              {{col.text}}
-            </span>
-          </div>
-        </div>
-      </ng-container>
-      <div class="d-flex flex-row justify-content-between w-100 mt-3">
-        <button class="btn btn-outline-warning" (click)="_onResetBoardClick()">
-          Reset Card
-        </button>
-        <button type="button"
-                class="btn btn-outline-info position-relative"
-                [disabled]="!_voteRequests.length">
-          Vote
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{_voteRequests.length > 99 ? '99+' : _voteRequests.length}}
-          </span>
-        </button>
-        <button class="btn btn-outline-warning">
-          Screenshot
-        </button>
-      </div>
-    </div>
-  </ng-container>
-  <!--Mobile Bingo Board -->
-  <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md && !_isMobileLandscape">
-    <div class="grid">
-      <ng-container *ngFor="let rows of _board; let dri = index;" class="row">
-        <div *ngFor="let col of rows; let dci = index;" class="gridCell">
-          <div [class.isSelected]="col.isSelected">
-            <span class="gridCellContent">
-              {{(5 * dri) + (dci + 1)}}
-            </span>
-          </div>
-        </div>
-      </ng-container>
-      <button class="btn btn-outline-warning mt-2 me-auto" (click)="_onResetBoardClick()">
+  <app-bingo-grid [board]="_board" (tileClick)="_onTileClick($event)">
+    <div class="d-flex flex-row justify-content-between w-100 mt-3">
+      <button class="btn btn-outline-warning" (click)="_onResetBoardClick()">
         Reset Card
       </button>
-      <button class="btn btn-outline-warning mt-2 ms-auto">
+      <button type="button"
+              class="btn btn-outline-info position-relative"
+              [disabled]="!_voteRequests.length">
+        Vote
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{_voteRequests.length > 99 ? '99+' : _voteRequests.length}}
+        </span>
+      </button>
+      <button class="btn btn-outline-warning">
         Screenshot
       </button>
     </div>
-    <div *ngFor="let rows of _board; let ri = index" class="my-2">
-      <h5>Row {{ri + 1}}</h5>
-      <ul class="list-group">
-        <li *ngFor="let col of rows; let ci = index"
-            class="list-group-item text-light border border-light"
-            [class.bg-dark]="!col.isSelected"
-            [class.selectedBg]="col.isSelected"
-            (click)="_onTileClick(col)">
-          {{(5 * ri) + (ci + 1)}}. {{col.text}}
-        </li>
-      </ul>
-    </div>
-  </ng-container>
-  <!-- Mobile Landscape Unsupported Notice -->
-  <div *ngIf="_isMobileLandscape" class="centerOnPage w-100 text-center" style="z-index: -1;">
-    <h1>Mobile Landscape Mode is currently not supported.</h1>
-    <br/>
-    <h1>Please rotate your device or play on a different device.</h1>
-    <br/>
-    <h6>If you want this functionality please reach out via the feedback page.</h6>
-    <h6>If enough people request support for this I can revisit it.</h6>
-  </div>
+  </app-bingo-grid>
 </ng-container>
 
 <app-leaderboard-submission-flow [board]="_board"

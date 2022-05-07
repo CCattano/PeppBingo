@@ -1,0 +1,24 @@
+<div class="grid">
+  <ng-container *ngFor="let rows of board; let dri = index;" class="row">
+    <div *ngFor="let col of rows; let dci = index;" class="gridCell">
+      <div [class.isSelected]="col.isSelected">
+            <span class="gridCellContent">
+              {{(5 * dri) + (dci + 1)}}
+            </span>
+      </div>
+    </div>
+  </ng-container>
+  <ng-content></ng-content>
+</div>
+<div *ngFor="let rows of board; let ri = index" class="my-2">
+  <h5>Row {{ri + 1}}</h5>
+  <ul class="list-group">
+    <li *ngFor="let col of rows; let ci = index"
+        class="list-group-item text-light border border-light"
+        [class.bg-dark]="!col.isSelected"
+        [class.selectedBg]="col.isSelected"
+        (click)="_onTileClick(col)">
+      {{(5 * ri) + (ci + 1)}}. {{col.text}}
+    </li>
+  </ul>
+</div>

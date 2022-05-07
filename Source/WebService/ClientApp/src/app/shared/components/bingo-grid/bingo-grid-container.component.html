@@ -1,0 +1,25 @@
+<!-- Desktop Bingo Board -->
+<ng-container *ngIf="_currBreakpoint >= breakpointsEnum.md && !_isMobileLandscape">
+  <app-desktop-bingo-grid [board]="board" (tileClick)="_onTileClick($event)">
+    <ng-container *ngTemplateOutlet="projectedContent"></ng-container>
+  </app-desktop-bingo-grid>
+</ng-container>
+<!--Mobile Bingo Board -->
+<ng-container *ngIf="_currBreakpoint < breakpointsEnum.md && !_isMobileLandscape">
+  <app-mobile-bingo-grid [board]="board" (tileClick)="_onTileClick($event)">
+    <ng-container *ngTemplateOutlet="projectedContent"></ng-container>
+  </app-mobile-bingo-grid>
+</ng-container>
+<!-- Mobile Landscape Unsupported Notice -->
+<div *ngIf="_isMobileLandscape" class="centerOnPage w-100 text-center" style="z-index: -1;">
+  <h1>Mobile Landscape Mode is currently not supported.</h1>
+  <br/>
+  <h1>Please rotate your device or play on a different device.</h1>
+  <br/>
+  <h6>If you want this functionality please reach out via the feedback page.</h6>
+  <h6>If enough people request support for this I can revisit it.</h6>
+</div>
+
+<ng-template #projectedContent>
+  <ng-content></ng-content>
+</ng-template>

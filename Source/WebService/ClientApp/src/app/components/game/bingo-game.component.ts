@@ -1,6 +1,4 @@
 import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {fromEvent, Observable, Subscription} from 'rxjs';
-import {debounceTime, distinctUntilChanged, filter, map, tap} from 'rxjs/operators';
 import {GameApi} from '../../shared/api/game.api';
 import {GameTileDto} from '../../shared/dtos/game-tile.dto';
 import {PlayerHub} from '../../shared/hubs/player/player.hub';
@@ -8,15 +6,6 @@ import {LeaderboardSubmissionFlowComponent} from '../leaderboard/submission-flow
 import {GameTileVM} from '../../shared/viewmodels/game-tile.viewmodel';
 import {BingoSubmissionEvent} from '../../shared/hubs/player/events/bingo-submission.event';
 import {TokenService} from '../../shared/service/token.service';
-
-enum BreakpointsEnum {
-  xs = 0,
-  sm = 576,
-  md = 768,
-  lg = 992,
-  xl = 1200,
-  xxl = 1400
-}
 
 @Component({
   templateUrl: './bingo-game.component.html',
@@ -50,32 +39,6 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   public _board: GameTileVM[][];
 
   /**
-   * Enum reference captures for use in template
-   */
-  public readonly breakpointsEnum: typeof BreakpointsEnum = BreakpointsEnum;
-
-  /**
-   * Observable constructed from the window.onresize event
-   */
-  private _resizeEvent$: Observable<Event> = fromEvent(window, 'resize');
-  /**
-   * Subscription to the resize event observable
-   */
-  private _resizeSub: Subscription;
-  /**
-   * The current breakpoint the page width is associated with
-   *
-   * Used to determine when to display mobile vs. desktop bingo board
-   */
-  public _currBreakpoint: BreakpointsEnum;
-
-  /**
-   * Bool flag that indicated we are in a mobile
-   * width and in a landscape orientation
-   */
-  public _isMobileLandscape: boolean;
-
-  /**
    * Array containing metadata related to another
    * player's board that has gotten a bingo
    */
@@ -91,9 +54,6 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public async ngOnInit(): Promise<void> {
     await this._registerHubEventHandlers();
-    this._currBreakpoint = this._calcViewport();
-    this._isMobileLandscape = this._calcIsMobileLandscape(this._currBreakpoint);
-    this._resizeSub = this._initResizeEventPipeline().subscribe();
     await this._getGameData();
   }
 
@@ -101,8 +61,6 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    * @inheritdoc
    */
   public ngOnDestroy(): void {
-    this._resizeSub?.unsubscribe();
-    this._resizeSub = null;
     this._playerHub.unregisterAllHandlers();
   }
 
@@ -139,16 +97,16 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   //#endregion
 
-  //#region Data Initalization Functions
+  //#region Data Initialization Functions
 
   /**
    * Fetch all data necessary to play a round of bingo
    */
-  private async _getGameData(activeBodardID: number = null): Promise<void> {
+  private async _getGameData(activeBoardID: number = null): Promise<void> {
     // Fetch the board to play with first
-    const boardID: number = activeBodardID || await this._gameApi.getActiveBoardID();
+    const boardID: number = activeBoardID || await this._gameApi.getActiveBoardID();
     this._noActiveBoard = !boardID;
-    // If a active board hasn't been set yet bail here
+    // If an active board hasn't been set yet bail here
     if (this._noActiveBoard) return;
     // If we have a board get its board info and tile info
     await Promise.all([
@@ -176,7 +134,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private _makeBoard(): void {
     const tiles: GameTileDto[] = this._tiles.slice(0);
-    // Shuffle the array befor grabbing
+    // Shuffle the array before grabbing
     // random items out of it for the board
     for (let i: number = tiles.length - 1; i > 0; i--) {
       const j: number = Math.floor(Math.random() * (i + 1));
@@ -235,45 +193,6 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     //If no rows or cols had 5 in a row check diagonals
     if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
       this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal();
-  }
-
-  //#endregion
-
-  //#region Resize Functions
-
-  private _calcViewport(): BreakpointsEnum {
-    const width: number = document.documentElement.clientWidth;
-    if (width >= BreakpointsEnum.xxl)
-      return BreakpointsEnum.xxl;
-    else if (width >= BreakpointsEnum.xl)
-      return BreakpointsEnum.xl;
-    else if (width >= BreakpointsEnum.lg)
-      return BreakpointsEnum.xl;
-    else if (width >= BreakpointsEnum.md)
-      return BreakpointsEnum.md;
-    else if (width >= BreakpointsEnum.sm)
-      return BreakpointsEnum.sm;
-    else
-      return BreakpointsEnum.xs;
-  }
-
-  private _calcIsMobileLandscape(breakpoint: BreakpointsEnum): boolean {
-    return breakpoint < BreakpointsEnum.lg && window.matchMedia('(orientation: landscape)').matches;
-  }
-
-  private _initResizeEventPipeline(): Observable<void> {
-    return this._resizeEvent$.pipe(
-      debounceTime(250),
-      distinctUntilChanged(),
-      map(() => this._calcViewport()),
-      filter((breakpoint: BreakpointsEnum) =>
-        this._currBreakpoint !== breakpoint),
-      tap((breakpoint: BreakpointsEnum) => {
-        this._currBreakpoint = breakpoint;
-        this._isMobileLandscape = this._calcIsMobileLandscape(breakpoint);
-      }),
-      map(() => null)
-    );
   }
 
   //#endregion
