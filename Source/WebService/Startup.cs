@@ -9,7 +9,8 @@ using Pepp.Web.Apps.Bingo.Adapters.Translators;
 using Pepp.Web.Apps.Bingo.Data;
 using Pepp.Web.Apps.Bingo.Facades;
 using Pepp.Web.Apps.Bingo.Facades.Translators;
-using Pepp.Web.Apps.Bingo.Hubs;
+using Pepp.Web.Apps.Bingo.Hubs.Admin;
+using Pepp.Web.Apps.Bingo.Hubs.Player;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
 using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
@@ -19,6 +20,7 @@ using Pepp.Web.Apps.Bingo.WebService.Middleware;
 using Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation;
 using ConnStrings =
     Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
+
 namespace Pepp.Web.Apps.Bingo.WebService
 {
     public class Startup
@@ -34,56 +36,76 @@ namespace Pepp.Web.Apps.Bingo.WebService
         public void ConfigureServices(IServiceCollection services)
         {
             #region FRAMEWORK
+
             services.AddHttpContextAccessor();
             services.AddMemoryCache();
             services.AddControllers();
-            services.AddCors(o => o.AddPolicy("CorsPolicy", builder => {
+            services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
+            {
                 builder
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials()
-                .WithOrigins("http://localhost:4200");
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .WithOrigins("http://localhost:4200");
             }));
             services.AddSignalR();
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = "ClientApp/dist";
-            });
+            services.AddSpaStaticFiles(cfg => cfg.RootPath = "ClientApp/dist");
+
             #endregion
 
             #region ADAPTERS
+
             services.AddScoped<ITwitchAdapter, TwitchAdapter>();
             services.AddScoped<IUserAdapter, UserAdapter>();
             services.AddScoped<IGameAdapter, GameAdapter>();
             services.AddScoped<ILiveAdapter, LiveAdapter>();
+
+            #endregion
+
+            #region Hubs
+
+            services.AddScoped<IAdminHub, AdminHub>();
+            services.AddScoped<IPlayerHub, PlayerHub>();
+
             #endregion
 
             #region MANAGERS
+
             services.AddScoped<ITokenManager, TokenManager>();
             services.AddSingleton<ILiveControlsManager, LiveControlsManager>();
+
             #endregion
 
             #region FACADES
+
             services.AddScoped<ITwitchFacade, TwitchFacade>();
             services.AddScoped<IUserFacade, UserFacade>();
             services.AddScoped<IGameFacade, GameFacade>();
+
             #endregion
 
             #region CACHES
+
             services.AddScoped<ITwitchCache, TwitchCache>();
             services.AddScoped<ITokenCache, TokenCache>();
+
             #endregion
 
             #region SERVICES
+
             services.AddBingoDataService(Configuration.GetConnectionString(ConnStrings.PeppBingo));
+
             #endregion
 
             #region CLIENTS
+
             services.AddTwitchClient();
+
             #endregion
 
             #region EXTERNAL
+
             services.AddAutoMapper(
                 typeof(BusinessEntity_TwitchClient),
                 typeof(Entity_BusinessEntity),
@@ -95,10 +117,13 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 cfg.SchemaType = NJsonSchema.SchemaType.OpenApi3;
                 cfg.Title = "Tandem.Web.Apps.Trivia";
             });
+
             #endregion
 
             #region MISC
+
             services.SetTokenValidationPathsToExclude();
+
             #endregion
         }
 
@@ -109,7 +134,8 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 // When request path is /status/isalive.
                 path => path.Request.Path.Value?.ToLower() == "/status/isalive",
                 // Return this message.
-                builder => builder.Run(async context => await context.Response.WriteAsync($"PeppBingo SPA server is currently running."))
+                builder => builder.Run(async context =>
+                    await context.Response.WriteAsync($"PeppBingo SPA server is currently running."))
             );
 
             /*
@@ -123,7 +149,6 @@ namespace Pepp.Web.Apps.Bingo.WebService
              *      That way we shut down the request ASAP
              * Then we flow into our cache hydration MW
              *      This will ensure our cache is current for whatever work we're about to do
-
              *
              * When an exception occurs or a response is returned
              * That response, whether an error or data bubbles back up our MW stack
@@ -161,8 +186,8 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<AdminHub>("/adminHub");
-                endpoints.MapHub<PlayerHub>("/playerHub");
+                endpoints.MapHub<BaseAdminHub>("/adminHub");
+                endpoints.MapHub<BasePlayerHub>("/playerHub");
             });
 
             app.UseEndpoints(endpoints =>

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using Pepp.Web.Apps.Bingo.Hubs;
+﻿using System.Threading.Tasks;
+using Pepp.Web.Apps.Bingo.Hubs.Admin;
+using Pepp.Web.Apps.Bingo.Hubs.Player;
 using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
-using System.Threading.Tasks;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
 {
@@ -27,13 +27,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
     public class LiveAdapter : ILiveAdapter
     {
         private readonly ILiveControlsManager _manager;
-        private readonly IHubContext<AdminHub, IAdminHub> _adminHub;
-        private readonly IHubContext<PlayerHub, IPlayerHub> _playerHub;
+        private readonly IAdminHub _adminHub;
+        private readonly IPlayerHub _playerHub;
 
         public LiveAdapter(
             ILiveControlsManager manager,
-            IHubContext<AdminHub, IAdminHub> adminHub,
-            IHubContext<PlayerHub, IPlayerHub> playerHub)
+            IAdminHub adminHub,
+            IPlayerHub playerHub)
         {
             _manager = manager;
             _adminHub = adminHub;
@@ -44,11 +44,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             _manager.SetActiveBoardID(activeBoardID);
             // Trigger cooldown on setting new active board
-            await _adminHub.Clients.All.TriggerSetActiveBoardCooldown();
+            await _adminHub.TriggerSetActiveBoardCooldown();
             // For any admins on the live control page broadcast the newest activeBoardID
-            await _adminHub.Clients.All.EmitLatestActiveBoardID(activeBoardID);
+            await _adminHub.EmitLatestActiveBoardID(activeBoardID);
             // For any players on the play page broadcast the newest activeBoardID
-            await _playerHub.Clients.All.EmitLatestActiveBoardID(activeBoardID);
+            await _playerHub.EmitLatestActiveBoardID(activeBoardID);
         }
     }
 }

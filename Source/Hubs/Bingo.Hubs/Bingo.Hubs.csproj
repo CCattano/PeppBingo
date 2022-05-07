@@ -4,6 +4,8 @@
 		<RootNamespace>Pepp.Web.Apps.Bingo.Hubs</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\..\BusinessEntities\Bingo.BusinessEntities\Bingo.BusinessEntities.csproj" />
+	  <ProjectReference Include="..\..\BusinessModels\Bingo.BusinessModels\Bingo.BusinessModels.csproj" />
 	  <ProjectReference Include="..\..\Infrastructure\Bingo.Infrastructure\Bingo.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
 
-namespace Pepp.Web.Apps.Bingo.Hubs
+namespace Pepp.Web.Apps.Bingo.Hubs.Admin
 {
-    public interface IAdminHub
+    public interface IBaseAdminHub
     {
         /// <summary>
         /// Emits an event that causes the UI to deactivate the
@@ -12,7 +12,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs
         /// <returns></returns>
         Task TriggerSetActiveBoardCooldown();
         /// <summary>
-        /// Emiots an event that contains the latest active
+        /// Emits an event that contains the latest active
         /// board ID Used by the UI to display the latest
         /// selected board on the LiveControls page
         /// </summary>
@@ -20,13 +20,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs
         Task EmitLatestActiveBoardID(int activeBoardID);
     }
 
-    public class AdminHub : Hub<IAdminHub>
+    public class BaseAdminHub : Hub<IBaseAdminHub>
     {
-        public async Task TriggerSetActiveBoardCooldown() =>
-            await base.Clients.All.TriggerSetActiveBoardCooldown();
-
-
-        public async Task EmitLatestActiveBoardID(int activeBoardID) =>
-            await base.Clients.All.EmitLatestActiveBoardID(activeBoardID);
     }
 }
