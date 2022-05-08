@@ -23,7 +23,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
         {
         }
 
-        public IBoardRepo BoardRepo { get => _boardRepo ??= new BoardRepo(base.DataSvc); }
-        public IBoardTileRepo BoardTileRepo { get => _boardTileRepo ??= new BoardTileRepo(base.DataSvc); }
+        public IBoardRepo BoardRepo => _boardRepo ??= new BoardRepo(base.DataSvc);
+        public IBoardTileRepo BoardTileRepo => _boardTileRepo ??= new BoardTileRepo(base.DataSvc);
     }
 }

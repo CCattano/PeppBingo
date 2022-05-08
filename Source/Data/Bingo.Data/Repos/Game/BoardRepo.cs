@@ -19,23 +19,34 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
         /// <param name="board"></param>
         /// <returns></returns>
         Task InsertBoard(BoardEntity board);
+
         /// <summary>
         /// Fetches Board information stored in the table
         /// </summary>
         /// <param name="boardID"></param>
         /// <returns></returns>
         Task<BoardEntity> GetBoard(int boardID);
+
         /// <summary>
         /// Fetches all Board information in the table
         /// </summary>
         /// <returns></returns>
-        Task<List<BoardEntity>> GetAllBoards();
+        Task<List<BoardEntity>> GetBoards();
+
+        /// <summary>
+        /// Fetches all Boards with BoardIDs in the
+        /// <paramref name="boardIDs"/> list provided
+        /// </summary>
+        /// <returns></returns>
+        Task<List<BoardEntity>> GetBoards(List<int> boardIDs);
+
         /// <summary>
         /// Updated Board information in the table
         /// </summary>
         /// <param name="entity"></param>
         /// <returns></returns>
         Task UpdateBoard(BoardEntity entity);
+
         /// <summary>
         /// Delete Board information in the table
         /// </summary>
@@ -108,10 +119,41 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             return queryData?.SingleOrDefault();
         }
 
-        public async Task<List<BoardEntity>> GetAllBoards()
+        public async Task<List<BoardEntity>> GetBoards()
         {
             List<BoardEntity> queryData =
                 await base.Read<BoardEntity>(Sprocs.GetAllBoards);
+            return queryData;
+        }
+
+        public async Task<List<BoardEntity>> GetBoards(List<int> boardIDs)
+        {
+            string sprocParamName = nameof(boardIDs)[..1].ToUpper() + nameof(boardIDs)[1..];
+            string udtName = $"game.{sprocParamName}";
+            string udtColName = sprocParamName[..^1];
+
+            DataTable udt = new();
+            udt.Columns.Add(udtColName, typeof(int));
+            boardIDs.ForEach(id =>
+            {
+                DataRow row = udt.NewRow();
+                row.SetField(udtColName, id);
+                udt.Rows.Add(row);
+            });
+
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{sprocParamName}",
+                    TypeName = udtName,
+                    Value = udt
+                }
+            };
+
+            List<BoardEntity> queryData =
+                await base.Read<BoardEntity>(Sprocs.GetBoardsByUserIDs, @params);
+
             return queryData;
         }
 
@@ -168,6 +210,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Game
             public const string InsertBoard = "game.usp_INSERT_Board";
             public const string GetBoardByBoardID = "game.usp_SELECT_Board_ByBoardID";
             public const string GetAllBoards = "game.usp_SELECT_AllBoards";
+            public const string GetBoardsByUserIDs = "game.usp_SELECT_Boards_ByBoardIDs";
             public const string UpdateBoard = "game.usp_UPDATE_Board";
             public const string DeleteBoardByBoardID = "game.usp_DELETE_Board_ByBoardID";
         }

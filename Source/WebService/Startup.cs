@@ -60,10 +60,11 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddScoped<IUserAdapter, UserAdapter>();
             services.AddScoped<IGameAdapter, GameAdapter>();
             services.AddScoped<ILiveAdapter, LiveAdapter>();
+            services.AddScoped<IStatsAdapter, StatsAdapter>();
 
             #endregion
 
-            #region Hubs
+            #region HUBS
 
             services.AddScoped<IAdminHub, AdminHub>();
             services.AddScoped<IPlayerHub, PlayerHub>();
@@ -82,6 +83,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddScoped<ITwitchFacade, TwitchFacade>();
             services.AddScoped<IUserFacade, UserFacade>();
             services.AddScoped<IGameFacade, GameFacade>();
+            services.AddScoped<IStatsFacade, StatsFacade>();
 
             #endregion
 

@@ -47,7 +47,6 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers
                 {
                     LockUntil = DateTime.Now.AddSeconds(30);
                     ActiveBoardID = activeBoardID;
-                    // TODO: Make hub post to all registrants to update after 30s
                 }
                 else
                 {

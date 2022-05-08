@@ -34,6 +34,12 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <returns></returns>
         Task<List<BoardBE>> GetAllBoards();
         /// <summary>
+        /// Fetches all boards maintained by admins in the application
+        /// with a BoardID found in the <paramref name="boardIDs"/> list
+        /// </summary>
+        /// <returns></returns>
+        Task<List<BoardBE>> GetBoards(List<int> boardIDs);
+        /// <summary>
         ///Updates an existing Board w/ new information from the param provided
         /// </summary>
         /// <param name="boardBE"></param>
@@ -108,7 +114,16 @@ namespace Pepp.Web.Apps.Bingo.Facades
         public async Task<List<BoardBE>> GetAllBoards()
         {
             List<BoardEntity> boardEntities =
-                await _dataSvc.Game.BoardRepo.GetAllBoards();
+                await _dataSvc.Game.BoardRepo.GetBoards();
+            List<BoardBE> boardBEs =
+                boardEntities?.Select(board => _mapper.Map<BoardBE>(board)).ToList();
+            return boardBEs;
+        }
+        
+        public async Task<List<BoardBE>> GetBoards(List<int> boardIDs)
+        {
+            List<BoardEntity> boardEntities =
+                await _dataSvc.Game.BoardRepo.GetBoards(boardIDs);
             List<BoardBE> boardBEs =
                 boardEntities?.Select(board => _mapper.Map<BoardBE>(board)).ToList();
             return boardBEs;

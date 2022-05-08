@@ -20,6 +20,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
         {
         }
 
-        public IUserRepo UserRepo { get => _userRepo ??= new UserRepo(base.DataSvc); }
+        public IUserRepo UserRepo => _userRepo ??= new UserRepo(base.DataSvc);
     }
 }

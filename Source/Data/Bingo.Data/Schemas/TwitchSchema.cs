@@ -20,7 +20,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
         {
         }
 
-        public IAccessTokenRepo AccessTokenRepo { get => _accessTokenRepo ??= new AccessTokenRepo(base.DataSvc); }
-
+        public IAccessTokenRepo AccessTokenRepo => _accessTokenRepo ??= new AccessTokenRepo(base.DataSvc);
     }
 }

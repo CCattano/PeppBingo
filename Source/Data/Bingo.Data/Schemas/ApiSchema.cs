@@ -20,6 +20,6 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
         {
         }
 
-        public ISecretRepo SecretRepo { get => _secretRepo ??= new SecretRepo(base.DataSvc); }
+        public ISecretRepo SecretRepo => _secretRepo ??= new SecretRepo(base.DataSvc);
     }
 }

@@ -30,6 +30,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <returns></returns>
         Task<List<BoardBE>> GetAllBoards();
         /// <summary>
+        /// Fetches all boards maintained by admins in the application
+        /// with a BoardID found in the <paramref name="boardIDs"/> list
+        /// </summary>
+        /// <param name="boardIDs"></param>
+        /// <returns></returns>
+        Task<List<BoardBE>> GetBoards(List<int> boardIDs);
+        /// <summary>
         /// Update an existing board w/ new information
         /// </summary>
         /// <param name="userID"></param>
@@ -91,6 +98,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task<List<BoardBE>> GetAllBoards()
         {
             List<BoardBE> boardBEs = await _facade.GetAllBoards();
+            return boardBEs;
+        }
+
+        public async Task<List<BoardBE>> GetBoards(List<int> boardIDs)
+        {
+            List<BoardBE> boardBEs = await _facade.GetBoards(boardIDs);
             return boardBEs;
         }
 

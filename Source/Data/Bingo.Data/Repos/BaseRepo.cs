@@ -18,10 +18,10 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
         {
             SqlParameter outputParam = sprocParams.FirstOrDefault(param => param.Direction == ParameterDirection.Output);
             if(outputParam == null)
-                throw new InvalidOperationException("Cannot insert table row utlizing PrimaryKey when no Output parameter is specified.");
-            using SqlConnection conn = _dataSvc.GetConnection();
+                throw new InvalidOperationException("Cannot insert table row utilizing PrimaryKey when no Output parameter is specified.");
+            await using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
-            using SqlCommand cmd = conn.CreateCommand();
+            await using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
             cmd.Parameters.AddRange(sprocParams.ToArray());
@@ -33,9 +33,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
 
         protected virtual async Task Create(string sproc, List<SqlParameter> sprocParams)
         {
-            using SqlConnection conn = _dataSvc.GetConnection();
+            await using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
-            using SqlCommand cmd = conn.CreateCommand();
+            await using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
             cmd.Parameters.AddRange(sprocParams.ToArray());
@@ -45,14 +45,14 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
 
         protected virtual async Task<List<T>> Read<T>(string sproc, List<SqlParameter> sprocParams = null) where T : new()
         {
-            using SqlConnection conn = _dataSvc.GetConnection();
+            await using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
-            using SqlCommand cmd = conn.CreateCommand();
+            await using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
             if(sprocParams != null)
                 cmd.Parameters.AddRange(sprocParams.ToArray());
-            using SqlDataReader queryResults = await cmd.ExecuteReaderAsync();
+            await using SqlDataReader queryResults = await cmd.ExecuteReaderAsync();
             DataTable resultTable = new();
             resultTable.Load(queryResults);
             await conn.CloseAsync();
@@ -62,9 +62,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
 
         protected virtual async Task Update(string sproc, List<SqlParameter> sprocParams)
         {
-            using SqlConnection conn = _dataSvc.GetConnection();
+            await using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
-            using SqlCommand cmd = conn.CreateCommand();
+            await using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
             cmd.Parameters.AddRange(sprocParams.ToArray());
@@ -74,9 +74,9 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos
 
         protected virtual async Task Delete(string sproc, List<SqlParameter> sprocParams)
         {
-            using SqlConnection conn = _dataSvc.GetConnection();
+            await using SqlConnection conn = _dataSvc.GetConnection();
             await conn.OpenAsync();
-            using SqlCommand cmd = conn.CreateCommand();
+            await using SqlCommand cmd = conn.CreateCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = sproc;
             cmd.Parameters.AddRange(sprocParams.ToArray());

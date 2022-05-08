@@ -17,10 +17,15 @@ namespace Pepp.Web.Apps.Bingo.Data
 
         /// <inheritdoc cref="IUserSchema"/>
         IUserSchema User { get; }
+
         /// <inheritdoc cref="ITokenSchema"/>
         ITokenSchema Token { get; }
+
         /// <inheritdoc cref="IGameSchema"/>
         IGameSchema Game { get; }
+
+        /// <inheritdoc cref="IStatsSchema"/>
+        IStatsSchema Stats { get; }
     }
 
     /// <inheritdoc cref="IBingoDataService"/>
@@ -31,17 +36,18 @@ namespace Pepp.Web.Apps.Bingo.Data
         private IUserSchema _userSchema;
         private ITokenSchema _tokenSchema;
         private IGameSchema _gameSchema;
+        private IStatsSchema _statsSchema;
 
         public BingoDataService(string connStr) : base(connStr)
         {
         }
 
-        public IApiSchema Api { get => _apiSchema ??= new ApiSchema(this); }
-        public ITwitchSchema Twitch { get => _twitchSchema ??= new TwitchSchema(this); }
-        public IUserSchema User { get => _userSchema ??= new UserSchema(this); }
-        public ITokenSchema Token { get => _tokenSchema ??= new TokenSchema(this); }
-        public IGameSchema Game { get => _gameSchema ??= new GameSchema(this); }
-
+        public IApiSchema Api => _apiSchema ??= new ApiSchema(this);
+        public ITwitchSchema Twitch => _twitchSchema ??= new TwitchSchema(this);
+        public IUserSchema User => _userSchema ??= new UserSchema(this);
+        public ITokenSchema Token => _tokenSchema ??= new TokenSchema(this);
+        public IGameSchema Game => _gameSchema ??= new GameSchema(this);
+        public IStatsSchema Stats => _statsSchema ??= new StatsSchema(this);
     }
 
     public static class BingoDataServiceExtensions
