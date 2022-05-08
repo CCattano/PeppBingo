@@ -13,7 +13,7 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="mobileUserDetails d-flex justify-content-evenly align-items-center d-md-none py-3 my-3">
-          <img [src]="_user.profileImageUri" alt="Profile Image" class="profileImage" height="50" width="50" />
+          <img [src]="_user.profileImageUri" alt="Profile Image" class="rounded-circle border border-light border-2" height="50" width="50" />
           <label>Hey there, {{_user.displayName}}!</label>
         </div>
         <ul class="navbar-nav">
@@ -42,7 +42,7 @@
       </div>
       <div class="d-none d-md-flex justify-content-evenly align-items-center">
         <label class="me-3">Hey there, {{_user.displayName}}!</label>
-        <img [src]="_user.profileImageUri" alt="Profile Image" class="profileImage" height="50" width="50" />
+        <img [src]="_user.profileImageUri" alt="Profile Image" class="rounded-circle border border-light border-2" height="50" width="50" />
       </div>
     </ng-container>
   </div>

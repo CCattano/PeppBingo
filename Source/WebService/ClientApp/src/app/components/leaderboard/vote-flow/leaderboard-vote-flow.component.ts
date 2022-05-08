@@ -2,6 +2,7 @@ import {Component, Input, TemplateRef, ViewChild} from '@angular/core';
 import {BingoSubmissionEvent} from '../../../shared/hubs/player/events/bingo-submission.event';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {GameTileVM} from '../../../shared/viewmodels/game-tile.viewmodel';
+import {LeaderboardApi} from '../../../shared/api/leaderboard.api';
 
 @Component({
   selector: 'app-leaderboard-vote-flow',
@@ -30,7 +31,8 @@ export class LeaderboardVoteFlowComponent {
 
   private _activeModalRef: NgbModalRef;
 
-  constructor(private _ngbModal: NgbModal) {
+  constructor(private _ngbModal: NgbModal,
+              private _leaderboardApi: LeaderboardApi) {
   }
 
   /**
@@ -76,13 +78,19 @@ export class LeaderboardVoteFlowComponent {
     this._board = null;
   }
 
-  public _onApproveClick(): void {
-    // TODO: Emit approval event for submission
+  /**
+   * Event handler for when a board is approved
+   */
+  public async _onApproveClick(): Promise<void> {
+    await this._leaderboardApi.approveBingoSubmission(this._submission.submitterConnectionID);
     this._removeProcessedSubmission();
   }
 
-  public _onRejectClick(): void {
-    // TODO: Emit rejection event for submission
+  /**
+   * Event handler for when a board is rejected
+   */
+  public async _onRejectClick(): Promise<void> {
+    await this._leaderboardApi.rejectBingoSubmission(this._submission.submitterConnectionID);
     this._removeProcessedSubmission();
   }
 

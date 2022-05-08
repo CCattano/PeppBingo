@@ -1,11 +1,11 @@
-import {Component, EventEmitter, Input, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnDestroy, Output, TemplateRef, ViewChild} from '@angular/core';
 import {faUserCircle, IconDefinition} from '@fortawesome/free-solid-svg-icons';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
-import {UserDto} from '../../../shared/dtos/user.dto';
 import {BingoSubmissionEvent} from '../../../shared/hubs/player/events/bingo-submission.event';
 import {PlayerHub} from '../../../shared/hubs/player/player.hub';
 import {GameTileVM} from '../../../shared/viewmodels/game-tile.viewmodel';
 import {LeaderboardApi} from '../../../shared/api/leaderboard.api';
+import {ApproveSubmissionEvent} from '../../../shared/hubs/player/events/approve-submission.event';
 
 enum SubmissionStepEnum {
   ConfirmSubmit = 0,
@@ -17,7 +17,7 @@ enum SubmissionStepEnum {
   templateUrl: './leaderboard-submission-flow.component.html',
   styleUrls: ['./leaderboard-submission-flow.component.scss']
 })
-export class LeaderboardSubmissionFlowComponent {
+export class LeaderboardSubmissionFlowComponent implements OnDestroy {
   @ViewChild('leaderboardSubmissionModal', {static: true})
   private readonly leaderboardSubmissionModalRef: TemplateRef<any>;
 
@@ -47,22 +47,31 @@ export class LeaderboardSubmissionFlowComponent {
   /**
    * Users who have confirmed this bingo
    */
-  public _approvers: UserDto[] = [];
+  public _approvers: ApproveSubmissionEvent[] = [];
 
   /**
    * Array representing the quantity of users who have rejected this bingo
+   *
    * Users who reject a bingo are kept anonymous,
-   * so the array is a arbitrary type of boolean array
+   * so the array is an arbitrary type of null array
+   *
    * We only need something to iterate over in
    * the template and display a font awesome icon for
    */
-  public _rejectors: boolean[] = [];
+  public _rejectors: null[] = [];
 
   private _modalInstance: NgbModalRef;
 
   constructor(private _modalService: NgbModal,
               private _leaderboardApi: LeaderboardApi,
               private _playerHub: PlayerHub) {
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public ngOnDestroy(): void {
+    this._playerHub.unregisterSubmissionResponseHandlers();
   }
 
   /**
@@ -95,6 +104,7 @@ export class LeaderboardSubmissionFlowComponent {
         text: col.text
       })))
     }
+    await this._registerSubmissionResponseEventHandlers();
     await this._leaderboardApi.submitBingoForLeaderboard(submission);
     this._currentSubmissionStep = SubmissionStepEnum.AwaitVotes;
   }
@@ -103,8 +113,9 @@ export class LeaderboardSubmissionFlowComponent {
    * Event handler for when the modal should be closed at
    * any point during the leaderboard submission workflow
    */
-  public async _onClose(): Promise<void> {
-    await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
+  public async _onClose(cancelSubmission: boolean = false): Promise<void> {
+    if (cancelSubmission)
+      await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
     this._modalInstance.close();
     this._resetModalState();
     this.workflowEnd.emit();
@@ -114,5 +125,23 @@ export class LeaderboardSubmissionFlowComponent {
     this._currentSubmissionStep = SubmissionStepEnum.ConfirmSubmit;
     this._approvers = [];
     this._rejectors = [];
+  }
+
+  private async _registerSubmissionResponseEventHandlers(): Promise<void> {
+    await this._playerHub.connect();
+    this._playerHub.registerApproveSubmissionHandler(this._onApproveSubmission);
+    this._playerHub.registerRejectSubmissionHandler(this._onRejectSubmission);
+  }
+
+  private _onApproveSubmission = (evtData: ApproveSubmissionEvent): void => {
+    this._approvers.push(evtData);
+    if (this._approvers.length === 2) {
+      this._playerHub.unregisterSubmissionResponseHandlers();
+      // TODO: set some bool, go to phase 3
+    }
+  }
+
+  private _onRejectSubmission = (): void => {
+    this._rejectors.push(null);
   }
 }

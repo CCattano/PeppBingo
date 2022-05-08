@@ -41,9 +41,10 @@
       <br/>
       <br/>
       <div class="d-flex flex-column">
-        <div class="d-flex flex-row">
-          <label class="me-2">Approved By:</label>
+        <div class="d-flex flex-row align-items-center">
+          <label class="me-3">Approved By:</label>
           <img *ngFor="let approver of _approvers"
+               class="rounded-circle border border-light border-3 me-2"
                [src]="approver.profileImageUri"
                [ngbTooltip]="approver.displayName"
                placement="auto"
@@ -52,18 +53,21 @@
                alt="approver"/>
         </div>
         <br/>
-        <div class="d-flex flex-row">
-          <label class="me-2">Rejected By:</label>
-          <fa-icon *ngFor="let _ of _rejectors"
-                   [icon]="icons.faUserCircle"
-                   ngbTooltip="Anonymous"
-                   placement="auto">
-          </fa-icon>
+        <div class="d-flex flex-row align-items-center">
+          <label class="me-3">Rejected By:</label>
+          <div *ngFor="let _ of _rejectors"
+               class="rounded-circle bg-light text-dark border border-light border-2">
+            <fa-icon class="d-flex fs-1 me-2"
+                     [icon]="icons.faUserCircle"
+                     ngbTooltip="Anonymous"
+                     placement="auto">
+            </fa-icon>
+          </div>
         </div>
       </div>
     </div>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">Cancel Submission</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onClose(true)">Cancel Submission</button>
   </div>
 </ng-template>

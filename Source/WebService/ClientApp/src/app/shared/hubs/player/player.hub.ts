@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import {BingoSubmissionEvent} from './events/bingo-submission.event';
+import {ApproveSubmissionEvent} from './events/approve-submission.event';
 
 enum PlayerEvents {
   LatestActiveBoardID = 'LatestActiveBoardID',
   BingoSubmission = 'BingoSubmission',
-  CancelSubmission = 'CancelSubmission'
+  CancelSubmission = 'CancelSubmission',
+  ApproveSubmission = 'ApproveSubmission',
+  RejectSubmission = 'RejectSubmission'
 }
 
 @Injectable({
@@ -49,6 +52,19 @@ export class PlayerHub {
 
   public registerCancelSubmissionHandler(handler: (hubConnID: string) => void): void {
     this._hubConn.on(PlayerEvents.CancelSubmission, handler);
+  }
+
+  public registerApproveSubmissionHandler(handler: (evtData: ApproveSubmissionEvent) => void): void {
+    this._hubConn.on(PlayerEvents.ApproveSubmission, handler);
+  }
+
+  public registerRejectSubmissionHandler(handler: () => void): void {
+    this._hubConn.on(PlayerEvents.RejectSubmission, handler);
+  }
+
+  public unregisterSubmissionResponseHandlers(): void {
+    this._hubConn.off(PlayerEvents.ApproveSubmission);
+    this._hubConn.off(PlayerEvents.RejectSubmission);
   }
 
   public unregisterAllHandlers(): void {
