@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.Hubs.Player;
+using Pepp.Web.Apps.Bingo.Hubs.Player.Events.ApproveSubmissionEvent;
 using Pepp.Web.Apps.Bingo.Hubs.Player.Events.BingoSubmission;
 using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
 
@@ -34,6 +35,27 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         public async Task<ActionResult> CancelSubmission([FromQuery] string hubConnID)
         {
             await _playerHub.EmitSubmissionCancel(hubConnID);
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ApproveSubmission([FromQuery] string requestorHubConnID)
+        {
+            UserBE requestingUser = await GetRequestingUser();
+            ApproveSubmissionEvent evtData = new()
+            {
+                UserID = requestingUser.UserID,
+                DisplayName = requestingUser.DisplayName,
+                ProfileImageUri = requestingUser.ProfileImageUri
+            };
+            await _playerHub.EmitApproveSubmission(requestorHubConnID, evtData);
+            return Ok();
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult> RejectSubmission([FromQuery] string requestorHubConnID)
+        {
+            await _playerHub.EmitRejectSubmission(requestorHubConnID);
             return Ok();
         }
 

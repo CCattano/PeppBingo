@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
+using Pepp.Web.Apps.Bingo.Hubs.Player.Events.ApproveSubmissionEvent;
 using Pepp.Web.Apps.Bingo.Hubs.Player.Events.BingoSubmission;
 
 namespace Pepp.Web.Apps.Bingo.Hubs.Player
@@ -28,6 +29,23 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// <param name="hubConnID"></param>
         /// <returns></returns>
         Task EmitSubmissionCancel(string hubConnID);
+        
+        /// <summary>
+        /// Emits an event to the user who submitted a bingo
+        /// signifying that another user approved their bingo
+        /// </summary>
+        /// <param name="requestorHubConnID"></param>
+        /// <param name="evtDetails"></param>
+        /// <returns></returns>
+        Task EmitApproveSubmission(string requestorHubConnID, ApproveSubmissionEvent evtDetails);
+        
+        /// <summary>
+        /// Emits an event to the user who submitted a bingo
+        /// signifying that another user rejected their bingo
+        /// </summary>
+        /// <param name="requestorHubConnID"></param>
+        /// <returns></returns>
+        Task EmitRejectSubmission(string requestorHubConnID);
     }
 
     public class PlayerHub : IPlayerHub
@@ -45,5 +63,11 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
 
         public async Task EmitSubmissionCancel(string hubConnID) =>
             await _playerHub.Clients.AllExcept(hubConnID).CancelSubmission(hubConnID);
+        
+        public async Task EmitApproveSubmission(string requestorHubConnID, ApproveSubmissionEvent evtData) =>
+            await _playerHub.Clients.Client(requestorHubConnID).ApproveSubmission(evtData);
+        
+        public async Task EmitRejectSubmission(string requestorHubConnID) =>
+            await _playerHub.Clients.Client(requestorHubConnID).RejectSubmission();
     }
 }
