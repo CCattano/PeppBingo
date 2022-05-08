@@ -6,7 +6,7 @@
   <div class="modal-body bg-dark text-center">
     <ul *ngIf="!_board" class="list-group">
       <li *ngFor="let request of requests; let i = index;"
-          class="list-group-item pointer" (click)="_onBoardClick(request)">
+          class="list-group-item bg-dark text-light border-light pointer" (click)="_onBoardClick(request)">
         {{i + 1}}. User requesting bingo confirmation
       </li>
     </ul>

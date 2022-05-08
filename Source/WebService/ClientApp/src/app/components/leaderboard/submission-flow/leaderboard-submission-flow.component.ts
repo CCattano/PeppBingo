@@ -1,4 +1,14 @@
-import {Component, EventEmitter, Input, OnDestroy, Output, TemplateRef, ViewChild} from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  Renderer2,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import {faUserCircle, IconDefinition} from '@fortawesome/free-solid-svg-icons';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {BingoSubmissionEvent} from '../../../shared/hubs/player/events/bingo-submission.event';
@@ -6,10 +16,15 @@ import {PlayerHub} from '../../../shared/hubs/player/player.hub';
 import {GameTileVM} from '../../../shared/viewmodels/game-tile.viewmodel';
 import {LeaderboardApi} from '../../../shared/api/leaderboard.api';
 import {ApproveSubmissionEvent} from '../../../shared/hubs/player/events/approve-submission.event';
+// @ts-ignore
+import * as confetti from 'canvas-confetti';
+import {Observable, Subject, Subscription} from 'rxjs';
+import {delay, map, tap} from 'rxjs/operators';
 
 enum SubmissionStepEnum {
   ConfirmSubmit = 0,
-  AwaitVotes = 1
+  AwaitVotes = 1,
+  VerifiedBingo = 2
 }
 
 @Component({
@@ -17,7 +32,7 @@ enum SubmissionStepEnum {
   templateUrl: './leaderboard-submission-flow.component.html',
   styleUrls: ['./leaderboard-submission-flow.component.scss']
 })
-export class LeaderboardSubmissionFlowComponent implements OnDestroy {
+export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
   @ViewChild('leaderboardSubmissionModal', {static: true})
   private readonly leaderboardSubmissionModalRef: TemplateRef<any>;
 
@@ -62,15 +77,28 @@ export class LeaderboardSubmissionFlowComponent implements OnDestroy {
 
   private _modalInstance: NgbModalRef;
 
+  private _confettiEventSource: Subject<void> = new Subject<void>();
+  private _confettiSub: Subscription;
+
   constructor(private _modalService: NgbModal,
               private _leaderboardApi: LeaderboardApi,
-              private _playerHub: PlayerHub) {
+              private _playerHub: PlayerHub,
+              private renderer2: Renderer2) {
+  }
+
+  /**
+   * @inheritDoc
+   */
+  public ngOnInit(): void {
+    this._confettiSub = this._initConfettiPipeline().subscribe();
   }
 
   /**
    * @inheritDoc
    */
   public ngOnDestroy(): void {
+    this._confettiSub?.unsubscribe();
+    this._confettiSub = null;
     this._playerHub.unregisterSubmissionResponseHandlers();
   }
 
@@ -137,11 +165,93 @@ export class LeaderboardSubmissionFlowComponent implements OnDestroy {
     this._approvers.push(evtData);
     if (this._approvers.length === 2) {
       this._playerHub.unregisterSubmissionResponseHandlers();
-      // TODO: set some bool, go to phase 3
+      this._leaderboardApi.updateLeaderboard()
+        .then(() => {
+          this._currentSubmissionStep = SubmissionStepEnum.VerifiedBingo;
+          this._confettiEventSource.next();
+        })
+        // TODO: Impl retry button logic
+        .catch(() => console.log('implement retry button here'));
     }
   }
 
   private _onRejectSubmission = (): void => {
     this._rejectors.push(null);
+  }
+
+  private _initConfettiPipeline(): Observable<void> {
+    return this._confettiEventSource.asObservable().pipe(
+      // Waiting for animate.css animations to complete
+      delay(1800),
+      map(() => {
+        const canvasEl: HTMLCanvasElement = this.renderer2.createElement('canvas');
+
+        const modalEl: HTMLDivElement =
+          document.getElementsByTagName('ngb-modal-window')?.item(0).firstChild.firstChild as HTMLDivElement;
+
+        this.renderer2.appendChild(modalEl, canvasEl);
+
+        let confettiCannon = confetti.create(canvasEl, {
+          resize: true // will fit all containing-element sizes
+        });
+        const count: number = 400;
+        const defaults: any = {
+          origin: {
+            y: 1
+          }
+        };
+        [
+          {
+            particleRatio: 0.25,
+            opts: {
+              spread: 26,
+              startVelocity: 55,
+            }
+          },
+          {
+            particleRatio: 0.2,
+            opts: {
+              spread: 60,
+            }
+          },
+          {
+            particleRatio: 0.35,
+            opts: {
+              spread: 100,
+              decay: 0.91,
+              scalar: 0.8
+            }
+          },
+          {
+            particleRatio: 0.1,
+            opts: {
+              spread: 120,
+              startVelocity: 25,
+              decay: 0.92,
+              scalar: 1.2
+            }
+          },
+          {
+            particleRatio: 0.1,
+            opts: {
+              spread: 120,
+              startVelocity: 45,
+            }
+          }
+        ].forEach(config => {
+          const confettiConf: any = {
+            ...defaults,
+            ...config.opts,
+            particleCount: Math.floor(count * config.particleRatio)
+          };
+          confettiCannon(confettiConf);
+        });
+        confettiCannon = null;
+        return canvasEl;
+      }),
+      delay(4000),
+      tap(canvas => canvas?.parentElement?.removeChild(canvas)),
+      map(() => null)
+    )
   }
 }

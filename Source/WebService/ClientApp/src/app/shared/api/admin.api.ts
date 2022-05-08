@@ -1,16 +1,27 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { of } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
-import { BoardTileDto } from '../dtos/board-tile.dto';
-import { BoardDto } from '../dtos/board.dto';
-import { UserDto } from '../dtos/user.dto';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {tap} from 'rxjs/operators';
+import {BoardTileDto} from '../dtos/board-tile.dto';
+import {BoardDto} from '../dtos/board.dto';
+import {UserDto} from '../dtos/user.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminApi {
   constructor(private _http: HttpClient) {
+  }
+
+  private static _convertDateStringsToDates(gameData: BoardDto | BoardTileDto): void {
+    if (!gameData) return;
+    gameData.createdDateTime =
+      new Date((gameData.createdDateTime as any as string).endsWith('Z')
+        ? gameData.createdDateTime
+        : gameData.createdDateTime + 'Z');
+    gameData.modDateTime =
+      new Date((gameData.modDateTime as any as string).endsWith('Z')
+        ? gameData.modDateTime
+        : gameData.modDateTime + 'Z');
   }
 
   //#region Admin User Data Endpoints
@@ -65,7 +76,7 @@ export class AdminApi {
    */
   public async createNewBoard(board: BoardDto): Promise<BoardDto> {
     return await this._http.post<BoardDto>('Admin/CreateBoard', board)
-      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .pipe(tap(board => AdminApi._convertDateStringsToDates(board)))
       .toPromise();
   }
 
@@ -82,7 +93,7 @@ export class AdminApi {
    */
   public async getAllBoards(): Promise<BoardDto[]> {
     return await this._http.get<BoardDto[]>('Admin/Boards')
-      .pipe(tap(boards => boards?.forEach(board => this._convertDateStringsToDates(board))))
+      .pipe(tap(boards => boards?.forEach(board => AdminApi._convertDateStringsToDates(board))))
       .toPromise();
   }
 
@@ -92,7 +103,7 @@ export class AdminApi {
    */
   public async updateBoard(board: BoardDto): Promise<BoardDto> {
     return await this._http.put<BoardDto>('Admin/UpdateBoard', board)
-      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .pipe(tap(board => AdminApi._convertDateStringsToDates(board)))
       .toPromise();
   }
 
@@ -102,11 +113,12 @@ export class AdminApi {
 
   /**
    * Create a new board tile for the board specified
+   * @param boardID
    * @param tile
    */
   public async createNewBoardTile(boardID: number, tile: BoardTileDto): Promise<BoardTileDto> {
     return await this._http.post<BoardTileDto>(`Admin/CreateBoardTile?boardID=${boardID}`, tile)
-      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .pipe(tap(board => AdminApi._convertDateStringsToDates(board)))
       .toPromise();
   }
 
@@ -116,17 +128,17 @@ export class AdminApi {
    */
   public async getTilesForBoard(boardID: number): Promise<BoardTileDto[]> {
     return await this._http.get<BoardTileDto[]>(`Admin/Tiles?boardID=${boardID}`)
-      .pipe(tap(tiles => tiles?.forEach(tile => this._convertDateStringsToDates(tile))))
+      .pipe(tap(tiles => tiles?.forEach(tile => AdminApi._convertDateStringsToDates(tile))))
       .toPromise();
   }
 
   /**
    * Updates an existing board tile with new information
-   * @param tileZ
+   * @param tile
    */
-  public async updateBoardTile(tile: BoardTileDto, showLoader: boolean = false): Promise<BoardTileDto> {
+  public async updateBoardTile(tile: BoardTileDto): Promise<BoardTileDto> {
     return this._http.put<BoardTileDto>('Admin/UpdateBoardTile', tile)
-      .pipe(tap(board => this._convertDateStringsToDates(board)))
+      .pipe(tap(board => AdminApi._convertDateStringsToDates(board)))
       .toPromise();
   }
 
@@ -138,24 +150,6 @@ export class AdminApi {
     return this._http.delete<null>(`Admin/DeleteBoardTile?tileID=${tileID}`).toPromise();
   }
 
-  private _convertDateStringsToDates(gameData: BoardDto | BoardTileDto): void {
-    if (!gameData) return;
-    gameData.createdDateTime =
-      new Date((gameData.createdDateTime as any as string).endsWith('Z')
-        ? gameData.createdDateTime
-        : gameData.createdDateTime + 'Z');
-    gameData.modDateTime =
-      new Date((gameData.modDateTime as any as string).endsWith('Z')
-        ? gameData.modDateTime
-        : gameData.modDateTime + 'Z');
-  }
-
-  /**
-   * Temp
-   */
-  private randomDelay(): number {
-    return Math.floor(Math.random() * (750 - 250 + 1)) + 250;
-  }
   //#endregion
 }
 

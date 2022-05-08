@@ -6,18 +6,21 @@
     <ng-container *ngSwitchCase="submissionStepEnum.AwaitVotes">
       <ng-container *ngTemplateOutlet="awaitVotes; context: {modal}"></ng-container>
     </ng-container>
+    <ng-container *ngSwitchCase="submissionStepEnum.VerifiedBingo">
+      <ng-container *ngTemplateOutlet="verifiedBingo; context: {modal}"></ng-container>
+    </ng-container>
   </ng-container>
 </ng-template>
 
 <ng-template #confirmSubmit let-modal>
   <div class="modal-header bg-success text-light">
-    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Bingo! Let's Goaarrr!!</h4>
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Bingo!</h4>
   </div>
   <div class="modal-body bg-dark text-center">
     <label>You just got a bingo!</label>
     <br/>
     <br/>
-    <label>Do you want to submit this Bingo to increase your leaderboard standing?</label>
+    <label>Do you want to submit this Bingo to improve your leaderboard standing?</label>
   </div>
   <div class="modal-footer bg-dark">
     <button type="button" class="btn btn-success" (click)="_onSubmitBingoRequest()">Submit It!</button>
@@ -56,8 +59,8 @@
         <div class="d-flex flex-row align-items-center">
           <label class="me-3">Rejected By:</label>
           <div *ngFor="let _ of _rejectors"
-               class="rounded-circle bg-light text-dark border border-light border-2">
-            <fa-icon class="d-flex fs-1 me-2"
+               class="rounded-circle bg-light text-dark border border-light border-2 me-2">
+            <fa-icon class="d-flex fs-1"
                      [icon]="icons.faUserCircle"
                      ngbTooltip="Anonymous"
                      placement="auto">
@@ -69,5 +72,37 @@
   </div>
   <div class="modal-footer bg-dark">
     <button type="button" class="btn btn-outline-secondary" (click)="_onClose(true)">Cancel Submission</button>
+  </div>
+</ng-template>
+
+<ng-template #verifiedBingo let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Bingo Confirmed! Let's Goaarrr!!</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label class="fs-4">These two had your back!</label>
+    <br/>
+    <br/>
+    <div class="d-flex flex-row justify-content-evenly">
+      <ng-container *ngFor="let approver of _approvers; let i = index">
+        <div class="d-flex flex-column align-items-center">
+          <img class="rounded-circle border border-light border-3 me-2 mb-2 animate__animated animate__fast"
+               [class.animate__slideInLeft]="i === 0"
+               [class.animate__slideInRight]="i === 1"
+               [src]="approver.profileImageUri"
+               [ngbTooltip]="approver.displayName"
+               placement="auto"
+               height="80"
+               width="80"
+               alt="approver"/>
+          <label class="fs-6 animate__animated animate__fadeInUp animate__fast animate__delay-1s">
+            {{approver.displayName}}
+          </label>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">Close</button>
   </div>
 </ng-template>
