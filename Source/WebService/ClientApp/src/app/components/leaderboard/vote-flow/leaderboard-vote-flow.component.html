@@ -1,0 +1,24 @@
+<ng-template #voteFlowModal let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title"
+        id="modal-basic-title">{{_board ? 'Cast Your Vote' : 'Select A User\'s Board'}}</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <ul *ngIf="!_board" class="list-group">
+      <li *ngFor="let request of requests; let i = index;"
+          class="list-group-item pointer" (click)="_onBoardClick(request)">
+        {{i + 1}}. User requesting bingo confirmation
+      </li>
+    </ul>
+    <app-bingo-grid *ngIf="_board" [board]="_board"></app-bingo-grid>
+  </div>
+  <div class="modal-footer bg-dark">
+    <ng-container *ngIf="!_board">
+      <button type="button" class="btn btn-outline-secondary" (click)="_onCloseModal()">Close</button>
+    </ng-container>
+    <ng-container *ngIf="_board">
+      <button type="button" class="btn btn-success" (click)="_onApproveClick()">Approve</button>
+      <button type="button" class="btn btn-danger" (click)="_onRejectClick()">Reject</button>
+    </ng-container>
+  </div>
+</ng-template>

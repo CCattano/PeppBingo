@@ -69,16 +69,14 @@ export class LeaderboardSubmissionFlowComponent {
    * Open the leaderboard submission workflow modal
    */
   public openSubmissionFlowModal(): void {
-    if (!this._modalInstance || this._modalInstance.closed) {
-      this._modalInstance =
-        this._modalService.open(this.leaderboardSubmissionModalRef, {
-          animation: true,
-          backdrop: 'static',
-          centered: true,
-          keyboard: false,
-          size: 'lg'
-        });
-    }
+    this._modalInstance =
+      this._modalService.open(this.leaderboardSubmissionModalRef, {
+        animation: true,
+        backdrop: 'static',
+        centered: true,
+        keyboard: false,
+        size: 'lg'
+      });
   }
 
   /**
@@ -105,7 +103,8 @@ export class LeaderboardSubmissionFlowComponent {
    * Event handler for when the modal should be closed at
    * any point during the leaderboard submission workflow
    */
-  public _onClose(): void {
+  public async _onClose(): Promise<void> {
+    await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
     this._modalInstance.close();
     this._resetModalState();
     this.workflowEnd.emit();

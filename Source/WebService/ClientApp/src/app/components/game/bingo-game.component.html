@@ -14,6 +14,7 @@
       </button>
       <button type="button"
               class="btn btn-outline-info position-relative"
+              (click)="_onOpenVoteModalClick()"
               [disabled]="!_voteRequests.length">
         Vote
         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
@@ -30,3 +31,4 @@
 <app-leaderboard-submission-flow [board]="_board"
                                  (workflowEnd)="_onLeaderboardSubmissionComplete()">
 </app-leaderboard-submission-flow>
+<app-leaderboard-vote-flow [requests]="_voteRequests"></app-leaderboard-vote-flow>

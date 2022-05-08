@@ -15,6 +15,10 @@ export class LeaderboardApi {
    * @param submission
    */
   public async submitBingoForLeaderboard(submission: BingoSubmissionEvent): Promise<void> {
-    return await this._http.post<void>('Leaderboard/BingoSubmission', submission).toPromise();
+    return await this._http.post<null>('Leaderboard/BingoSubmission', submission).toPromise();
+  }
+
+  public async cancelBingoSubmission(hubConnID: string): Promise<void> {
+    return await this._http.post<null>(`LeaderBoard/CancelSubmission?hubConnID=${hubConnID}`, null).toPromise();
   }
 }

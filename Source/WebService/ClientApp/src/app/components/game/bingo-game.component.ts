@@ -6,6 +6,7 @@ import {LeaderboardSubmissionFlowComponent} from '../leaderboard/submission-flow
 import {GameTileVM} from '../../shared/viewmodels/game-tile.viewmodel';
 import {BingoSubmissionEvent} from '../../shared/hubs/player/events/bingo-submission.event';
 import {TokenService} from '../../shared/service/token.service';
+import {LeaderboardVoteFlowComponent} from '../leaderboard/vote-flow/leaderboard-vote-flow.component';
 
 @Component({
   templateUrl: './bingo-game.component.html',
@@ -14,6 +15,9 @@ import {TokenService} from '../../shared/service/token.service';
 export class BingoGameComponent implements OnInit, OnDestroy {
   @ViewChild(LeaderboardSubmissionFlowComponent, {static: true})
   private readonly _leaderboardSubmissionFlowComponent: LeaderboardSubmissionFlowComponent;
+
+  @ViewChild(LeaderboardVoteFlowComponent, {static: true})
+  private readonly _leaderboardVoteFlowComponent: LeaderboardVoteFlowComponent;
   /**
    * Bool flag indicating an admin has not set an active board to play
    */
@@ -93,6 +97,14 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     this._makeBoard();
     // TODO: Long-term: Enable board shuffling for 30s
     // If board is never shuffled at end of 30s perform shuffle automatically
+  }
+
+  /**
+   * Event handler for the Vote button.
+   * Opens the vote modal
+   */
+  public _onOpenVoteModalClick(): void {
+    this._leaderboardVoteFlowComponent.openModal();
   }
 
   //#endregion
@@ -201,15 +213,16 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private async _registerHubEventHandlers(): Promise<void> {
     await this._playerHub.connect();
-    this._playerHub.registerEmitLatestActiveBoardIDHandler(this._onEmitLatestActiveBoardID);
-    this._playerHub.registerEmitBingoSubmissionHandler(this._onEmitBingoSubmission);
+    this._playerHub.registerLatestActiveBoardIDHandler(this._onLatestActiveBoardID);
+    this._playerHub.registerBingoSubmissionHandler(this._onBingoSubmission);
+    this._playerHub.registerCancelSubmissionHandler(this._onSubmissionCancel);
   }
 
-  private _onEmitLatestActiveBoardID = (activeBoardID: number): void => {
+  private _onLatestActiveBoardID = (activeBoardID: number): void => {
     this._getGameData(activeBoardID);
   };
 
-  public _onEmitBingoSubmission = (submission: BingoSubmissionEvent): void => {
+  public _onBingoSubmission = (submission: BingoSubmissionEvent): void => {
     // This Hub event is sent to all users who are NOT the user that initiated the event
     // We are able to distinguish the initiator by their Hub connection ID
     // But if that initiator had multiple tabs open they will have different HubConnIDs per tab
@@ -221,6 +234,13 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       return; // Nice try m8.
 
     this._voteRequests.push(submission);
+  }
+
+  private _onSubmissionCancel = (hubConnID: string): void => {
+    const canceledReqIndex: number =
+      this._voteRequests.findIndex(req => req.submitterConnectionID === hubConnID);
+    if(canceledReqIndex >= 0)
+      this._voteRequests.splice(canceledReqIndex, 1);
   }
 
   //#endregion

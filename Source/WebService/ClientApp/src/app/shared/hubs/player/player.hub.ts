@@ -3,8 +3,9 @@ import { HubConnection, HubConnectionBuilder } from '@microsoft/signalr';
 import {BingoSubmissionEvent} from './events/bingo-submission.event';
 
 enum PlayerEvents {
-  EmitLatestActiveBoardID = 'EmitLatestActiveBoardID',
-  EmitBingoSubmission = 'EmitBingoSubmission'
+  LatestActiveBoardID = 'LatestActiveBoardID',
+  BingoSubmission = 'BingoSubmission',
+  CancelSubmission = 'CancelSubmission'
 }
 
 @Injectable({
@@ -38,17 +39,22 @@ export class PlayerHub {
     await this._hubConn.start();
   }
 
-  public registerEmitLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void): void {
-    this._hubConn.on(PlayerEvents.EmitLatestActiveBoardID, handler);
+  public registerLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void): void {
+    this._hubConn.on(PlayerEvents.LatestActiveBoardID, handler);
   }
 
-  public registerEmitBingoSubmissionHandler(handler: (submission: BingoSubmissionEvent) => void): void {
-    this._hubConn.on(PlayerEvents.EmitBingoSubmission, handler);
+  public registerBingoSubmissionHandler(handler: (submission: BingoSubmissionEvent) => void): void {
+    this._hubConn.on(PlayerEvents.BingoSubmission, handler);
+  }
+
+  public registerCancelSubmissionHandler(handler: (hubConnID: string) => void): void {
+    this._hubConn.on(PlayerEvents.CancelSubmission, handler);
   }
 
   public unregisterAllHandlers(): void {
-    this._hubConn.off(PlayerEvents.EmitLatestActiveBoardID);
-    this._hubConn.off(PlayerEvents.EmitBingoSubmission);
+    this._hubConn.off(PlayerEvents.LatestActiveBoardID);
+    this._hubConn.off(PlayerEvents.BingoSubmission);
+    this._hubConn.off(PlayerEvents.CancelSubmission);
     this._hubConn.stop();
     this._hubConn = null;
   }
