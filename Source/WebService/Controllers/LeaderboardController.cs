@@ -29,6 +29,13 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await _playerHub.EmitBingoSubmission(submission);
             return Ok();
         }
+        
+        [HttpPost]
+        public async Task<ActionResult> CancelSubmission([FromQuery] string hubConnID)
+        {
+            await _playerHub.EmitSubmissionCancel(hubConnID);
+            return Ok();
+        }
 
         private async Task<UserBE> GetRequestingUser()
         {

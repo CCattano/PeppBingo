@@ -11,7 +11,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// new board all players should be playing
         /// </summary>
         /// <returns></returns>
-        Task EmitLatestActiveBoardID(int activeBoardID);
+        Task LatestActiveBoardID(int activeBoardID);
 
         /// <summary>
         /// Emits an event containing the bingo board data
@@ -19,7 +19,15 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// </summary>
         /// <param name="submission"></param>
         /// <returns></returns>
-        Task EmitBingoSubmission(BingoSubmissionEvent submission);
+        Task BingoSubmission(BingoSubmissionEvent submission);
+
+        /// <summary>
+        /// Emits a void event to all connected clients that a user who
+        /// submitted a bingo for voting has canceled their request
+        /// </summary>
+        /// <param name="hubConnectionID"></param>
+        /// <returns></returns>
+        Task CancelSubmission(string hubConnectionID);
     }
 
     public class BasePlayerHub : Hub<IBasePlayerHub>

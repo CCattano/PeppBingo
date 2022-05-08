@@ -20,6 +20,14 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// <param name="submission"></param>
         /// <returns></returns>
         Task EmitBingoSubmission(BingoSubmissionEvent submission);
+
+        /// <summary>
+        /// Emits a void event to all connected clients that a user who
+        /// submitted a bingo for voting has canceled their request
+        /// </summary>
+        /// <param name="hubConnID"></param>
+        /// <returns></returns>
+        Task EmitSubmissionCancel(string hubConnID);
     }
 
     public class PlayerHub : IPlayerHub
@@ -30,9 +38,12 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
             _playerHub = playerHub;
 
         public async Task EmitLatestActiveBoardID(int activeBoardID) =>
-            await _playerHub.Clients.All.EmitLatestActiveBoardID(activeBoardID);
+            await _playerHub.Clients.All.LatestActiveBoardID(activeBoardID);
 
         public async Task EmitBingoSubmission(BingoSubmissionEvent submission) =>
-            await _playerHub.Clients.AllExcept(submission.SubmitterConnectionID).EmitBingoSubmission(submission);
+            await _playerHub.Clients.AllExcept(submission.SubmitterConnectionID).BingoSubmission(submission);
+
+        public async Task EmitSubmissionCancel(string hubConnID) =>
+            await _playerHub.Clients.AllExcept(hubConnID).CancelSubmission(hubConnID);
     }
 }
