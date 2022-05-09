@@ -4,9 +4,13 @@ CREATE TABLE [stats].LeaderboardPos(
 		CONSTRAINT 
 			FK_LeaderboardPos_Leaderboard_LeaderBoardID 
 		FOREIGN KEY REFERENCES 
-			[stats].Leaderboard(LeaderboardID),
+			[stats].Leaderboards(LeaderboardID),
 	UserID int NOT NULL,
-	BingoQty int NOT NULL CONSTRAINT D_Leaderboard_BingoQty DEFAULT(0),
+	-- If a row is being created it's b/c someone previously 
+	-- not on the leaderboard has gotten their first bingo
+	-- So when we are inserting a row we want to default to
+	--a BingoQty of 1, that's why we're here in this sproc
+	BingoQty int NOT NULL CONSTRAINT D_LeaderboardPos_BingoQty DEFAULT(1),
 	CONSTRAINT PK_LeaderboardPos_LeaderboardPosID PRIMARY KEY(LeaderboardPosID),
 	CONSTRAINT UNQ_LeaderboardPos_LeaderboardID_UserID UNIQUE(LeaderboardID, UserID),
 	INDEX IDX_LeaderboardPos_UserID (UserID)

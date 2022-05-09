@@ -4,10 +4,11 @@ SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
 -- Author:		Chris Cattano
--- Create date: 04/22/2022
--- Description:	Fetches all rows in table
+-- Create date: 05/09/2022
+-- Description:	Fetch Leaderboard data by BoardID
 -- =============================================
-CREATE PROCEDURE [stats].usp_SELECT_AllLeaderboards
+CREATE PROCEDURE [stats].usp_SELECT_Leaderboard_ByBoardID
+	@BoardID int
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -17,5 +18,7 @@ BEGIN
 		[BoardID]
 	FROM
 		[stats].[Leaderboards]
+	WHERE
+		BoardID = @BoardID
 END
 GO

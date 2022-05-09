@@ -9,17 +9,22 @@ namespace Pepp.Web.Apps.Bingo.Data.Schemas
     {
         /// <see cref="ILeaderboardRepo"/>
         ILeaderboardRepo LeaderboardRepo { get; }
+
+        /// <see cref="ILeaderboardPosRepo"/>
+        ILeaderboardPosRepo LeaderboardPosRepo { get; }
     }
 
     /// <see cref="IStatsSchema"/>
-    public class StatsSchema: BaseSchema, IStatsSchema
+    public class StatsSchema : BaseSchema, IStatsSchema
     {
         private ILeaderboardRepo _leaderboardRepo;
+        private ILeaderboardPosRepo _leaderboardPosRepo;
 
         public StatsSchema(BaseDataService dataSvc) : base(dataSvc)
         {
         }
 
         public ILeaderboardRepo LeaderboardRepo => _leaderboardRepo ??= new LeaderboardRepo(base.DataSvc);
+        public ILeaderboardPosRepo LeaderboardPosRepo => _leaderboardPosRepo ??= new LeaderboardPosRepo(base.DataSvc);
     }
 }

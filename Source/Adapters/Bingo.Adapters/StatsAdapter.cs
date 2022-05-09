@@ -15,6 +15,14 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <returns></returns>
         Task<List<LeaderboardBE>> GetAllLeaderboards();
+        /// <summary>
+        /// Update a user's leaderboard position if it exists or create
+        /// a new leaderboard position for the user if it does not
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="boardID"></param>
+        /// <returns></returns>
+        Task UpdatePosition(int userID, int boardID);
     }
 
     public class StatsAdapter : IStatsAdapter
@@ -28,6 +36,17 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             List<LeaderboardBE> leaderboardBEs = await _facade.GetAllLeaderboards();
             return leaderboardBEs;
+        }
+
+        public async Task UpdatePosition(int userID, int boardID)
+        {
+            LeaderboardBE leaderboardBE = await _facade.GetLeaderboard(boardID);
+            LeaderboardPosBE userLeaderboardPosition =
+                await _facade.GetLeaderboardPosition(userID, leaderboardBE.LeaderboardID);
+            if (userLeaderboardPosition == null)
+                await _facade.CreateLeaderboardPosition(userID, leaderboardBE.LeaderboardID);
+            else
+                await _facade.UpdateLeaderboardPosition(userID, leaderboardBE.LeaderboardID);
         }
     }
 }

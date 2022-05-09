@@ -58,6 +58,13 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             return leaderboardBMs;
         }
 
+        [HttpPut]
+        public async Task UpdatePosition([FromQuery] int boardID)
+        {
+            UserBE requestingUser = await GetRequestingUser();
+            await _statsAdapter.UpdatePosition(requestingUser.UserID, boardID);
+        }
+
         [HttpPost]
         public async Task<ActionResult> BingoSubmission([FromBody] BingoSubmissionEvent submission)
         {
