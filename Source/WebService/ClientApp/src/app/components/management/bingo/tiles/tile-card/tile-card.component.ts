@@ -66,7 +66,7 @@ export class TileCardComponent {
    */
   public async _onIsActiveChange(): Promise<void> {
     const updatedTile: BoardTileDto =
-      await this._adminApi.updateBoardTile(this.tile, false);
+      await this._adminApi.updateBoardTile(this.tile);
     Object.keys(updatedTile).forEach((key: string) =>
       (this.tile as any)[key] = (updatedTile as any)[key]);
     this.saveSuccess.emit(this.index);
@@ -74,8 +74,7 @@ export class TileCardComponent {
 
   /**
    * Event handler for when the delete tile icon is clicked
-   * @param index
-   * @param content
+   * @param modalContent
    */
   public async _onDeleteTileClick(modalContent: TemplateRef<any>): Promise<void> {
     const modalRef = this._modalService.open(modalContent, {

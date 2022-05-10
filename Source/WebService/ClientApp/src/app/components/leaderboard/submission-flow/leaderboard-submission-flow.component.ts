@@ -23,8 +23,9 @@ import {delay, map, tap} from 'rxjs/operators';
 
 enum SubmissionStepEnum {
   ConfirmSubmit = 0,
-  AwaitVotes = 1,
-  VerifiedBingo = 2
+  CannotSubmit = 1,
+  AwaitVotes = 2,
+  VerifiedBingo = 3,
 }
 
 @Component({
@@ -36,11 +37,27 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
   @ViewChild('leaderboardSubmissionModal', {static: true})
   private readonly leaderboardSubmissionModalRef: TemplateRef<any>;
 
+  /**
+   * The ID of the board the user has gotten a bingo for
+   */
+  @Input()
+  public boardID: number;
+
+  /**
+   * The state of the user's board
+   */
   @Input()
   public board: GameTileVM[][];
 
+  /**
+   * Event emitted when the modal is closed.
+   *
+   * Emits true if the bingo was accepted by the community
+   *
+   * Emits false if the user canceled their submission request
+   */
   @Output()
-  public workflowEnd: EventEmitter<void> = new EventEmitter<void>();
+  public workflowEnd: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /**
    * Fontawesome icons used in the template
@@ -77,13 +94,15 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
 
   private _modalInstance: NgbModalRef;
 
+  private _bingoWasApproved: boolean = false;
+
   private _confettiEventSource: Subject<void> = new Subject<void>();
   private _confettiSub: Subscription;
 
   constructor(private _modalService: NgbModal,
               private _leaderboardApi: LeaderboardApi,
               private _playerHub: PlayerHub,
-              private renderer2: Renderer2) {
+              private _renderer2: Renderer2) {
   }
 
   /**
@@ -105,7 +124,9 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
   /**
    * Open the leaderboard submission workflow modal
    */
-  public openSubmissionFlowModal(): void {
+  public openSubmissionFlowModal(cannotSubmit: boolean): void {
+    if (cannotSubmit)
+      this._currentSubmissionStep = SubmissionStepEnum.CannotSubmit;
     this._modalInstance =
       this._modalService.open(this.leaderboardSubmissionModalRef, {
         animation: true,
@@ -145,12 +166,13 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
     if (cancelSubmission)
       await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
     this._modalInstance.close();
+    this.workflowEnd.emit(this._bingoWasApproved);
     this._resetModalState();
-    this.workflowEnd.emit();
   }
 
   private _resetModalState(): void {
     this._currentSubmissionStep = SubmissionStepEnum.ConfirmSubmit;
+    this._bingoWasApproved = false;
     this._approvers = [];
     this._rejectors = [];
   }
@@ -165,13 +187,12 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
     this._approvers.push(evtData);
     if (this._approvers.length === 2) {
       this._playerHub.unregisterSubmissionResponseHandlers();
-      this._leaderboardApi.updateLeaderboard()
+      this._bingoWasApproved = true;
+      this._leaderboardApi.updateLeaderboard(this.boardID)
         .then(() => {
           this._currentSubmissionStep = SubmissionStepEnum.VerifiedBingo;
           this._confettiEventSource.next();
-        })
-        // TODO: Impl retry button logic
-        .catch(() => console.log('implement retry button here'));
+        });
     }
   }
 
@@ -184,12 +205,12 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
       // Waiting for animate.css animations to complete
       delay(1800),
       map(() => {
-        const canvasEl: HTMLCanvasElement = this.renderer2.createElement('canvas');
+        const canvasEl: HTMLCanvasElement = this._renderer2.createElement('canvas');
 
         const modalEl: HTMLDivElement =
           document.getElementsByTagName('ngb-modal-window')?.item(0).firstChild.firstChild as HTMLDivElement;
 
-        this.renderer2.appendChild(modalEl, canvasEl);
+        this._renderer2.appendChild(modalEl, canvasEl);
 
         let confettiCannon = confetti.create(canvasEl, {
           resize: true // will fit all containing-element sizes

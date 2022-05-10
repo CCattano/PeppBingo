@@ -1,18 +1,12 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BingoSubmissionEvent} from '../hubs/player/events/bingo-submission.event';
-import {of} from 'rxjs';
-import {delay} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeaderboardApi {
   constructor(private _http: HttpClient) {
-  }
-
-  private static _tempRandomDelay(): number {
-    return Math.floor(Math.random() * (750 - 250 + 1)) + 250;
   }
 
   /**
@@ -51,7 +45,7 @@ export class LeaderboardApi {
   /**
    * Update a user's leaderboard standing
    */
-  public async updateLeaderboard(): Promise<void> {
-    return await of(null).pipe(delay(LeaderboardApi._tempRandomDelay())).toPromise();
+  public async updateLeaderboard(boardID: number): Promise<void> {
+    return await this._http.put<null>(`Leaderboard/UpdatePosition?boardID=${boardID}`, null).toPromise();
   }
 }

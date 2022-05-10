@@ -43,10 +43,17 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   public _board: GameTileVM[][];
 
   /**
+   * The ID of the board currently being played
+   */
+  public _activeBoardID: number;
+
+  /**
    * Array containing metadata related to another
    * player's board that has gotten a bingo
    */
   public readonly _voteRequests: BingoSubmissionEvent[] = [];
+
+  private _cannotSubmitBingo: boolean = false;
 
   constructor(private _gameApi: GameApi,
               private _playerHub: PlayerHub,
@@ -92,7 +99,9 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    * Event handler for when the user has closed the leaderboard
    * submission modal whether by complete submission or cancel
    */
-  public _onLeaderboardSubmissionComplete(): void {
+  public _onLeaderboardSubmissionComplete(bingoWasApproved: boolean): void {
+    if (!this._cannotSubmitBingo)
+      this._cannotSubmitBingo = bingoWasApproved;
     // Short-term: Reset board
     this._makeBoard();
     // TODO: Long-term: Enable board shuffling for 30s
@@ -117,6 +126,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   private async _getGameData(activeBoardID: number = null): Promise<void> {
     // Fetch the board to play with first
     const boardID: number = activeBoardID || await this._gameApi.getActiveBoardID();
+    this._activeBoardID = boardID;
     this._noActiveBoard = !boardID;
     // If an active board hasn't been set yet bail here
     if (this._noActiveBoard) return;
@@ -192,7 +202,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       }
       //Check if nested for-loop found winner
       if (selectedRowCount === 5 || selectedColCount === 5) {
-        this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal();
+        this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._cannotSubmitBingo);
         return;
       }
       //check top-left to bottom-right diag coordinate
@@ -204,7 +214,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     }
     //If no rows or cols had 5 in a row check diagonals
     if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
-      this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal();
+      this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._cannotSubmitBingo);
   }
 
   //#endregion
