@@ -37,6 +37,7 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators
             #region Stats Translators
 
             this.RegisterTranslator<LeaderboardEntity, LeaderboardBE, LeaderboardEntity_LeaderboardBE>();
+            this.RegisterTranslator<LeaderboardPosEntity, LeaderboardPosBE, LeaderboardPosEntity_LeaderboardPosBE>();
 
             #endregion
         }
