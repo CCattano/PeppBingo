@@ -1,13 +1,13 @@
-﻿using Pepp.Web.Apps.Bingo.Infrastructure.Exceptions;
-using System;
+﻿using System;
+using Pepp.Web.Apps.Bingo.Infrastructure.Exceptions;
 
-namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers
+namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
     /// <summary>
     /// Manager that handles holding state data related
     /// to real time settings within the application
     /// </summary>
-    public interface ILiveControlsManager
+    public interface IActiveBoardCache
     {
         /// <summary>
         /// Get the ID of the board that
@@ -23,17 +23,17 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers
         void SetActiveBoardID(int activeBoardID);
     }
 
-    public class LiveControlsManager : ILiveControlsManager
+    public class ActiveBoardCache : IActiveBoardCache
     {
-        private int? ActiveBoardID;
-        private DateTime LockUntil = DateTime.Now;
-        private readonly object LOCK = new();
+        private int? _activeBoardID;
+        private DateTime _lockUntil = DateTime.Now;
+        private readonly object _lock = new();
         public int? GetActiveBoardID()
         {
             int? activeBoardID;
-            lock (LOCK)
+            lock (_lock)
             {
-                activeBoardID = ActiveBoardID;
+                activeBoardID = _activeBoardID;
             }
             return activeBoardID;
         }
@@ -41,12 +41,12 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Managers
         public void SetActiveBoardID(int activeBoardID)
         {
             bool throwEx = false;
-            lock (LOCK)
+            lock (_lock)
             {
-                if (DateTime.Now >= LockUntil)
+                if (DateTime.Now >= _lockUntil)
                 {
-                    LockUntil = DateTime.Now.AddSeconds(30);
-                    ActiveBoardID = activeBoardID;
+                    _lockUntil = DateTime.Now.AddSeconds(30);
+                    _activeBoardID = activeBoardID;
                 }
                 else
                 {

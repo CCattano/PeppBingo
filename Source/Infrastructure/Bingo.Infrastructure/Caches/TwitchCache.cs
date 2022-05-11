@@ -31,7 +31,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 
     public class TwitchCache : BaseCache, ITwitchCache
     {
-        protected override TimeSpan CacheEntryTTL => TimeSpan.FromHours(1);
+        protected override TimeSpan CacheEntryTTL => TimeSpan.FromHours(8);
         public TwitchCache(IMemoryCache cache) : base(cache)
         {
         }

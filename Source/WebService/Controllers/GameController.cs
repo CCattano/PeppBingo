@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.BusinessEntities.Game;
 using Pepp.Web.Apps.Bingo.BusinessModels.Game;
-using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 {
@@ -16,18 +16,18 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
     [Route("[controller]/[action]")]
     public class GameController : BaseController<IMapper, IGameAdapter>
     {
-        private readonly ILiveControlsManager _manager;
+        private readonly IActiveBoardCache _activeBoardCache;
 
         public GameController(
             IMapper mapper,
             IGameAdapter adapter,
-            ILiveControlsManager manager
-        ) : base(mapper, adapter) => _manager = manager;
+            IActiveBoardCache activeBoardCache
+        ) : base(mapper, adapter) => _activeBoardCache = activeBoardCache;
 
         [HttpGet]
         public ActionResult<int?> GetActiveBoardID()
         {
-            int? activeBoardID = _manager.GetActiveBoardID();
+            int? activeBoardID = _activeBoardCache.GetActiveBoardID();
             return Ok(activeBoardID);
         }
 

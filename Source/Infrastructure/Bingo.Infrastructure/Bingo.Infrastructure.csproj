@@ -15,8 +15,4 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.17.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Managers\Caches\" />
-	</ItemGroup>
-
 </Project>

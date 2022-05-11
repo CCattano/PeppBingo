@@ -13,7 +13,6 @@ using Pepp.Web.Apps.Bingo.Hubs.Admin;
 using Pepp.Web.Apps.Bingo.Hubs.Player;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch;
-using Pepp.Web.Apps.Bingo.Infrastructure.Managers;
 using Pepp.Web.Apps.Bingo.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Controllers.Translators;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
@@ -74,7 +73,6 @@ namespace Pepp.Web.Apps.Bingo.WebService
             #region MANAGERS
 
             services.AddScoped<ITokenManager, TokenManager>();
-            services.AddSingleton<ILiveControlsManager, LiveControlsManager>();
 
             #endregion
 
@@ -89,8 +87,10 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region CACHES
 
-            services.AddScoped<ITwitchCache, TwitchCache>();
-            services.AddScoped<ITokenCache, TokenCache>();
+            services.AddSingleton<ITwitchCache, TwitchCache>();
+            services.AddSingleton<ITokenCache, TokenCache>();
+            services.AddSingleton<IActiveBoardCache, ActiveBoardCache>();
+            services.AddSingleton<IUserSubmitCache, UserSubmitCache>();
 
             #endregion
 

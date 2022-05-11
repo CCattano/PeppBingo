@@ -10,7 +10,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         /// ability to set an active board for 30 seconds
         /// </summary>
         /// <returns></returns>
-        Task TriggerSetActiveBoardCooldown();
+        Task StartSetActiveBoardCooldown();
 
         /// <summary>
         /// Emits an event that contains the latest active
@@ -18,7 +18,14 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         /// selected board on the LiveControls page
         /// </summary>
         /// <returns></returns>
-        Task EmitLatestActiveBoardID(int activeBoardID);
+        Task LatestActiveBoardID(int activeBoardID);
+
+        /// <summary>
+        /// Emits an event that causes the UI to deactivate the
+        /// ability to reset all player's boards for 30 seconds
+        /// </summary>
+        /// <returns></returns>
+        Task StartResetAllBoardsCooldown();
     }
 
     public class AdminHub : IAdminHub
@@ -28,11 +35,13 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         public AdminHub(IHubContext<BaseAdminHub, IBaseAdminHub> adminHub) =>
             _adminHub = adminHub;
 
-        public async Task TriggerSetActiveBoardCooldown() =>
-            await _adminHub.Clients.All.TriggerSetActiveBoardCooldown();
+        public async Task StartSetActiveBoardCooldown() =>
+            await _adminHub.Clients.All.StartSetActiveBoardCooldown();
 
+        public async Task LatestActiveBoardID(int activeBoardID) =>
+            await _adminHub.Clients.All.LatestActiveBoardID(activeBoardID);
 
-        public async Task EmitLatestActiveBoardID(int activeBoardID) =>
-            await _adminHub.Clients.All.EmitLatestActiveBoardID(activeBoardID);
+        public async Task StartResetAllBoardsCooldown() =>
+            await _adminHub.Clients.All.StartResetAllBoardsCooldown();
     }
 }

@@ -44,6 +44,12 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// </summary>
         /// <returns></returns>
         Task RejectSubmission();
+        /// <summary>
+        /// Emits an event to a connected user to
+        /// reset the board they are playing on
+        /// </summary>
+        /// <returns></returns>
+        Task ResetBoard();
     }
 
     public class BasePlayerHub : Hub<IBasePlayerHub>

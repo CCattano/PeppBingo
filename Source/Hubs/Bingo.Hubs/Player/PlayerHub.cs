@@ -46,6 +46,12 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// <param name="requestorHubConnID"></param>
         /// <returns></returns>
         Task EmitRejectSubmission(string requestorHubConnID);
+        /// <summary>
+        /// Emits an event to a connected user to
+        /// reset the board they are playing on
+        /// </summary>
+        /// <returns></returns>
+        Task ResetBoard();
     }
 
     public class PlayerHub : IPlayerHub
@@ -69,5 +75,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         
         public async Task EmitRejectSubmission(string requestorHubConnID) =>
             await _playerHub.Clients.Client(requestorHubConnID).RejectSubmission();
+
+        public async Task ResetBoard() => await _playerHub.Clients.All.ResetBoard();
     }
 }
