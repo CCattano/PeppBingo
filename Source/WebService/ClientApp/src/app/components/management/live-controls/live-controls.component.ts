@@ -1,19 +1,23 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { faEdit, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { Observable, Subject, timer } from 'rxjs';
-import { scan, switchMap, take, tap } from 'rxjs/operators';
-import { AdminApi } from '../../../shared/api/admin.api';
-import { GameApi } from '../../../shared/api/game.api';
-import { BoardDto } from '../../../shared/dtos/board.dto';
-import { AdminHub } from '../../../shared/hubs/admin.hub';
-import { ToastService } from '../../../shared/service/toast.service';
+import {HttpErrorResponse} from '@angular/common/http';
+import {Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {faEdit, faRadiationAlt, IconDefinition} from '@fortawesome/free-solid-svg-icons';
+import {Observable, Subject, timer} from 'rxjs';
+import {map, scan, switchMap, take, tap} from 'rxjs/operators';
+import {AdminApi} from '../../../shared/api/admin.api';
+import {GameApi} from '../../../shared/api/game.api';
+import {BoardDto} from '../../../shared/dtos/board.dto';
+import {AdminHub} from '../../../shared/hubs/admin.hub';
+import {ToastService} from '../../../shared/service/toast.service';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   templateUrl: './live-controls.component.html',
   styleUrls: ['./live-controls.component.scss']
 })
 export class LiveControlsComponent implements OnInit, OnDestroy {
+  @ViewChild('resetBoardsConfirmationModal', {static: true})
+  private readonly _resetBoardsConfirmationModalContent: TemplateRef<any>;
+
   /**
    * All boards available to be selected as an active board
    */
@@ -42,19 +46,31 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
    */
   public readonly icons: { [icon: string]: IconDefinition; } = {
     'faEdit': faEdit,
+    'faRadiationAlt': faRadiationAlt
   };
 
-  private _cooldownSource: Subject<number> = new Subject<number>();
-  public _cooldownIsActive: boolean = false;
-  public readonly cooldownTime$: Observable<number>;
+  public _latestBoardCooldownIsActive: boolean = false;
+  public _resetBoardCooldownIsActive: boolean = false;
+  private _latestBoardCooldownSource: Subject<number> = new Subject<number>();
+  private _resetBoardsCooldownSource: Subject<number> = new Subject<number>();
+  public readonly latestBoardCooldownTime$: Observable<number>;
+  public readonly resetBoardCooldownTime$: Observable<number>;
+
+  private _activeModalRef: NgbModalRef;
 
   constructor(
     private _adminHub: AdminHub,
     private _adminApi: AdminApi,
     private _gameApi: GameApi,
-    private _toastService: ToastService
+    private _toastService: ToastService,
+    private _ngbModal: NgbModal
   ) {
-    this.cooldownTime$ = this._initCooldownPipeline();
+    this.latestBoardCooldownTime$ =
+      this._initCooldownPipeline(this._latestBoardCooldownSource.asObservable()
+        .pipe(map((timeout: number) => [false, timeout])));
+    this.resetBoardCooldownTime$ =
+      this._initCooldownPipeline(this._resetBoardsCooldownSource.asObservable()
+        .pipe(map((timeout: number) => [true, timeout])));
   }
 
   /**
@@ -81,7 +97,7 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
    * active board edit icon in the template
    */
   public _onChangeActiveBoardClick(): void {
-    if (this._cooldownIsActive || !this._boards?.length) return;
+    if (this._latestBoardCooldownIsActive || !this._boards?.length) return;
     if (!this._activeBoard)
       this._newActiveBoard =
         this._boards
@@ -113,18 +129,66 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
     this._newActiveBoard = this._activeBoard;
   }
 
-  private _initCooldownPipeline(): Observable<number> {
-    return this._cooldownSource.asObservable().pipe(
-      tap(() => this._cooldownIsActive = true),
-      switchMap((timeRemaining: number) =>
-        timer(0, 1000)
-          .pipe(
-            scan((acc, _) => --acc, timeRemaining),
-            take(30),
-            tap((second: number) => {
-              if (second === 0) this._cooldownIsActive = false;
-            }),
-          ))
+  /**
+   * Event handler for the Nuke 'Em button in the template
+   *
+   * Opens a modal to confirm the reset boards actions to prevent
+   * accidental resets
+   */
+  public _onResetAllBoardsClick(): void {
+    this._activeModalRef =
+      this._ngbModal.open(this._resetBoardsConfirmationModalContent, {
+        animation: true,
+        backdrop: 'static',
+        centered: true,
+        keyboard: false,
+        size: 'lg'
+      });
+  }
+
+  /**
+   * Event handle for the reset board confirmation button
+   *
+   * Sends and event to the server to be broadcast to all
+   * connected players to reset their boards
+   */
+  public async _onConfirmResetClick(): Promise<void> {
+    await this._adminApi.resetAllBoards();
+    this._activeModalRef.close();
+  }
+
+  /**
+   * Event handler for the cancel reset button
+   *
+   * Closes the confirmation modal
+   */
+  public _onCancelResetClick(): void {
+    this._activeModalRef.close();
+  }
+
+  private _initCooldownPipeline(sourceObs: Observable<[boolean, number?]>): Observable<number> {
+    return sourceObs.pipe(
+      tap(([forResetEvt, _]: [boolean, number?]) => {
+        if (forResetEvt)
+          this._resetBoardCooldownIsActive = true;
+        else
+          this._latestBoardCooldownIsActive = true
+      }),
+      map(([_, timeRemaining]: [boolean, number?]) => [_, timeRemaining || 30] as [boolean, number?]),
+      switchMap(([forResetEvt, timeRemaining]: [boolean, number?]) =>
+        timer(0, 1000).pipe(
+          scan((acc, _) => --acc, timeRemaining),
+          take(timeRemaining + 1),
+          tap((second: number) => {
+            if (second === 0) {
+              if (forResetEvt)
+                this._resetBoardCooldownIsActive = false;
+              else
+                this._latestBoardCooldownIsActive = false;
+            }
+          })
+        )
+      )
     );
   }
 
@@ -132,8 +196,9 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
 
   private async _registerHubEventHandlers(): Promise<void> {
     await this._adminHub.connect();
-    this._adminHub.registerOnTriggerSetActiveBoardCooldown(this._onTriggerSetActiveBoardCooldown);
+    this._adminHub.registerOnStartSetActiveBoardCooldown(this._onStartSetActiveBoardCooldown);
     this._adminHub.registerOnLatestActiveBoardIDHandler(this._onEmitLatestActiveBoardID);
+    this._adminHub.registerOnStartResetAllBoardsCooldown(this._onStartResetAllBoardsCooldown);
   }
 
   private _onEmitLatestActiveBoardID = (activeBoardID: number) => {
@@ -142,8 +207,12 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
       this._boards.find(board => board.boardID === activeBoardID);
   };
 
-  private _onTriggerSetActiveBoardCooldown = (timeRemaining: number = null) => {
-    this._cooldownSource.next(timeRemaining || 30);
+  private _onStartSetActiveBoardCooldown = (timeRemaining: number = null) => {
+    this._latestBoardCooldownSource.next(timeRemaining);
+  };
+
+  private _onStartResetAllBoardsCooldown = (timeRemaining: number = null) => {
+    this._resetBoardsCooldownSource.next(timeRemaining);
   };
 
   //#endregion

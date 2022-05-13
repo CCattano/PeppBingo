@@ -1,20 +1,21 @@
-<div class="d-flex flex-row mt-5">
-  <div class="d-flex flex-column mx-auto">
+<div class="d-flex flex-column mt-5">
+  <!--___Set Active Board Container___-->
+  <div class="d-flex flex-column mx-auto mb-5">
     <label class="float-label">Active Board</label>
     <div *ngIf="!_editingActiveBoard" class="d-flex flex-row">
       <h4>{{_activeBoard?.name || 'No Board Selected'}}</h4>
       <fa-icon [icon]="icons.faEdit"
                class="pointer float-end fs-5 ms-3"
-               [class.disabled]="_cooldownIsActive || !_boards?.length"
+               [class.disabled]="_latestBoardCooldownIsActive || !_boards?.length"
                ngbTooltip="{{(!_boards?.length) ? 'At least 1 board needs 25 tiles to be selectable' : 'Change active board'}}"
                placement="auto"
                (click)="_onChangeActiveBoardClick()">
       </fa-icon>
     </div>
-    <div [hidden]="!_cooldownIsActive">
+    <div [hidden]="!_latestBoardCooldownIsActive">
       <div class="d-flex flex-column">
         <label class="float-label">Board Change Cooldown:</label>
-        <label>{{cooldownTime$ | async}} seconds remaining</label>
+        <label>{{latestBoardCooldownTime$ | async}} seconds remaining</label>
       </div>
     </div>
     <div *ngIf="_editingActiveBoard" class="d-flex flex-column justify-content-between">
@@ -33,4 +34,41 @@
       </div>
     </div>
   </div>
+  <!--___Reset All Boards Container___-->
+  <div class="d-flex flex-column mx-auto mt-5">
+    <div [hidden]="!_resetBoardCooldownIsActive">
+      <div class="d-flex flex-column">
+        <label class="float-label">Reset Boards Cooldown:</label>
+        <label>{{resetBoardCooldownTime$ | async}} seconds remaining</label>
+      </div>
+    </div>
+    <button class="btn btn-lg btn-outline-warning"
+            ngbTooltip="Nuke 'Em"
+            placement="auto"
+            [disabled]="_resetBoardCooldownIsActive"
+            (click)="_onResetAllBoardsClick()">
+      <fa-icon [icon]="icons.faRadiationAlt"></fa-icon>
+      Reset All Players' Boards
+      <fa-icon [icon]="icons.faRadiationAlt"></fa-icon>
+    </button>
+  </div>
 </div>
+
+<ng-template #resetBoardsConfirmationModal let-modal>
+  <div class="modal-header bg-warning text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Reset All Players' Boards?</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>This will reset the bingo board progress for all connected players on the platform</label>
+    <br/>
+    <br/>
+    <label>This is an irreversible action.</label>
+    <br/>
+    <br/>
+    <label>Are you sure you want to continue?</label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-warning" (click)="_onConfirmResetClick()">I. Said. Nuke 'Em.</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onCancelResetClick()">On second thought...</button>
+  </div>
+</ng-template>

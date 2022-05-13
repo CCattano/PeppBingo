@@ -8,7 +8,8 @@ enum PlayerEvents {
   BingoSubmission = 'BingoSubmission',
   CancelSubmission = 'CancelSubmission',
   ApproveSubmission = 'ApproveSubmission',
-  RejectSubmission = 'RejectSubmission'
+  RejectSubmission = 'RejectSubmission',
+  ResetBoard = 'ResetBoard'
 }
 
 @Injectable({
@@ -62,6 +63,13 @@ export class PlayerHub {
     this._hubConn.on(PlayerEvents.RejectSubmission, handler);
   }
 
+  public registerResetBoardHandler(handler: (timeRemaining?: number) => void): void {
+    this._hubConn.on(PlayerEvents.ResetBoard, () => {
+      console.log('in internal hub handler')
+      handler(null);
+    });
+  }
+
   public unregisterSubmissionResponseHandlers(): void {
     this._hubConn.off(PlayerEvents.ApproveSubmission);
     this._hubConn.off(PlayerEvents.RejectSubmission);
@@ -71,6 +79,7 @@ export class PlayerHub {
     this._hubConn.off(PlayerEvents.LatestActiveBoardID);
     this._hubConn.off(PlayerEvents.BingoSubmission);
     this._hubConn.off(PlayerEvents.CancelSubmission);
+    this._hubConn.off(PlayerEvents.ResetBoard);
     this._hubConn.stop();
     this._hubConn = null;
   }

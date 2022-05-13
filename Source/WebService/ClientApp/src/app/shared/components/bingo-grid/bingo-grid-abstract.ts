@@ -9,6 +9,9 @@ export abstract class BingoGridAbstract {
   @Input()
   public board: GameTileVM[][];
 
+  /**
+   * Event that emits whenever a bingo board tile is clicked
+   */
   @Output()
   public readonly tileClick: EventEmitter<GameTileVM> = new EventEmitter<GameTileVM>();
 

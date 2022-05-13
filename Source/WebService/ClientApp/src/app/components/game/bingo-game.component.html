@@ -9,9 +9,19 @@
 <ng-container *ngIf="!_noActiveBoard">
   <app-bingo-grid [board]="_board" (tileClick)="_onTileClick($event)">
     <div class="d-flex flex-row justify-content-between w-100 mt-3">
-      <button class="btn btn-outline-warning" (click)="_onResetBoardClick()">
-        Reset Card
-      </button>
+      <div class="d-flex flex-column"
+           [ngbTooltip]="!_resetIsActive ? 'Reset only available for 30s after Mod reset' : null"
+           placement="auto">
+        <label *ngIf="_resetIsActive"
+               class="float-label">
+          Available For {{resetActiveTimer$ | async}}s
+        </label>
+        <button class="btn btn-outline-warning"
+                [disabled]="!_resetIsActive"
+                (click)="_onResetBoardClick()">
+          Reset Card
+        </button>
+      </div>
       <button type="button"
               class="btn btn-outline-info position-relative"
               (click)="_onOpenVoteModalClick()"

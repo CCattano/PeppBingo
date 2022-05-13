@@ -150,6 +150,13 @@ export class AdminApi {
     return this._http.delete<null>(`Admin/DeleteBoardTile?tileID=${tileID}`).toPromise();
   }
 
+  /**
+   * Resets the bingo boards of all players connected to the platform
+   */
+  public async resetAllBoards(): Promise<void> {
+    return await this._http.put<null>('Admin/Live/ResetAllBoards', null).toPromise();
+  }
+
   //#endregion
 }
 

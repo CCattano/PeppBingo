@@ -7,6 +7,8 @@ import {GameTileVM} from '../../shared/viewmodels/game-tile.viewmodel';
 import {BingoSubmissionEvent} from '../../shared/hubs/player/events/bingo-submission.event';
 import {TokenService} from '../../shared/service/token.service';
 import {LeaderboardVoteFlowComponent} from '../leaderboard/vote-flow/leaderboard-vote-flow.component';
+import {Observable, Subject, timer} from 'rxjs';
+import {map, scan, switchMap, take, tap} from 'rxjs/operators';
 
 @Component({
   templateUrl: './bingo-game.component.html',
@@ -18,6 +20,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   @ViewChild(LeaderboardVoteFlowComponent, {static: true})
   private readonly _leaderboardVoteFlowComponent: LeaderboardVoteFlowComponent;
+
   /**
    * Bool flag indicating an admin has not set an active board to play
    */
@@ -55,9 +58,14 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private _cannotSubmitBingo: boolean = false;
 
+  private readonly _resetActiveSource: Subject<number> = new Subject<number>();
+  public readonly resetActiveTimer$: Observable<number>;
+  public _resetIsActive: boolean = false;
+
   constructor(private _gameApi: GameApi,
               private _playerHub: PlayerHub,
               private _tokenService: TokenService) {
+    this.resetActiveTimer$ = this._initResetActivePipe();
   }
 
   /**
@@ -92,6 +100,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    * in either the mobile or desktop bingo board layout
    */
   public _onResetBoardClick(): void {
+    if (!this._resetIsActive) return;
     this._makeBoard();
   }
 
@@ -217,6 +226,26 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._cannotSubmitBingo);
   }
 
+  private _initResetActivePipe(): Observable<number> {
+    return this._resetActiveSource.asObservable().pipe(
+      tap(() => {
+        this._resetIsActive = true;
+        this._makeBoard();
+      }),
+      map((timeRemaining?: number) => timeRemaining || 30),
+      switchMap((timeRemaining: number) =>
+        timer(0, 1000).pipe(
+          scan((acc, _) => --acc, timeRemaining),
+          take(timeRemaining + 1),
+          tap((second: number) => {
+            if (second === 0)
+              this._resetIsActive = false;
+          })
+        )
+      )
+    );
+  }
+
   //#endregion
 
   //#region SignalR Functions
@@ -226,6 +255,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     this._playerHub.registerLatestActiveBoardIDHandler(this._onLatestActiveBoardID);
     this._playerHub.registerBingoSubmissionHandler(this._onBingoSubmission);
     this._playerHub.registerCancelSubmissionHandler(this._onSubmissionCancel);
+    this._playerHub.registerResetBoardHandler(this._onResetBoardEvent);
   }
 
   private _onLatestActiveBoardID = (activeBoardID: number): void => {
@@ -249,8 +279,12 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   private _onSubmissionCancel = (hubConnID: string): void => {
     const canceledReqIndex: number =
       this._voteRequests.findIndex(req => req.submitterConnectionID === hubConnID);
-    if(canceledReqIndex >= 0)
+    if (canceledReqIndex >= 0)
       this._voteRequests.splice(canceledReqIndex, 1);
+  }
+
+  private _onResetBoardEvent = (timeRemaining?: number): void => {
+    this._resetActiveSource.next(timeRemaining);
   }
 
   //#endregion

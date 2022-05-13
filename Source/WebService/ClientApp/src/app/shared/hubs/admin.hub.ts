@@ -1,17 +1,32 @@
-import { Injectable } from '@angular/core';
-import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import {Injectable} from '@angular/core';
+import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr';
 
 enum AdminEvents {
-  EmitLatestActiveBoardID = 'EmitLatestActiveBoardID',
-  TriggerSetActiveBoardCooldown = 'TriggerSetActiveBoardCooldown'
+  LatestActiveBoardID = 'LatestActiveBoardID',
+  StartSetActiveBoardCooldown = 'StartSetActiveBoardCooldown',
+  StartResetAllBoardsCooldown = 'StartResetAllBoardsCooldown'
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AdminHub {
-  private _eventCaptureDatetime: Date;
+  private _latestBoardIDEvtCaptureDT: Date;
+  private _resetAllBoardsEvtCaptureDT: Date;
   private _hubConn: HubConnection;
+
+  private static _handleInProgressCooldownEvent(lastEvtDateTime: Date, evtHandler: (timeRemaining?: number) => void): void {
+    if (lastEvtDateTime) {
+      const currentDatetime: Date = new Date();
+      const cooldownExpireTime: Date =
+        new Date(new Date(lastEvtDateTime).setSeconds(lastEvtDateTime.getSeconds() + 30));
+      if (cooldownExpireTime > currentDatetime) {
+        const timeRemaining: number =
+          Math.round(Math.abs(cooldownExpireTime.getTime() - currentDatetime.getTime()) / 1000);
+        evtHandler(timeRemaining);
+      }
+    }
+  }
 
   /**
    * Connect to the SignalR hub associated with this service
@@ -37,7 +52,7 @@ export class AdminHub {
    * @param handler
    */
   public registerOnLatestActiveBoardIDHandler(handler: (activeBoardID: number) => void): void {
-    this._hubConn.on(AdminEvents.EmitLatestActiveBoardID, handler);
+    this._hubConn.on(AdminEvents.LatestActiveBoardID, handler);
   }
 
   /**
@@ -46,32 +61,39 @@ export class AdminHub {
    * representhing the latest active board that has been chosen by an admin
    * @param handler
    */
-  public registerOnTriggerSetActiveBoardCooldown(handler: (timeRemaining?: number) => void): void {
-    this._hubConn.off(AdminEvents.TriggerSetActiveBoardCooldown);
-    if (this._eventCaptureDatetime) {
-      const currentDatetime: Date = new Date();
-      const cooldownExpireTime: Date =
-        new Date(new Date(this._eventCaptureDatetime).setSeconds(this._eventCaptureDatetime.getSeconds() + 30));
-      if (cooldownExpireTime > currentDatetime) {
-        const timeRemaining: number =
-          Math.round(Math.abs(cooldownExpireTime.getTime() - currentDatetime.getTime()) / 1000);
-        handler(timeRemaining);
-      }
-    }
-    this._hubConn.on(AdminEvents.TriggerSetActiveBoardCooldown, () => {
-      this._eventCaptureDatetime = new Date();
+  public registerOnStartSetActiveBoardCooldown(handler: (timeRemaining?: number) => void): void {
+    this._hubConn.off(AdminEvents.StartSetActiveBoardCooldown);
+    AdminHub._handleInProgressCooldownEvent(this._latestBoardIDEvtCaptureDT, handler);
+    this._hubConn.on(AdminEvents.StartSetActiveBoardCooldown, () => {
+      this._latestBoardIDEvtCaptureDT = new Date();
+      handler();
+    });
+  }
+
+  /**
+   * Register a callback function to act as handler for the
+   * EmitLatestActiveBoardID event which broadcast a activeBoardID
+   * representhing the latest active board that has been chosen by an admin
+   * @param handler
+   */
+  public registerOnStartResetAllBoardsCooldown(handler: (timeRemaining?: number) => void): void {
+    this._hubConn.off(AdminEvents.StartResetAllBoardsCooldown);
+    AdminHub._handleInProgressCooldownEvent(this._resetAllBoardsEvtCaptureDT, handler);
+    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, () => {
+      this._resetAllBoardsEvtCaptureDT = new Date();
       handler();
     });
   }
 
   public unregisterAllHandlers(): void {
-    this._hubConn.off(AdminEvents.EmitLatestActiveBoardID);
-    this._hubConn.off(AdminEvents.TriggerSetActiveBoardCooldown);
+    this._hubConn.off(AdminEvents.LatestActiveBoardID);
+    this._hubConn.off(AdminEvents.StartSetActiveBoardCooldown);
+    this._hubConn.off(AdminEvents.StartResetAllBoardsCooldown);
     this._registerInternalCooldownHandler();
   }
 
   private _registerInternalCooldownHandler(): void {
-    this._hubConn.on(AdminEvents.TriggerSetActiveBoardCooldown, () =>
-      this._eventCaptureDatetime = new Date());
+    this._hubConn.on(AdminEvents.StartSetActiveBoardCooldown, () => this._latestBoardIDEvtCaptureDT = new Date());
+    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, () => this._resetAllBoardsEvtCaptureDT = new Date());
   }
 }
