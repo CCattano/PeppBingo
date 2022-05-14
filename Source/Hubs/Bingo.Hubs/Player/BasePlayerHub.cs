@@ -48,8 +48,11 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Player
         /// Emits an event to a connected user to
         /// reset the board they are playing on
         /// </summary>
+        /// <param name="resetEventID">
+        /// A unique guid-format string that represents this reset event that is firing
+        /// </param>
         /// <returns></returns>
-        Task ResetBoard();
+        Task ResetBoard(string resetEventID);
     }
 
     public class BasePlayerHub : Hub<IBasePlayerHub>

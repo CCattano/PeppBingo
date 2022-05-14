@@ -1,9 +1,9 @@
-﻿using Pepp.Web.Apps.Bingo.BusinessEntities.Game;
-using Pepp.Web.Apps.Bingo.Facades;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Pepp.Web.Apps.Bingo.BusinessEntities.Game;
 using Pepp.Web.Apps.Bingo.BusinessEntities.Stats;
+using Pepp.Web.Apps.Bingo.Facades;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
 {

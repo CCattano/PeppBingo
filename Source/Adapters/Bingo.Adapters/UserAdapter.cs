@@ -4,6 +4,7 @@ using Pepp.Web.Apps.Bingo.Managers;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
 using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
@@ -16,6 +17,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="jwt"></param>
         /// <returns></returns>
         Task<UserBE> GetUser(string jwt);
+
         /// <summary>
         /// Fetches Users who's <see cref="UserBE.DisplayName"/> contains the <paramref name="displayName"/> provided
         /// </summary>
@@ -38,11 +40,13 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="displayName"></param>
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(string displayName);
+
         /// <summary>
         /// Fetch Users who's UserID is in the provided list
         /// </summary>
         /// <returns></returns>
         Task<List<UserBE>> GetUsers(List<int> userIDs);
+
         /// <summary>
         /// Fetch all users with an IsAdmin value of 1
         /// </summary>
@@ -56,14 +60,25 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="isAdmin"></param>
         /// <returns></returns>
         Task SetAdminPermissionForUser(int userID, bool isAdmin);
+        /// <summary>
+        /// Logs that a user performed a
+        /// suspicious action in the client
+        /// </summary>
+        /// <param name="userID"></param>
+        void LogSuspiciousUserBehaviour(int userID);
     }
 
     /// <inheritdoc cref="IUserAdapter"/>
     public class UserAdapter : IUserAdapter
     {
         private readonly IUserFacade _facade;
+        private readonly IUserCanSubmitCache _userCanSubmitCache;
 
-        public UserAdapter(IUserFacade facade) => _facade = facade;
+        public UserAdapter(IUserFacade facade, IUserCanSubmitCache userCanSubmitCache)
+        {
+            _facade = facade;
+            _userCanSubmitCache = userCanSubmitCache;
+        }
 
         public async Task<UserBE> GetUser(string jwt)
         {
@@ -98,5 +113,8 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             await _facade.SetIsAdminForUser(userID, isAdmin);
         }
+
+        public void LogSuspiciousUserBehaviour(int userID) =>
+            _userCanSubmitCache.LogSuspiciousBehaviourForUser(userID);
     }
 }

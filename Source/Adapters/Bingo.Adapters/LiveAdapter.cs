@@ -22,6 +22,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </remarks>
         /// <param name="activeBoardID"></param>
         Task SetActiveBoardID(int activeBoardID);
+
         /// <summary>
         /// Resets all boards for all players
         /// </summary>
@@ -43,19 +44,19 @@ namespace Pepp.Web.Apps.Bingo.Adapters
     public class LiveAdapter : ILiveAdapter
     {
         private readonly IActiveBoardCache _activeBoardCache;
-        private readonly IUserSubmitCache _userSubmitCache;
+        private readonly IUserCanSubmitCache _userCanSubmitCache;
         private readonly IAdminHub _adminHub;
         private readonly IPlayerHub _playerHub;
 
         public LiveAdapter(
             IActiveBoardCache activeBoardCache,
-            IUserSubmitCache userSubmitCache,
+            IUserCanSubmitCache userCanSubmitCache,
             IAdminHub adminHub,
             IPlayerHub playerHub
         )
         {
             _activeBoardCache = activeBoardCache;
-            _userSubmitCache = userSubmitCache;
+            _userCanSubmitCache = userCanSubmitCache;
             _adminHub = adminHub;
             _playerHub = playerHub;
         }
@@ -74,11 +75,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task ResetAllBoards()
         {
             // Clear list of users who cannot submit for bingo
-            _userSubmitCache.ClearCache();
+            _userCanSubmitCache.ResetUserCanSubmitCache();
             // Start 30s cooldown for admins on client so Reset btn cannot be mashed
             await _adminHub.StartResetAllBoardsCooldown();
             // Reset all player's boards
-            await _playerHub.ResetBoard();
+            await _playerHub.ResetBoard(_userCanSubmitCache.ResetEventID);
         }
     }
 }

@@ -90,7 +90,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
             services.AddSingleton<ITwitchCache, TwitchCache>();
             services.AddSingleton<ITokenCache, TokenCache>();
             services.AddSingleton<IActiveBoardCache, ActiveBoardCache>();
-            services.AddSingleton<IUserSubmitCache, UserSubmitCache>();
+            services.AddSingleton<IUserCanSubmitCache, UserCanSubmitCache>();
 
             #endregion
 
