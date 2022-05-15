@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.Json;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.BusinessModels.User;
+using Pepp.Web.Apps.Bingo.Infrastructure.Enums;
 using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
@@ -30,6 +32,22 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         {
             UserBE requestingUser = await GetRequestingUser();
             base.Adapter.LogSuspiciousUserBehaviour(requestingUser.UserID);
+            return Ok();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<UserSubmissionStatus>> GetUserSubmissionStatus()
+        {
+            UserBE requestingUser = await GetRequestingUser();
+            UserSubmissionStatus userCanSubmitBingo = base.Adapter.GetUserSubmissionStatus(requestingUser.UserID);
+            return Ok(JsonSerializer.Serialize(userCanSubmitBingo));
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult> MarkUserAsBingoSubmitted()
+        {
+            UserBE requestingUser = await GetRequestingUser();
+            base.Adapter.MarkUserAsBingoSubmitted(requestingUser.UserID);
             return Ok();
         }
         

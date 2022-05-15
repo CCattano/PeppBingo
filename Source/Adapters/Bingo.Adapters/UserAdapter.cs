@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
+using Pepp.Web.Apps.Bingo.Infrastructure.Enums;
 using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Adapters
@@ -66,6 +67,17 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// </summary>
         /// <param name="userID"></param>
         void LogSuspiciousUserBehaviour(int userID);
+        /// <summary>
+        /// Add userID to list of Users who cannot submit
+        /// </summary>
+        /// <param name="userID"></param>
+        void MarkUserAsBingoSubmitted(int userID);
+        /// <summary>
+        /// Get whether a user can or cannot submit a bingo
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <returns></returns>
+        UserSubmissionStatus GetUserSubmissionStatus(int userID);
     }
 
     /// <inheritdoc cref="IUserAdapter"/>
@@ -116,5 +128,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
 
         public void LogSuspiciousUserBehaviour(int userID) =>
             _userCanSubmitCache.LogSuspiciousBehaviourForUser(userID);
+
+        public void MarkUserAsBingoSubmitted(int userID) =>
+            _userCanSubmitCache.MarkUserAsBingoSubmitted(userID);
+        
+        public UserSubmissionStatus GetUserSubmissionStatus(int userID) =>
+            _userCanSubmitCache.GetUserSubmissionStatus(userID);
     }
 }

@@ -1,26 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using Pepp.Web.Apps.Bingo.Infrastructure.Enums;
 
 namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
     public interface IUserCanSubmitCache
     {
         /// <summary>
-        /// A unique guid-format string that represents this reset event that is firing
+        /// Get the unique guid-format string that
+        /// represents the latest reset event that
+        /// has occurred for connected users
         /// </summary>
-        string ResetEventID { get; }
+        /// <returns></returns>
+        string GetResetEventID();
 
         /// <summary>
         /// Add userID to list of Users who cannot submit
         /// </summary>
-        void MarkUserAsUnableToSubmit(int userID);
+        void MarkUserAsBingoSubmitted(int userID);
 
         /// <summary>
         /// Get whether a user can or cannot submit
         /// </summary>
         /// <param name="userID"></param>
         /// <returns></returns>
-        bool GetCanSubmitForUser(int userID);
+        UserSubmissionStatus GetUserSubmissionStatus(int userID);
 
         /// <summary>
         /// Clear list of users that could no longer submit 
@@ -37,14 +42,25 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 
     public class UserCanSubmitCache : IUserCanSubmitCache
     {
-        public string ResetEventID { get; private set; } = Guid.NewGuid().ToString();
+        private string _resetEventID = Guid.NewGuid().ToString();
         private DateTime _lastResetDateTime = DateTime.UtcNow;
-        private readonly HashSet<int> _usersThatCannotSubmit = new();
+        private readonly Dictionary<int, UserSubmissionStatus> _usersThatCannotSubmit = new();
         private DateTime _lockCacheResetUntil = DateTime.Now;
         private readonly object _canSubmitLock = new();
 
         private readonly Dictionary<int, List<DateTime>> _suspiciousBehaviourByUserID = new();
         private readonly object _suspiciousBehaviourLock = new();
+
+        public string GetResetEventID()
+        {
+            string eventResetID;
+            lock (_canSubmitLock)
+            {
+                eventResetID = _resetEventID;
+            }
+
+            return eventResetID;
+        }
 
         public void LogSuspiciousBehaviourForUser(int userID)
         {
@@ -118,30 +134,56 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
                         // User has had 1+1 suspicious behaviour events logged any time 30 minutes or more after reset
                         // They can no longer submit their bingo for the leaderboards until a reset event occurs
                         case >= 30 when suspiciousActivityDateTimes.Count == 2:
-                            MarkUserAsUnableToSubmit(userID);
+                            lock (_canSubmitLock)
+                            {
+                                if (_usersThatCannotSubmit.TryGetValue(userID, out UserSubmissionStatus currentStatus))
+                                {
+                                    /*
+                                     * If the user is already on the cannot submit list b/c they've submitted a fair bingo prev.
+                                     * Then don't update to the CannotSubmit status
+                                     * Let them keep playing under the AlreadySubmitted status
+                                     * Either way until a reset their leaderboard standing isn't changing until a reset happens
+                                     * So just let them stay locked in their current cannot-submit loop
+                                     */
+                                    if (currentStatus != UserSubmissionStatus.AlreadySubmitted)
+                                    {
+                                        _usersThatCannotSubmit[userID] = UserSubmissionStatus.CannotSubmitBingo;
+                                    }
+                                }
+                                else
+                                {
+                                    _usersThatCannotSubmit.Add(userID, UserSubmissionStatus.CannotSubmitBingo);
+                                }
+                            }
+
                             break;
                     }
                 }
             }
         }
-        
-        public void MarkUserAsUnableToSubmit(int userID)
+
+        public void MarkUserAsBingoSubmitted(int userID)
         {
             lock (_canSubmitLock)
             {
-                _usersThatCannotSubmit.Add(userID);
+                if (_usersThatCannotSubmit.TryGetValue(userID, out UserSubmissionStatus _))
+                    _usersThatCannotSubmit[userID] = UserSubmissionStatus.AlreadySubmitted;
+                else
+                    _usersThatCannotSubmit.Add(userID, UserSubmissionStatus.AlreadySubmitted);
             }
         }
 
-        public bool GetCanSubmitForUser(int userID)
+        public UserSubmissionStatus GetUserSubmissionStatus(int userID)
         {
-            bool userCannotSubmit;
+            UserSubmissionStatus userSubmissionStatus;
             lock (_canSubmitLock)
             {
-                userCannotSubmit = _usersThatCannotSubmit.Contains(userID);
+                userSubmissionStatus = _usersThatCannotSubmit.TryGetValue(userID, out UserSubmissionStatus status)
+                    ? status
+                    : UserSubmissionStatus.CanSubmitBingo;
             }
 
-            return userCannotSubmit;
+            return userSubmissionStatus;
         }
 
         public void ResetUserCanSubmitCache()
@@ -151,11 +193,18 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
                 lock (_canSubmitLock)
                 {
                     if (DateTime.UtcNow <= _lockCacheResetUntil) return;
+                    // Inducing a brief hold on this lock for 1s for anyone who just
+                    // finished using it so the code that runs as a result of
+                    // fetching the data this lock protects can finish running
+                    // Once the lock is released here new code is going to run
+                    // and ideally the 1s delay will make sure everyone is in
+                    // a settled state before that happens
+                    Thread.Sleep(1000);
                     _lockCacheResetUntil = DateTime.UtcNow.AddSeconds(30);
                     _usersThatCannotSubmit.Clear();
                     _suspiciousBehaviourByUserID.Clear();
                     _lastResetDateTime = DateTime.UtcNow;
-                    ResetEventID = Guid.NewGuid().ToString();
+                    _resetEventID = Guid.NewGuid().ToString();
                 }
             }
         }

@@ -64,6 +64,8 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task SetActiveBoardID(int activeBoardID)
         {
             _activeBoardCache.SetActiveBoardID(activeBoardID);
+            // Clear list of users who cannot submit for bingo
+            _userCanSubmitCache.ResetUserCanSubmitCache();
             // Trigger cooldown on setting new active board
             await _adminHub.StartSetActiveBoardCooldown();
             // For any admins on the live control page broadcast the newest activeBoardID
@@ -79,7 +81,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             // Start 30s cooldown for admins on client so Reset btn cannot be mashed
             await _adminHub.StartResetAllBoardsCooldown();
             // Reset all player's boards
-            await _playerHub.ResetBoard(_userCanSubmitCache.ResetEventID);
+            await _playerHub.ResetBoard(_userCanSubmitCache.GetResetEventID());
         }
     }
 }
