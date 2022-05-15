@@ -63,11 +63,8 @@ export class PlayerHub {
     this._hubConn.on(PlayerEvents.RejectSubmission, handler);
   }
 
-  public registerResetBoardHandler(handler: (timeRemaining?: number) => void): void {
-    this._hubConn.on(PlayerEvents.ResetBoard, () => {
-      console.log('in internal hub handler')
-      handler(null);
-    });
+  public registerResetBoardHandler(handler: (resetEventID: string) => void): void {
+    this._hubConn.on(PlayerEvents.ResetBoard, handler);
   }
 
   public unregisterSubmissionResponseHandlers(): void {

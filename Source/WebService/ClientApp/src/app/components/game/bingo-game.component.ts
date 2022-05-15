@@ -7,14 +7,35 @@ import {GameTileVM} from '../../shared/viewmodels/game-tile.viewmodel';
 import {BingoSubmissionEvent} from '../../shared/hubs/player/events/bingo-submission.event';
 import {TokenService} from '../../shared/service/token.service';
 import {LeaderboardVoteFlowComponent} from '../leaderboard/vote-flow/leaderboard-vote-flow.component';
-import {Observable, Subject, timer} from 'rxjs';
-import {map, scan, switchMap, take, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {switchMap, tap} from 'rxjs/operators';
+import {UserApi} from '../../shared/api/user.api';
+import {UserSubmissionStatus} from '../../shared/enums/user-submission-state.enum';
+
+interface ILocalStorageContent {
+  /**
+   * The ID of the board the grid of
+   * tiles has been constructed from
+   */
+  boardID: number;
+  /**
+   * The last board made for this user
+   */
+  boardGrid: GameTileVM[][];
+  /**
+   * The ID of the most recent reset
+   * event this player was apart of
+   */
+  resetEventID: string;
+}
 
 @Component({
   templateUrl: './bingo-game.component.html',
   styleUrls: ['./bingo-game.component.scss']
 })
 export class BingoGameComponent implements OnInit, OnDestroy {
+  private static readonly _localStorageKey: string = 'PeppBingo_Board';
+
   @ViewChild(LeaderboardSubmissionFlowComponent, {static: true})
   private readonly _leaderboardSubmissionFlowComponent: LeaderboardSubmissionFlowComponent;
 
@@ -56,16 +77,14 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public readonly _voteRequests: BingoSubmissionEvent[] = [];
 
-  private _cannotSubmitBingo: boolean = false;
-
-  private readonly _resetActiveSource: Subject<number> = new Subject<number>();
-  public readonly resetActiveTimer$: Observable<number>;
-  public _resetIsActive: boolean = false;
+  private _userSubmissionStatus: UserSubmissionStatus =
+    UserSubmissionStatus.CanSubmitBingo;
+  private _resetEventID: string;
 
   constructor(private _gameApi: GameApi,
+              private _userApi: UserApi,
               private _playerHub: PlayerHub,
               private _tokenService: TokenService) {
-    this.resetActiveTimer$ = this._initResetActivePipe();
   }
 
   /**
@@ -73,7 +92,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public async ngOnInit(): Promise<void> {
     await this._registerHubEventHandlers();
-    await this._getGameData();
+    await this._initGameData();
   }
 
   /**
@@ -96,25 +115,16 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Event handler for when the reset board button is clicked
-   * in either the mobile or desktop bingo board layout
-   */
-  public _onResetBoardClick(): void {
-    if (!this._resetIsActive) return;
-    this._makeBoard();
-  }
-
-  /**
    * Event handler for when the user has closed the leaderboard
    * submission modal whether by complete submission or cancel
    */
-  public _onLeaderboardSubmissionComplete(bingoWasApproved: boolean): void {
-    if (!this._cannotSubmitBingo)
-      this._cannotSubmitBingo = bingoWasApproved;
-    // Short-term: Reset board
-    this._makeBoard();
-    // TODO: Long-term: Enable board shuffling for 30s
-    // If board is never shuffled at end of 30s perform shuffle automatically
+  public _onLeaderboardSubmissionComplete(userSubmissionStatus: UserSubmissionStatus): void {
+    this._userSubmissionStatus = userSubmissionStatus;
+    // Only reset the board if a bingo was approved by the community.
+    // Otherwise, keep the same board on rejections and cancelled submissions.
+    // Only a successful bingo or a Mod reset event can get a player a new board.
+    if (userSubmissionStatus === UserSubmissionStatus.AlreadySubmitted)
+      this._makeBoard();
   }
 
   /**
@@ -132,20 +142,37 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   /**
    * Fetch all data necessary to play a round of bingo
    */
-  private async _getGameData(activeBoardID: number = null): Promise<void> {
+  private async _initGameData(activeBoardID: number = null): Promise<void> {
     // Fetch the board to play with first
     const boardID: number = activeBoardID || await this._gameApi.getActiveBoardID();
+
     this._activeBoardID = boardID;
     this._noActiveBoard = !boardID;
     // If an active board hasn't been set yet bail here
     if (this._noActiveBoard) return;
+
     // If we have a board get its board info and tile info
     await Promise.all([
       this._getBoardName(boardID),
-      this._getBoardTiles(boardID)
+      this._getBoardTiles(boardID),
+      this._getCurrentResetID()
     ]);
-    // Construct the board to be displayed
-    this._makeBoard();
+
+    // Determine if this is a returning user with a still valid board
+    const boardWasMade: boolean = this._tryGetBoardFromLocalStorage();
+    if (!boardWasMade) {
+      // If a board could not be provided by LS data
+      // Mark that as suspicious on the server for this user
+      // Then determine if that means they cannot submit
+      of(null).pipe(
+        switchMap(() => this._userApi.logSuspiciousBehaviour()),
+        switchMap(() => this._userApi.getUserSubmissionStatus()),
+        tap((userSubmissionStatus: UserSubmissionStatus) => {
+          this._userSubmissionStatus = userSubmissionStatus;
+          this._makeBoard();
+        })
+      ).subscribe();
+    }
   }
 
   private async _getBoardName(activeBoardID: number): Promise<void> {
@@ -157,6 +184,32 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     const freeSpaceIdx: number = this._tiles.findIndex(tile => tile.isFreeSpace);
     if (freeSpaceIdx >= 0)
       this._freeSpace = this._tiles.splice(freeSpaceIdx, 1).shift();
+  }
+
+  private async _getCurrentResetID(): Promise<void> {
+    this._resetEventID = await this._gameApi.getCurrentResetID();
+  }
+
+  private _tryGetBoardFromLocalStorage(): boolean {
+    const boardContent: string =
+      window.localStorage.getItem(BingoGameComponent._localStorageKey);
+    if (!boardContent) return false;
+    const {boardID, boardGrid, resetEventID} =
+      JSON.parse(boardContent) as ILocalStorageContent;
+    if (this._resetEventID !== resetEventID) {
+      // This user had a board in LS but since it was made a reset has happened
+      // This board is stale, so we will construct a new board for them
+      this._makeBoard();
+    } else if (this._activeBoardID !== boardID) {
+      // This user had a board in LS but since it was made the active board has changed
+      // So we cannot give them this board to play with. Let's make a new one.
+      this._makeBoard();
+    } else {
+      this._board = boardGrid;
+    }
+    // We'll return true to indicate were able to set
+    // this user up with a board based on their LS data
+    return true;
   }
 
   //#endregion
@@ -191,6 +244,12 @@ export class BingoGameComponent implements OnInit, OnDestroy {
         } as GameTileVM);
       }
     }
+    const localStorageContent: ILocalStorageContent = {
+      boardID: this._activeBoardID,
+      boardGrid: this._board,
+      resetEventID: this._resetEventID
+    };
+    window.localStorage.setItem(BingoGameComponent._localStorageKey, JSON.stringify(localStorageContent));
   }
 
   private _checkForWinCondition() {
@@ -211,7 +270,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       }
       //Check if nested for-loop found winner
       if (selectedRowCount === 5 || selectedColCount === 5) {
-        this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._cannotSubmitBingo);
+        this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._userSubmissionStatus);
         return;
       }
       //check top-left to bottom-right diag coordinate
@@ -223,27 +282,7 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     }
     //If no rows or cols had 5 in a row check diagonals
     if (topLToBotRDiagCount === 5 || botLToTopRDiagCount === 5)
-      this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._cannotSubmitBingo);
-  }
-
-  private _initResetActivePipe(): Observable<number> {
-    return this._resetActiveSource.asObservable().pipe(
-      tap(() => {
-        this._resetIsActive = true;
-        this._makeBoard();
-      }),
-      map((timeRemaining?: number) => timeRemaining || 30),
-      switchMap((timeRemaining: number) =>
-        timer(0, 1000).pipe(
-          scan((acc, _) => --acc, timeRemaining),
-          take(timeRemaining + 1),
-          tap((second: number) => {
-            if (second === 0)
-              this._resetIsActive = false;
-          })
-        )
-      )
-    );
+      this._leaderboardSubmissionFlowComponent.openSubmissionFlowModal(this._userSubmissionStatus);
   }
 
   //#endregion
@@ -259,10 +298,17 @@ export class BingoGameComponent implements OnInit, OnDestroy {
   }
 
   private _onLatestActiveBoardID = (activeBoardID: number): void => {
-    this._getGameData(activeBoardID);
+    this._userSubmissionStatus = UserSubmissionStatus.CanSubmitBingo;
+    this._initGameData(activeBoardID).then(null);
   };
 
-  public _onBingoSubmission = (submission: BingoSubmissionEvent): void => {
+  private _onResetBoardEvent = (resetEventID: string): void => {
+    this._resetEventID = resetEventID;
+    this._userSubmissionStatus = UserSubmissionStatus.CanSubmitBingo;
+    this._makeBoard();
+  }
+
+  private _onBingoSubmission = (submission: BingoSubmissionEvent): void => {
     // This Hub event is sent to all users who are NOT the user that initiated the event
     // We are able to distinguish the initiator by their Hub connection ID
     // But if that initiator had multiple tabs open they will have different HubConnIDs per tab
@@ -281,10 +327,6 @@ export class BingoGameComponent implements OnInit, OnDestroy {
       this._voteRequests.findIndex(req => req.submitterConnectionID === hubConnID);
     if (canceledReqIndex >= 0)
       this._voteRequests.splice(canceledReqIndex, 1);
-  }
-
-  private _onResetBoardEvent = (timeRemaining?: number): void => {
-    this._resetActiveSource.next(timeRemaining);
   }
 
   //#endregion

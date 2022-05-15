@@ -31,4 +31,11 @@ export class GameApi {
   public async getActiveBoardTilesByBoardID(boardID: number): Promise<GameTileDto[]> {
     return await this._http.get<GameTileDto[]>(`Game/GetActiveBoardTilesByBoardID?boardID=${boardID}`).toPromise();
   }
+
+  /**
+   * Get the ID of the most recent reset event
+   */
+  public async getCurrentResetID(): Promise<string> {
+    return await this._http.get<string>('Game/GetCurrentResetID').toPromise();
+  }
 }

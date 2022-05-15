@@ -20,12 +20,15 @@ import {ApproveSubmissionEvent} from '../../../shared/hubs/player/events/approve
 import * as confetti from 'canvas-confetti';
 import {Observable, Subject, Subscription} from 'rxjs';
 import {delay, map, tap} from 'rxjs/operators';
+import {UserApi} from '../../../shared/api/user.api';
+import {UserSubmissionStatus} from '../../../shared/enums/user-submission-state.enum';
 
 enum SubmissionStepEnum {
   ConfirmSubmit = 0,
   CannotSubmit = 1,
-  AwaitVotes = 2,
-  VerifiedBingo = 3,
+  AlreadySubmitted = 2,
+  AwaitVotes = 3,
+  VerifiedBingo = 4,
 }
 
 @Component({
@@ -57,7 +60,7 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
    * Emits false if the user canceled their submission request
    */
   @Output()
-  public workflowEnd: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public workflowEnd: EventEmitter<UserSubmissionStatus> = new EventEmitter<UserSubmissionStatus>();
 
   /**
    * Fontawesome icons used in the template
@@ -94,13 +97,14 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
 
   private _modalInstance: NgbModalRef;
 
-  private _bingoWasApproved: boolean = false;
+  private _userSubmissionStatus: UserSubmissionStatus;
 
   private _confettiEventSource: Subject<void> = new Subject<void>();
   private _confettiSub: Subscription;
 
   constructor(private _modalService: NgbModal,
               private _leaderboardApi: LeaderboardApi,
+              private _userApi: UserApi,
               private _playerHub: PlayerHub,
               private _renderer2: Renderer2) {
   }
@@ -124,9 +128,13 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
   /**
    * Open the leaderboard submission workflow modal
    */
-  public openSubmissionFlowModal(cannotSubmit: boolean): void {
-    if (cannotSubmit)
+  public openSubmissionFlowModal(userSubmissionStatus: UserSubmissionStatus): void {
+    this._userSubmissionStatus = userSubmissionStatus;
+    if (userSubmissionStatus === UserSubmissionStatus.CannotSubmitBingo)
       this._currentSubmissionStep = SubmissionStepEnum.CannotSubmit;
+    else if (userSubmissionStatus === UserSubmissionStatus.AlreadySubmitted)
+      this._currentSubmissionStep = SubmissionStepEnum.AlreadySubmitted
+
     this._modalInstance =
       this._modalService.open(this.leaderboardSubmissionModalRef, {
         animation: true,
@@ -159,20 +167,50 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Event handler for when a user declines to
+   * submit their bingo for leaderboard advancement
+   */
+  public _onDeclineToSubmit(): void {
+    this._modalInstance.close();
+    this.workflowEnd.emit(UserSubmissionStatus.CanSubmitBingo);
+    this._resetModalState();
+  }
+
+  /**
    * Event handler for when the modal should be closed at
    * any point during the leaderboard submission workflow
    */
-  public async _onClose(cancelSubmission: boolean = false): Promise<void> {
-    if (cancelSubmission)
-      await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
+  public async _onCancelSubmission(): Promise<void> {
+    this._playerHub.unregisterSubmissionResponseHandlers();
+    await this._leaderboardApi.cancelBingoSubmission(this._playerHub.connectionID);
     this._modalInstance.close();
-    this.workflowEnd.emit(this._bingoWasApproved);
+    this.workflowEnd.emit(UserSubmissionStatus.CanSubmitBingo);
+    this._resetModalState();
+  }
+
+  /**
+   * Event handler for when a user closes the submission workflow modal after they
+   * have successfully submitted a bingo and increased their leaderboard position
+   */
+  public _onCloseAfterVerified(): void {
+    this._modalInstance.close();
+    this.workflowEnd.emit(UserSubmissionStatus.AlreadySubmitted);
+    this._resetModalState();
+  }
+
+  /**
+   * Event handler for when a user has closed the modal after being notified
+   * that they cannot submit their bingo for leaderboard standing improvement
+   */
+  public _onCloseAfterUnableToSubmit(): void {
+    this._modalInstance.close();
+    this.workflowEnd.emit(this._userSubmissionStatus);
     this._resetModalState();
   }
 
   private _resetModalState(): void {
     this._currentSubmissionStep = SubmissionStepEnum.ConfirmSubmit;
-    this._bingoWasApproved = false;
+    this._userSubmissionStatus = UserSubmissionStatus.CanSubmitBingo;
     this._approvers = [];
     this._rejectors = [];
   }
@@ -187,12 +225,12 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
     this._approvers.push(evtData);
     if (this._approvers.length === 2) {
       this._playerHub.unregisterSubmissionResponseHandlers();
-      this._bingoWasApproved = true;
-      this._leaderboardApi.updateLeaderboard(this.boardID)
-        .then(() => {
+      this._leaderboardApi.updateLeaderboard(this.boardID).finally(() => {
+        this._userApi.markUserAsBingoSubmitted().finally(() => {
           this._currentSubmissionStep = SubmissionStepEnum.VerifiedBingo;
           this._confettiEventSource.next();
         });
+      });
     }
   }
 

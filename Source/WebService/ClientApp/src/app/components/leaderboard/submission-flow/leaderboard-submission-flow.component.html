@@ -3,6 +3,9 @@
     <ng-container *ngSwitchCase="submissionStepEnum.ConfirmSubmit">
       <ng-container *ngTemplateOutlet="confirmSubmit; context: {modal}"></ng-container>
     </ng-container>
+    <ng-container *ngSwitchCase="submissionStepEnum.AlreadySubmitted">
+      <ng-container *ngTemplateOutlet="alreadySubmitted; context: {modal}"></ng-container>
+    </ng-container>
     <ng-container *ngSwitchCase="submissionStepEnum.CannotSubmit">
       <ng-container *ngTemplateOutlet="cannotSubmit; context: {modal}"></ng-container>
     </ng-container>
@@ -27,16 +30,16 @@
   </div>
   <div class="modal-footer bg-dark">
     <button type="button" class="btn btn-success" (click)="_onSubmitBingoRequest()">Submit It!</button>
-    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">No Thanks</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onDeclineToSubmit()">No Thanks</button>
   </div>
 </ng-template>
 
-<ng-template #cannotSubmit let-modal>
+<ng-template #alreadySubmitted let-modal>
   <div class="modal-header bg-success text-light">
     <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Bingo Confirmed! Let's Goaarrr!!</h4>
   </div>
   <div class="modal-body bg-dark text-center">
-    <label>You just got a bingo!</label>
+    <label>You just got a bingo! Go brag about it in the Discy!</label>
     <br/>
     <br/>
     <label>You've already submitted a bingo for yer leaderboard standing for this current game.</label>
@@ -45,7 +48,33 @@
     <label>You'll be able to submit another bingo once a new game starts and Mods reset everyone's boards.</label>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-success" (click)="_onClose()">Got it!</button>
+    <button type="button" class="btn btn-success" (click)="_onCloseAfterUnableToSubmit()">Got it!</button>
+  </div>
+</ng-template>
+
+<ng-template #cannotSubmit let-modal>
+  <div class="modal-header bg-success text-light">
+    <h4 ngbAutofocus class="modal-title" id="modal-basic-title">Sus Bingo Confirmed!</h4>
+  </div>
+  <div class="modal-body bg-dark text-center">
+    <label>You just got a bingo!</label>
+    <br/>
+    <br/>
+    <label>Unfortunately due to your recent player activity we can't let you submit this bingo at this time.</label>
+    <br/>
+    <br/>
+    <label>You'll be able to submit another bingo once a new game starts and Mods reset everyone's boards.</label>
+    <br/>
+    <br/>
+    <label>We're sorry for any inconvenience this has caused.</label>
+    <br/>
+    <br/>
+    <label>If you believe your actions have been incorrectly flagged as suspicious please reach out to a Mod.</label>
+  </div>
+  <div class="modal-footer bg-dark">
+    <button type="button" class="btn btn-success" (click)="_onCloseAfterUnableToSubmit()">
+      I'm sorry.
+    </button>
   </div>
 </ng-template>
 
@@ -92,7 +121,7 @@
     </div>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-outline-secondary" (click)="_onClose(true)">Cancel Submission</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onCancelSubmission()">Cancel Submission</button>
   </div>
 </ng-template>
 
@@ -124,6 +153,6 @@
     </div>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-outline-secondary" (click)="_onClose()">Close</button>
+    <button type="button" class="btn btn-outline-secondary" (click)="_onCloseAfterVerified()">Close</button>
   </div>
 </ng-template>
