@@ -32,6 +32,7 @@ import {LeaderboardVoteFlowComponent} from './components/leaderboard/vote-flow/l
 import {DesktopBingoGridComponent} from './shared/components/bingo-grid/desktop/desktop-bingo-grid.component';
 import {MobileBingoGridComponent} from './shared/components/bingo-grid/mobile/mobile-bingo-grid.component';
 import {BingoGridContainerComponent} from './shared/components/bingo-grid/bingo-grid-container.component';
+import {LeaderboardStandingsComponent} from './components/leaderboard/standings/leaderboard-standings.component';
 
 const httpInterceptors: Provider = [
   { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
@@ -72,6 +73,7 @@ const appInitializers: Provider = [
     // -- Leaderboard
     LeaderboardSubmissionFlowComponent,
     LeaderboardVoteFlowComponent,
+    LeaderboardStandingsComponent,
 
     //#endregion
 

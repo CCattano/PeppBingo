@@ -9,6 +9,7 @@ import { BingoTileAddEditComponent } from './components/management/bingo/tiles/b
 import { LiveControlsComponent } from './components/management/live-controls/live-controls.component';
 import { AdminAuthGuard } from './shared/middleware/authguards/admin.authguard';
 import { CommonAuthGuard } from './shared/middleware/authguards/common.authguard';
+import {LeaderboardStandingsComponent} from './components/leaderboard/standings/leaderboard-standings.component';
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
@@ -18,7 +19,8 @@ const routes: Routes = [
   { path: 'admin/bingo/add-edit', pathMatch: 'full', component: BingoBoardAddEditComponent, canActivate: [AdminAuthGuard] },
   { path: 'admin/bingo/board/:boardID/tiles/add-edit', pathMatch: 'full', component: BingoTileAddEditComponent, canActivate: [AdminAuthGuard] },
   { path: 'admin/bingo/live-controls', pathMatch: 'full', component: LiveControlsComponent, canActivate: [AdminAuthGuard] },
-  { path: 'game/bingo/play', pathMatch: 'full', component: BingoGameComponent, canActivate: [CommonAuthGuard] }
+  { path: 'game/bingo/play', pathMatch: 'full', component: BingoGameComponent, canActivate: [CommonAuthGuard] },
+  { path: 'leaderboards', pathMatch: 'full', component: LeaderboardStandingsComponent, canActivate: [CommonAuthGuard] }
 ];
 
 @NgModule({
