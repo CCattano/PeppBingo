@@ -1,12 +1,28 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {BingoSubmissionEvent} from '../hubs/player/events/bingo-submission.event';
+import {LeaderboardDto} from '../dtos/leaderboard.dto';
+import {LeaderboardPosDto} from '../dtos/leaderboard-pos.dto';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LeaderboardApi {
   constructor(private _http: HttpClient) {
+  }
+
+  /**
+   * Get an array of all the leaderboards that currently exist
+   */
+  public async getAllLeaderboards(): Promise<LeaderboardDto[]> {
+    return this._http.get<LeaderboardDto[]>('Leaderboard/All').toPromise();
+  }
+
+  /**
+   * Get an array of all the leaderboards positions for a given leaderboard
+   */
+  public async getAllLeaderboardPositions(leaderboardID: number): Promise<LeaderboardPosDto[]> {
+    return this._http.get<LeaderboardPosDto[]>(`Leaderboard/Positions?leaderboardID=${leaderboardID}`).toPromise();
   }
 
   /**
