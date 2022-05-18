@@ -15,9 +15,9 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Stats
         {
             LeaderboardPosBE result = destination ?? new();
             result.LeaderboardPosID = source.LeaderboardPosID;
-            result.LeaderboardID = source.LeaderboardPosID;
-            result.UserID = source.LeaderboardPosID;
-            result.BingoQty = source.LeaderboardPosID;
+            result.LeaderboardID = source.LeaderboardID;
+            result.UserID = source.UserID;
+            result.BingoQty = source.BingoQty;
             return result;
         }
     }

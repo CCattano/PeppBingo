@@ -40,22 +40,46 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         public async Task<ActionResult<List<LeaderboardBM>>> All()
         {
             List<LeaderboardBE> leaderboardBEs = await _statsAdapter.GetAllLeaderboards();
-            
+
+            if (leaderboardBEs == null) return NotFound();
+
             List<int> boardIDs = leaderboardBEs.Select(leaderboard => leaderboard.BoardID).ToList();
             List<BoardBE> boardBEs = await _gameAdapter.GetBoards(boardIDs);
-            
-            Dictionary<int, string> boardNamesByBoardID =
-                boardBEs.ToDictionary(key => key.BoardID, value => value.Name);
-            
-            List<LeaderboardBM> leaderboardBMs =
-                leaderboardBEs
-                    .Select(leaderboardBE => new LeaderboardBM
-                    {
-                        LeaderboardID = leaderboardBE.LeaderboardID,
-                        BoardName = boardNamesByBoardID[leaderboardBE.BoardID]
-                    })
-                    .ToList();
+            boardBEs = boardBEs.Where(b => b.TileCount >= 25).ToList();
+
+            Dictionary<int, LeaderboardBE> leaderboardsByBoardID =
+                leaderboardBEs.ToDictionary(key => key.BoardID);
+
+            List<LeaderboardBM> leaderboardBMs = boardBEs.Select(boardBE => new LeaderboardBM
+            {
+                LeaderboardID = leaderboardsByBoardID[boardBE.BoardID].LeaderboardID,
+                BoardName = boardBE.Name
+            }).ToList();
             return leaderboardBMs;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<List<LeaderboardPosBM>>> Positions([FromQuery] int leaderboardID)
+        {
+            List<LeaderboardPosBE> positions =
+                await _statsAdapter.GetLeaderboardPositions(leaderboardID);
+
+            if (positions == null) return NotFound();
+
+            Dictionary<int, LeaderboardPosBE> positionsByUserID = positions.ToDictionary(k => k.UserID);
+
+            List<int> userIDs = positions.Select(p => p.UserID).Distinct().ToList();
+            List<UserBE> users = await _userAdapter.GetUsers(userIDs);
+
+            List<LeaderboardPosBM> result = users.Select(u => new LeaderboardPosBM()
+            {
+                LeaderboardID = leaderboardID,
+                DisplayName = u.DisplayName,
+                ProfileImageUri = u.ProfileImageUri,
+                BingoQty = positionsByUserID[u.UserID].BingoQty
+            }).ToList();
+
+            return result;
         }
 
         [HttpPut]

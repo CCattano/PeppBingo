@@ -48,7 +48,14 @@ namespace Pepp.Web.Apps.Bingo.Facades
         /// <param name="leaderboardID"></param>
         /// <returns></returns>
         Task CreateLeaderboardPosition(int userID, int leaderboardID);
-
+        
+        /// <summary>
+        /// Get all leaderboard position information for a specific leaderboard
+        /// </summary>
+        /// <param name="leaderboardID"></param>
+        /// <returns></returns>
+        Task<List<LeaderboardPosBE>> GetLeaderboardPositions(int leaderboardID);
+        
         /// <summary>
         /// Get user's leaderboard position information
         /// </summary>
@@ -123,6 +130,15 @@ namespace Pepp.Web.Apps.Bingo.Facades
         public async Task CreateLeaderboardPosition(int userID, int leaderboardID) =>
             await _dataSvc.Stats.LeaderboardPosRepo.CreateLeaderboardPosition(userID, leaderboardID);
 
+        public async Task<List<LeaderboardPosBE>> GetLeaderboardPositions(int leaderboardID)
+        {
+            List<LeaderboardPosEntity> leaderboardPositionEntity =
+                await _dataSvc.Stats.LeaderboardPosRepo.GetLeaderboardPositions(leaderboardID);
+            List<LeaderboardPosBE> leaderboardPosBEs =
+                leaderboardPositionEntity?.Select(entity => _mapper.Map<LeaderboardPosBE>(entity)).ToList();
+            return leaderboardPosBEs;
+        }
+        
         public async Task<LeaderboardPosBE> GetLeaderboardPosition(int userID, int leaderboardID)
         {
             LeaderboardPosEntity leaderboardPositionEntity =

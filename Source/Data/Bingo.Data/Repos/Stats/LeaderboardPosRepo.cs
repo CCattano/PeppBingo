@@ -19,6 +19,12 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Stats
         /// <summary>
         /// Get Leaderboard Position information in the table
         /// </summary>
+        /// <param name="leaderboardID"></param>
+        /// <returns></returns>
+        Task<List<LeaderboardPosEntity>> GetLeaderboardPositions(int leaderboardID);
+        /// <summary>
+        /// Get Leaderboard Position information in the table
+        /// </summary>
         /// <param name="userID"></param>
         /// <param name="leaderboardID"></param>
         /// <returns></returns>
@@ -65,6 +71,23 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Stats
             await base.Create(Sprocs.InsertLeaderboardPosition, @params);
         } 
 
+        public async Task<List<LeaderboardPosEntity>> GetLeaderboardPositions(int leaderboardID)
+        {
+            List<SqlParameter> @params = new()
+            {
+                new SqlParameter()
+                {
+                    ParameterName = $"@{nameof(LeaderboardPosEntity.LeaderboardID)}",
+                    SqlDbType = SqlDbType.Int,
+                    Value = leaderboardID
+                }
+            };
+
+            List<LeaderboardPosEntity> queryData = 
+                await base.Read<LeaderboardPosEntity>(Sprocs.GetLeaderboardPositionsByLeaderboardID, @params);
+            return queryData;
+        } 
+        
         public async Task<LeaderboardPosEntity> GetLeaderboardPosition(int userID, int leaderboardID)
         {
             List<SqlParameter> @params = new()
@@ -128,6 +151,7 @@ namespace Pepp.Web.Apps.Bingo.Data.Repos.Stats
         {
             public const string InsertLeaderboardPosition = "stats.usp_INSERT_LeaderboardPos";
             public const string GetLeaderboardPosition = "stats.usp_SELECT_LeaderboardPos_ByUserAndLeaderboardID";
+            public const string GetLeaderboardPositionsByLeaderboardID = "stats.usp_SELECT_LeaderBoardPos_ByLeaderboardID";
             public const string UpdateLeaderboardPosition = "stats.usp_UPDATE_LeaderboardPos_ByUserAndLeaderboardID";
             public const string DeleteLeaderboardPositionsByLeaderboardID = "stats.usp_DELETE_LeaderboardPos_ByLeaderboardID";
         }
