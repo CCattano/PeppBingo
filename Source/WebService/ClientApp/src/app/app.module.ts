@@ -6,7 +6,6 @@ import {FontAwesomeModule} from '@fortawesome/angular-fontawesome';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import {NgToggleModule} from '@nth-cloud/ng-toggle';
 import {AppRoutingModule} from './app-routing.module';
-import {DashboardComponent} from './components/dashboard/dashboard.component';
 import {BingoGameComponent} from './components/game/bingo-game.component';
 import {
   LeaderboardSubmissionFlowComponent
@@ -34,6 +33,7 @@ import {MobileBingoGridComponent} from './shared/components/bingo-grid/mobile/mo
 import {BingoGridContainerComponent} from './shared/components/bingo-grid/bingo-grid-container.component';
 import {LeaderboardStandingsComponent} from './components/leaderboard/standings/leaderboard-standings.component';
 import {BindOnceDirective} from './shared/directives/bind-once.directive';
+import {AboutComponent} from './components/about/about.component';
 
 const httpInterceptors: Provider = [
   { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
@@ -50,7 +50,7 @@ const appInitializers: Provider = [
     //#region PAGE COMPONENTS
 
     LoginComponent,
-    DashboardComponent,
+    AboutComponent,
 
     // -- Admin Management
     AddEditAdminComponent,
