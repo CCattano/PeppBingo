@@ -41,7 +41,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         {
             List<LeaderboardBE> leaderboardBEs = await _statsAdapter.GetAllLeaderboards();
 
-            if (leaderboardBEs == null) return NotFound();
+            if (leaderboardBEs == null) return NoContent();
 
             List<int> boardIDs = leaderboardBEs.Select(leaderboard => leaderboard.BoardID).ToList();
             List<BoardBE> boardBEs = await _gameAdapter.GetBoards(boardIDs);
@@ -64,7 +64,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             List<LeaderboardPosBE> positions =
                 await _statsAdapter.GetLeaderboardPositions(leaderboardID);
 
-            if (positions == null) return NotFound();
+            if (positions == null) return NoContent();
 
             Dictionary<int, LeaderboardPosBE> positionsByUserID = positions.ToDictionary(k => k.UserID);
 
