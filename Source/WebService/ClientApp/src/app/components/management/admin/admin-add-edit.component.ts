@@ -95,8 +95,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
    */
   public _onBlur(event: Event): void {
     (event.target as HTMLInputElement).value = '';
-    const inputEvent: Event = new Event('input', { bubbles: true, cancelable: true });
-    (event.target as HTMLInputElement).dispatchEvent(inputEvent);
+    this._inputChangeSource.next('');
   }
 
   private _initInputValueChangePipeline(): Observable<void> {
@@ -139,6 +138,7 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
   /**
    * Revoke a user's admin permissions within the application
    * @param index
+   * @param content
    */
   public async _onRemoveAdminClick(index: number, content: TemplateRef<any>): Promise<void> {
     this._userModalData = this._admins[index];
@@ -159,12 +159,13 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
                   'user\'s permissions. Please try again.',
             ttlMs: 5000
           }));
-    await this._openModal(index, content, affirmativeAction);
+    await this._openModal(content, affirmativeAction);
   }
 
   /**
    * Grant a user admin permissions within the application
    * @param index
+   * @param content
    */
   public async _onAddAdminClick(index: number, content: TemplateRef<any>): Promise<void> {
     this._userModalData = { ...this._searchResults[index] } as UserDto;
@@ -184,10 +185,10 @@ export class AddEditAdminComponent implements OnInit, OnDestroy {
             body: 'New Admin could not be added. Please try again.',
             ttlMs: 5000
           }));
-    await this._openModal(index, content, affirmativeAction);
+    await this._openModal(content, affirmativeAction);
   }
 
-  private async _openModal(index: number, content: TemplateRef<any>, affirmativeAction: () => Promise<void>) {
+  private async _openModal(content: TemplateRef<any>, affirmativeAction: () => Promise<void>) {
     const modalRef = this._modalService.open(content, {
       animation: true,
       ariaLabelledBy: 'modal-basic-title',

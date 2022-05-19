@@ -1,7 +1,6 @@
 <div class="d-flex flex-column justify-content-evenly mx-auto mb-5 userSearch">
   <label for="userSearch" class="form-label">Goobie Search</label>
-  <input #userSearch
-         id="userSearch"
+  <input id="userSearch"
          class="form-control"
          placeholder="Pepp"
          (input)="_onInput($event)"
@@ -13,7 +12,7 @@
       <!-- search result line-item -->
       <div class="searchResults d-flex flex-row align-items-center px-2 py-2"
            (click)="_onAddAdminClick(searchResultIndex, confirmAddAdmin)">
-        <img class="profileImage me-3" [src]="result.profileImageUri" height="30" width="30" />
+        <img class="profileImage me-3" [src]="result.profileImageUri" height="30" width="30" alt="profile picture"/>
         <label [innerHtml]="result.highlightedName | safeHtml"></label>
       </div>
     </ng-container>
@@ -27,7 +26,7 @@
     <div *ngFor="let admin of _admins; let adminIndex = index;" class="col-12 col-md-6">
       <div class="d-flex flex-row justify-content-between px-2 py-2">
         <div class="d-flex flex-row justify-content-around align-items-center">
-          <img class="profileImage me-3" [src]="admin.profileImageUri" height="50" width="50" />
+          <img class="profileImage me-3" [src]="admin.profileImageUri" height="50" width="50" alt="profile picture"/>
           <label [innerHtml]="admin.displayName"></label>
         </div>
         <div class="d-flex flex-row justify-content-end align-items-center">

@@ -33,6 +33,7 @@ import {DesktopBingoGridComponent} from './shared/components/bingo-grid/desktop/
 import {MobileBingoGridComponent} from './shared/components/bingo-grid/mobile/mobile-bingo-grid.component';
 import {BingoGridContainerComponent} from './shared/components/bingo-grid/bingo-grid-container.component';
 import {LeaderboardStandingsComponent} from './components/leaderboard/standings/leaderboard-standings.component';
+import {BindOnceDirective} from './shared/directives/bind-once.directive';
 
 const httpInterceptors: Provider = [
   { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
@@ -92,7 +93,13 @@ const appInitializers: Provider = [
 
     //#region SHARED PIPES
 
-    SafeHtmlPipe
+    SafeHtmlPipe,
+
+    //#endregion
+
+    //#region SHARED DIRECTIVES
+
+    BindOnceDirective
 
     //#endregion
   ],

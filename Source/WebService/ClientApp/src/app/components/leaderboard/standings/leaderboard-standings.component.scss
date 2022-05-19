@@ -1,0 +1,20 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+.tableContainer {
+  overflow-y: scroll;
+}
+
+.vh-90 {
+  max-height: 90vh;
+}
+
+.table-striped>tbody>tr.highlight-fade>td {
+  -webkit-transition: color 1000ms linear !important;
+  -ms-transition: color 1000ms linear !important;
+  transition: color 1000ms linear !important;
+}
+
+.table-striped>tbody>tr.highlight>td {
+  color: $warning !important;
+}
