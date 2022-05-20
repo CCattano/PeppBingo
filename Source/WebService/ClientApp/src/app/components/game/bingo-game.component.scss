@@ -1,12 +1,10 @@
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-
 .centerOnPage {
   margin: 0;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  z-index: -1;
 }
 
 .grid {
@@ -26,7 +24,7 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  border: 1px solid $light;
+  border: 1px solid var(--bs-light);
 
   &:after {
     content: '';

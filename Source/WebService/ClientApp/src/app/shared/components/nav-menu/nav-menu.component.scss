@@ -1,27 +1,23 @@
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-@import "../../../../styles.scss";
-
 .navBorder {
-  border-bottom: 1px solid $light
+  border-bottom: 1px solid var(--bs-light)
 }
 
 .mobileUserDetails {
-  border-top: .125rem solid $light;
-  border-bottom: .125rem solid $light;
+  border-top: .125rem solid var(--bs-light);
+  border-bottom: .125rem solid var(--bs-light);
 }
 
 .dropdown-menu {
-  background-color: $dark;
-  color: $light;
-  border-color: $light;
+  background-color: var(--bs-dark);
+  color: var(--bs-light);
+  border-color: var(--bs-light);
 
   .dropdown-item {
-    color: $light;
+    color: var(--bs-light);
 
     &:hover {
-      background-color: $dark;
-      color: $bonani;
+      background-color: var(--bs-dark);
+      color: var(--bonani);
     }
   }
 }

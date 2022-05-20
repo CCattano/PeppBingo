@@ -1,6 +1,3 @@
-@import "bootstrap/scss/functions";
-@import "bootstrap/scss/variables";
-
 .tableContainer {
   overflow-y: scroll;
 }
@@ -16,5 +13,5 @@
 }
 
 .table-striped>tbody>tr.highlight>td {
-  color: $warning !important;
+  color: var(--bs-warning) !important;
 }

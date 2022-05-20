@@ -3,18 +3,20 @@
 /* Importing Bootstrap SCSS file. */
 @import '~bootstrap/scss/bootstrap';
 
-$bonani: #fed800;
+:root {
+  --bonani: #fed800;
+}
 
 .popover-dark {
-  border-color: $light !important;
+  border-color: var(--bs-light) !important;
 
   & > .popover-header, .popover-body {
-    color: $light !important;
-    background-color: $dark !important;
-    border-color: $light !important;
+    color: var(--bs-light) !important;
+    background-color: var(--bs-dark) !important;
+    border-color: var(--bs-light) !important;
   }
 }
 
 .pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
