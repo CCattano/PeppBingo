@@ -1,12 +1,12 @@
 <!-- Desktop Bingo Board -->
 <ng-container *ngIf="_currBreakpoint >= breakpointsEnum.md && !_isMobileLandscape">
-  <app-desktop-bingo-grid [board]="board" (tileClick)="_onTileClick($event)">
+  <app-desktop-bingo-grid #bingoBoard [board]="board" (tileClick)="_onTileClick($event)">
     <ng-container *ngTemplateOutlet="projectedContent"></ng-container>
   </app-desktop-bingo-grid>
 </ng-container>
 <!--Mobile Bingo Board -->
 <ng-container *ngIf="_currBreakpoint < breakpointsEnum.md && !_isMobileLandscape">
-  <app-mobile-bingo-grid [board]="board" (tileClick)="_onTileClick($event)">
+  <app-mobile-bingo-grid #bingoBoard [board]="board" (tileClick)="_onTileClick($event)">
     <ng-container *ngTemplateOutlet="projectedContent"></ng-container>
   </app-mobile-bingo-grid>
 </ng-container>

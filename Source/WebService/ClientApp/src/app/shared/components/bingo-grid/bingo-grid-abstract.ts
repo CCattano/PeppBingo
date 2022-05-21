@@ -23,4 +23,6 @@ export abstract class BingoGridAbstract {
   public _onTileClick(selectedTile: GameTileVM): void {
     this.tileClick.emit(selectedTile);
   }
+
+  public abstract getScreenshotOfBoard(): void;
 }

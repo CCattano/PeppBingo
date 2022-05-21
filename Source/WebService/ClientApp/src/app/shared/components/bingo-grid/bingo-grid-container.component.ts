@@ -1,6 +1,6 @@
 import {fromEvent, Observable, Subscription} from 'rxjs';
 import {debounceTime, distinctUntilChanged, filter, map, tap} from 'rxjs/operators';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {BingoGridAbstract} from './bingo-grid-abstract';
 
 enum BreakpointsEnum {
@@ -18,6 +18,14 @@ enum BreakpointsEnum {
   styleUrls: ['./bingo-grid.styles.scss']
 })
 export class BingoGridContainerComponent extends BingoGridAbstract implements OnInit, OnDestroy {
+  /**
+   * Component reference to the shared functionality that
+   * exists on both the desktop and mobile bingo boards
+   * @private
+   */
+  @ViewChild('bingoBoard')
+  private readonly _bongoBoardComponent: BingoGridAbstract;
+
   /**
    * Enum reference captures for use in template
    */
@@ -42,6 +50,10 @@ export class BingoGridContainerComponent extends BingoGridAbstract implements On
    * Subscription to the resize event observable
    */
   private _resizeSub: Subscription;
+
+  public getScreenshotOfBoard(): void {
+    this._bongoBoardComponent.getScreenshotOfBoard();
+  }
 
   private static _calcViewport(): BreakpointsEnum {
     const width: number = document.documentElement.clientWidth;

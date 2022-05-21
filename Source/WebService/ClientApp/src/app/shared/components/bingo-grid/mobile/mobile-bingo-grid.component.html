@@ -22,3 +22,17 @@
     </li>
   </ul>
 </div>
+
+<div id="bingoBoard" class="grid mobileScreenshot m-auto d-none">
+  <ng-container *ngFor="let rows of board" class="row">
+    <div *ngFor="let col of rows"
+         class="gridCell pointer"
+         (click)="_onTileClick(col)">
+      <div [class.isSelected]="col.isSelected">
+            <span class="gridCellContent">
+              {{col.text}}
+            </span>
+      </div>
+    </div>
+  </ng-container>
+</div>

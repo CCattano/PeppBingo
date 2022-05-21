@@ -4,6 +4,15 @@
   justify-content: center;
 }
 
+.grid.desktop {
+  max-width: 85vh;
+}
+
+.grid.mobileScreenshot {
+  width: 475px;
+  height: 475px;
+}
+
 .gridCell {
   overflow: hidden;
   position: relative;

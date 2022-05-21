@@ -11,6 +11,7 @@ import {of} from 'rxjs';
 import {switchMap, tap} from 'rxjs/operators';
 import {UserApi} from '../../shared/api/user.api';
 import {UserSubmissionStatus} from '../../shared/enums/user-submission-state.enum';
+import {BingoGridContainerComponent} from '../../shared/components/bingo-grid/bingo-grid-container.component';
 
 interface ILocalStorageContent {
   /**
@@ -41,6 +42,9 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   @ViewChild(LeaderboardVoteFlowComponent, {static: true})
   private readonly _leaderboardVoteFlowComponent: LeaderboardVoteFlowComponent;
+
+  @ViewChild(BingoGridContainerComponent)
+  private readonly _bingoGridContainerComponent: BingoGridContainerComponent;
 
   /**
    * Bool flag indicating an admin has not set an active board to play
@@ -135,6 +139,9 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     this._leaderboardVoteFlowComponent.openModal();
   }
 
+  public _onScreenshotClick(): void {
+    this._bingoGridContainerComponent.getScreenshotOfBoard();
+  }
   //#endregion
 
   //#region Data Initialization Functions
