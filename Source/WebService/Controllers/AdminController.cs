@@ -21,17 +21,20 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         private readonly IMapper _mapper;
         private readonly IUserAdapter _userAdapter;
         private readonly IGameAdapter _gameAdapter;
+        private readonly IStatsAdapter _statsAdapter;
 
         public AdminController
         (
             IMapper mapper,
             IUserAdapter userAdapter,
-            IGameAdapter gameAdapter
+            IGameAdapter gameAdapter,
+            IStatsAdapter statsAdapter
         )
         {
             _mapper = mapper;
             _userAdapter = userAdapter;
             _gameAdapter = gameAdapter;
+            _statsAdapter = statsAdapter;
         }
 
         #region Admin User Data Endpoints
@@ -128,7 +131,8 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         {
             UserBE requestingUser = await ConfirmIsAdmin("Non-Administrators cannot create new Board Tiles");
             BoardTileBE newBoardTileBE = _mapper.Map<BoardTileBE>(newTile);
-            BoardTileBE boardTileBE = await _gameAdapter.CreateBoardTile(requestingUser.UserID, boardID, newBoardTileBE);
+            BoardTileBE boardTileBE =
+                await _gameAdapter.CreateBoardTile(requestingUser.UserID, boardID, newBoardTileBE);
             BoardTileBM boardTileBM = _mapper.Map<BoardTileBM>(boardTileBE);
             return boardTileBM;
         }
@@ -158,6 +162,19 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await ConfirmIsAdmin("Non-Administrators cannot delete Board Tiles");
             await _gameAdapter.DeleteBoardTile(tileID);
         }
+
+        #endregion
+
+        #region Admin Leaderboard Data Endpoints
+
+        [HttpPut]
+        public async Task<ActionResult> ResetLeaderboard([FromQuery]int leaderboardID)
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot modify Leaderboards");
+            await _statsAdapter.ResetLeaderboard(leaderboardID);
+            return Ok();
+        }
+
         #endregion
 
         private async Task<UserBE> ConfirmIsAdmin(string rejectionMsg)

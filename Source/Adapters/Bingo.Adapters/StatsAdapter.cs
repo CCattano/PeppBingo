@@ -29,6 +29,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="boardID"></param>
         /// <returns></returns>
         Task UpdatePosition(int userID, int boardID);
+        /// <summary>
+        /// Remove all existing leaderboard position data for a given leaderboard
+        /// </summary>
+        /// <param name="leaderboardID"></param>
+        /// <returns></returns>
+        Task ResetLeaderboard(int leaderboardID);
     }
 
     public class StatsAdapter : IStatsAdapter
@@ -60,6 +66,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
                 await _facade.CreateLeaderboardPosition(userID, leaderboardBE.LeaderboardID);
             else
                 await _facade.UpdateLeaderboardPosition(userID, leaderboardBE.LeaderboardID);
+        }
+
+        public async Task ResetLeaderboard(int leaderboardID)
+        {
+            await _facade.DeleteAllLeaderboardPositions(leaderboardID);
         }
     }
 }
