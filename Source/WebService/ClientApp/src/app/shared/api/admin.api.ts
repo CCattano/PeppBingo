@@ -157,6 +157,14 @@ export class AdminApi {
     return await this._http.put<null>('Admin/Live/ResetAllBoards', null).toPromise();
   }
 
+  /**
+   * Remove all current leaderboard positions for a given leaderboard
+   * @param leaderboardID
+   */
+  public async resetLeaderboard(leaderboardID: number): Promise<void> {
+    return await this._http.put<null>(`Admin/ResetLeaderboard?leaderboardID=${leaderboardID}`, null).toPromise();
+  }
+
   //#endregion
 }
 

@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {LeaderboardApi} from '../../../shared/api/leaderboard.api';
 import {LeaderboardDto} from '../../../shared/dtos/leaderboard.dto';
 import {LeaderboardPosDto} from '../../../shared/dtos/leaderboard-pos.dto';
@@ -7,12 +7,17 @@ import {Observable, Subject, Subscription} from 'rxjs';
 import {debounceTime, delay, filter, map, tap} from 'rxjs/operators';
 import {UserApi} from '../../../shared/api/user.api';
 import {UserDto} from '../../../shared/dtos/user.dto';
+import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
+import {AdminApi} from '../../../shared/api/admin.api';
 
 @Component({
   templateUrl: './leaderboard-standings.component.html',
   styleUrls: ['leaderboard-standings.component.scss']
 })
 export class LeaderboardStandingsComponent implements OnInit, OnDestroy {
+  @ViewChild('confirmReset', {static: true})
+  private readonly _confirmResetModal: TemplateRef<any>;
+
   /**
    * The leaderboards a user can view additional data about
    */
@@ -46,13 +51,16 @@ export class LeaderboardStandingsComponent implements OnInit, OnDestroy {
     '#FF5733' // Bronze
   ];
 
-  private _authUser: UserDto;
+  public _authUser: UserDto;
   private _inputChangeSubscription: Subscription;
   private readonly _inputChangeSource: Subject<string> = new Subject<string>();
   private readonly _inputChange$: Observable<string> = this._inputChangeSource.asObservable();
+  private _modalInstance: NgbModalRef;
 
   constructor(private _leaderboardApi: LeaderboardApi,
-              private _userApi: UserApi) {
+              private _adminApi: AdminApi,
+              private _userApi: UserApi,
+              private _ngbModal: NgbModal) {
   }
 
   /**
@@ -78,18 +86,51 @@ export class LeaderboardStandingsComponent implements OnInit, OnDestroy {
    */
   public async _onShowBoardStandings(board: LeaderboardDto): Promise<void> {
     if (board === null) {
-      this._positions = [];
+      this._positions = null;
       this._currentBoard = null;
       return;
     }
+    this._currentBoard = board;
     this._positions =
       await this._leaderboardApi.getAllLeaderboardPositions(board.leaderboardID);
+    if(!this._positions?.length) return;
     this._positions = this._positions?.sort((a, b) => a.bingoQty > b.bingoQty ? -1 : 1) || [];
     this._userIsOnBoard =
       !!this._positions.find(p => p.displayName.toLowerCase() === this._authUser.displayName.toLowerCase());
-    this._currentBoard = board;
   }
 
+  /**
+   * Event handler for the reset leaderboard button
+   */
+  public _onResetLeaderboardClick(): void {
+    this._modalInstance = this._ngbModal.open(this._confirmResetModal, {
+      animation: true,
+      backdrop: 'static',
+      centered: true,
+      keyboard: false,
+      size: 'lg'
+    });
+  }
+
+  /**
+   * Event handler for when a leaderboard should be reset
+   */
+  public async _onConfirmResetClick(): Promise<void> {
+    await this._adminApi.resetLeaderboard(this._currentBoard.leaderboardID);
+    this._positions = null;
+    this._modalInstance.close();
+  }
+
+  /**
+   * Event handler for when a leaderboard reset is canceled
+   */
+  public _onCancelResetClick(): void {
+    this._modalInstance.close();
+  }
+
+  /**
+   * Event handler for the Jump To Me button
+   */
   public _onJumpToMeClick(): void {
     this._inputChangeSource.next(this._authUser.displayName);
   }
@@ -136,7 +177,8 @@ export class LeaderboardStandingsComponent implements OnInit, OnDestroy {
       tap((targetEl: HTMLElement) => {
         targetEl.scrollIntoView({
           block: 'center',
-          inline: 'center'
+          inline: 'center',
+          behavior: 'smooth'
         } as ScrollIntoViewOptions);
         targetEl.classList.add('highlight');
       }),
