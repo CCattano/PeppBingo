@@ -38,7 +38,7 @@ export class AdminHub {
     if (this._hubConn) return;
     this._hubConn =
       new HubConnectionBuilder()
-        .withUrl('https://localhost:44339/adminHub')
+        .withUrl(`${window.location.origin}/adminHub`)
         .withAutomaticReconnect()
         .build();
     await this._hubConn.start();

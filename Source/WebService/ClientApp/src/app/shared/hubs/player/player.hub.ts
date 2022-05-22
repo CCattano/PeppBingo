@@ -37,7 +37,7 @@ export class PlayerHub {
     if (this._hubConn) return;
     this._hubConn =
       new HubConnectionBuilder()
-        .withUrl('https://localhost:44339/playerHub')
+        .withUrl(`${window.location.origin}/playerHub`)
         .withAutomaticReconnect()
         .build();
     await this._hubConn.start();
