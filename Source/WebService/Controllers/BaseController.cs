@@ -29,7 +29,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 
     public abstract class BaseController : Controller
     {
-        protected string BaseUri => $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+        protected string BaseUri => $"https://{HttpContext.Request.Host}";
 
         protected string TryGetAccessTokenFromRequestHeader() =>
             HttpContext.Request.Headers.TryGetValue(TokenManager.AccessJWTCookieName, out StringValues headerVal)

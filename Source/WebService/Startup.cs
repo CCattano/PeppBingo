@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NJsonSchema;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.Adapters.Translators;
 using Pepp.Web.Apps.Bingo.Data;
@@ -17,16 +18,20 @@ using Pepp.Web.Apps.Bingo.Managers;
 using Pepp.Web.Apps.Bingo.WebService.Controllers.Translators;
 using Pepp.Web.Apps.Bingo.WebService.Middleware;
 using Tandem.Web.Apps.Trivia.WebService.Middleware.TokenValidation;
-using ConnStrings =
-    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings.ConnStrings;
+using AppSettings =
+    Pepp.Web.Apps.Bingo.Infrastructure.SystemConstants.AppSettings;
 
 namespace Pepp.Web.Apps.Bingo.WebService
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup(IWebHostEnvironment env)
         {
-            Configuration = configuration;
+            Configuration = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: false)
+                .AddEnvironmentVariables()
+                .Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -45,11 +50,12 @@ namespace Pepp.Web.Apps.Bingo.WebService
                     .AllowAnyMethod()
                     .AllowAnyHeader()
                     .AllowCredentials()
-                    .WithOrigins("http://localhost:4200");
+                    .WithOrigins(Configuration.GetValue<string>(AppSettings.CorsOrigin));
             }));
             services.AddSignalR();
+            
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(cfg => cfg.RootPath = "ClientApp/dist");
+            services.AddSpaStaticFiles(cfg => cfg.RootPath = "ClientApp/dist/pepp-bingo");
 
             #endregion
 
@@ -96,7 +102,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             #region SERVICES
 
-            services.AddBingoDataService(Configuration.GetConnectionString(ConnStrings.PeppBingo));
+            services.AddBingoDataService(Configuration.GetConnectionString(AppSettings.ConnStrings.PeppBingo));
 
             #endregion
 
@@ -116,7 +122,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             services.AddOpenApiDocument(cfg =>
             {
-                cfg.SchemaType = NJsonSchema.SchemaType.OpenApi3;
+                cfg.SchemaType = SchemaType.OpenApi3;
                 cfg.Title = "Tandem.Web.Apps.Trivia";
             });
 
@@ -137,7 +143,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 path => path.Request.Path.Value?.ToLower() == "/status/isalive",
                 // Return this message.
                 builder => builder.Run(async context =>
-                    await context.Response.WriteAsync($"PeppBingo SPA server is currently running."))
+                    await context.Response.WriteAsync("PeppBingo SPA server is currently running."))
             );
 
             /*
@@ -174,7 +180,6 @@ namespace Pepp.Web.Apps.Bingo.WebService
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             if (!env.IsDevelopment())

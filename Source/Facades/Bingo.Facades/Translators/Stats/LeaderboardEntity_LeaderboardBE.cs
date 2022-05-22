@@ -8,7 +8,10 @@ namespace Pepp.Web.Apps.Bingo.Facades.Translators.Stats
     {
         public LeaderboardEntity Convert(LeaderboardBE source, LeaderboardEntity destination, ResolutionContext context)
         {
-            throw new System.NotImplementedException();
+            LeaderboardEntity result = destination ?? new();
+            result.LeaderboardID = source.LeaderboardID;
+            result.BoardID = source.BoardID;
+            return result;
         }
         
         public LeaderboardBE Convert(LeaderboardEntity source, LeaderboardBE destination, ResolutionContext context)

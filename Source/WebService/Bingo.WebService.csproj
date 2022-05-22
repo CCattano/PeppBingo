@@ -28,6 +28,9 @@
 		<None Remove="$(SpaRoot)**" />
 		<None Remove="ClientApp-Deprecated\**" />
 		<None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+		<Content Update="appsettings.Production.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Content>
 	</ItemGroup>
 
 	<ItemGroup>

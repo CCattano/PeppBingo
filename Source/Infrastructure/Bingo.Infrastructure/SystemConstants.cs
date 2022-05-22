@@ -101,6 +101,8 @@
             {
                 public const string PeppBingo = "PeppBingo";
             }
+
+            public const string CorsOrigin = "CorsOrigin";
         }
     }
 }

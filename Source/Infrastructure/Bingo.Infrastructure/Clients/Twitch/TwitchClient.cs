@@ -67,9 +67,8 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
             string clientSecret = _cache.GetApiSecret(Secrets.Types.Twitch.ClientSecret);
 
             string redirectUri =
-                $"{_httpCtx.HttpContext.Request.Scheme}://" +
-                $"{_httpCtx.HttpContext.Request.Host}" +
-                $"{_httpCtx.HttpContext.Request.Path}";
+                $"https://{_httpCtx.HttpContext.Request.Host}{_httpCtx.HttpContext.Request.Path}";
+
 
             Dictionary<string, string> queryParams = new()
             {
@@ -106,7 +105,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Clients.Twitch
             FormUrlEncodedContent httpRequestContent = new(refreshRequestData);
 
             const string baseUri = @"https://id.twitch.tv";
-            string request = $"{baseUri}/{TwitchRequests.GetAccessToken}";
+            string request = $"{baseUri}/{TwitchRequests.RefreshAccessToken}";
 
             using HttpResponseMessage response = await _client.PostAsync(request, httpRequestContent);
             TwitchAccessToken accessToken = null;
