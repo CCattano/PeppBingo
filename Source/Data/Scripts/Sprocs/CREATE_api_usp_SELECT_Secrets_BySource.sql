@@ -1,5 +1,9 @@
+USE [PeppBingo]
+GO
+
 SET ANSI_NULLS ON
 GO
+
 SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
@@ -7,7 +11,7 @@ GO
 -- Create date: 04/02/2022
 -- Description:	Fetch Secret details for a given Source
 -- =============================================
-ALTER PROCEDURE api.usp_SELECT_Secrets_BySource
+CREATE PROCEDURE [api].[usp_SELECT_Secrets_BySource]
 	@Source varchar(10)
 AS
 BEGIN
@@ -19,8 +23,7 @@ BEGIN
 		[Value],
 		[Description]
 	FROM
-		[PeppBingo].[api].[SecretValueDetailDescription]
+		[PeppBingo].[api].[Secrets]
 	WHERE
 		[Source] = @Source
 END
-GO

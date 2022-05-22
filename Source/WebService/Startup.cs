@@ -171,7 +171,7 @@ namespace Pepp.Web.Apps.Bingo.WebService
 
             if (env.IsDevelopment())
             {
-                //app.UseDeveloperExceptionPage();
+                app.UseDeveloperExceptionPage();
             }
 
             app.UseHttpsRedirection();
@@ -199,8 +199,11 @@ namespace Pepp.Web.Apps.Bingo.WebService
                     pattern: "{controller}/{action}/{id?}");
             });
 
-            app.UseOpenApi(); //Generates OpenAPI-compliant schema for API
-            app.UseSwaggerUi3(); //Generates UI that parses generated schema
+            if (env.IsDevelopment())
+            {
+                app.UseOpenApi(); //Generates OpenAPI-compliant schema for API
+                app.UseSwaggerUi3(); //Generates UI that parses generated schema
+            }
 
             app.UseSpa(spa =>
             {
