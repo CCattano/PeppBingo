@@ -14,7 +14,7 @@
               (click)="_onOpenVoteModalClick()"
               [disabled]="!_voteRequests.length">
         Vote
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        <span *ngIf="_voteRequests?.length" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             {{_voteRequests.length > 99 ? '99+' : _voteRequests.length}}
         </span>
       </button>
