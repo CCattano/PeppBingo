@@ -115,6 +115,12 @@ export class BingoGameComponent implements OnInit, OnDestroy {
    */
   public _onTileClick(selectedTile: GameTileVM): void {
     selectedTile.isSelected = !selectedTile.isSelected;
+    const localStorageContent: ILocalStorageContent = {
+      boardID: this._activeBoardID,
+      boardGrid: this._board,
+      resetEventID: this._resetEventID
+    };
+    window.localStorage.setItem(BingoGameComponent._localStorageKey, JSON.stringify(localStorageContent));
     this._checkForWinCondition();
   }
 
