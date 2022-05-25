@@ -168,7 +168,8 @@ export class BingoGameComponent implements OnInit, OnDestroy {
     await Promise.all([
       this._getBoardName(boardID),
       this._getBoardTiles(boardID),
-      this._getCurrentResetID()
+      this._getCurrentResetID(),
+      this._getSubmissionStatus()
     ]);
 
     // Determine if this is a returning user with a still valid board
@@ -201,6 +202,10 @@ export class BingoGameComponent implements OnInit, OnDestroy {
 
   private async _getCurrentResetID(): Promise<void> {
     this._resetEventID = await this._gameApi.getCurrentResetID();
+  }
+
+  private async _getSubmissionStatus(): Promise<void> {
+    this._userSubmissionStatus = await this._userApi.getUserSubmissionStatus();
   }
 
   private _tryGetBoardFromLocalStorage(): boolean {

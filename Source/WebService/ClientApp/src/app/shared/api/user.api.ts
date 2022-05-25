@@ -37,7 +37,7 @@ export class UserApi {
    * can no longer submit bingos for leaderboard advancement
    */
   public async markUserAsBingoSubmitted(): Promise<void> {
-    return await this._http.put<null>('User/MarkUserAsBingoSubmitted', null).toPromise();
+    return await this._http.post<null>('User/MarkUserAsBingoSubmitted', null).toPromise();
   }
 }
 
