@@ -27,6 +27,7 @@
 
 <app-leaderboard-submission-flow [boardID]="_activeBoardID"
                                  [board]="_board"
+                                 (screenshotRequest)="_onScreenshotClick()"
                                  (workflowEnd)="_onLeaderboardSubmissionComplete($event)">
 </app-leaderboard-submission-flow>
 <app-leaderboard-vote-flow [requests]="_voteRequests"></app-leaderboard-vote-flow>

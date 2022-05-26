@@ -48,7 +48,13 @@
     <label>You'll be able to submit another bingo once a new game starts and Mods reset everyone's boards.</label>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-success" (click)="_onCloseAfterUnableToSubmit()">Got it!</button>
+    <div class="d-flex flex-row justify-content-between w-100">
+      <button type="button" class="btn btn-outline-secondary" (click)="_onScreenshotRequest()">
+        Screenshot
+        <fa-icon [icon]="icons.faExternalLinkAlt" class="ms-1"></fa-icon>
+      </button>
+      <button type="button" class="btn btn-success" (click)="_onCloseAfterUnableToSubmit()">Got it!</button>
+    </div>
   </div>
 </ng-template>
 
@@ -121,7 +127,13 @@
     </div>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-outline-secondary" (click)="_onCancelSubmission()">Cancel Submission</button>
+    <div class="d-flex flex-row justify-content-between w-100">
+      <button type="button" class="btn btn-outline-secondary" (click)="_onScreenshotRequest()">
+        Screenshot
+        <fa-icon [icon]="icons.faExternalLinkAlt" class="ms-1"></fa-icon>
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="_onCancelSubmission()">Cancel Submission</button>
+    </div>
   </div>
 </ng-template>
 
@@ -153,6 +165,12 @@
     </div>
   </div>
   <div class="modal-footer bg-dark">
-    <button type="button" class="btn btn-outline-secondary" (click)="_onCloseAfterVerified()">Close</button>
+    <div class="d-flex flex-row justify-content-between w-100">
+      <button type="button" class="btn btn-outline-secondary" (click)="_onScreenshotRequest()">
+        Screenshot
+        <fa-icon [icon]="icons.faExternalLinkAlt" class="ms-1"></fa-icon>
+      </button>
+      <button type="button" class="btn btn-outline-secondary" (click)="_onCloseAfterVerified()">Close</button>
+    </div>
   </div>
 </ng-template>

@@ -9,7 +9,7 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import {faUserCircle, IconDefinition} from '@fortawesome/free-solid-svg-icons';
+import {faUserCircle, faExternalLinkAlt, IconDefinition} from '@fortawesome/free-solid-svg-icons';
 import {NgbModal, NgbModalRef} from '@ng-bootstrap/ng-bootstrap';
 import {BingoSubmissionEvent} from '../../../shared/hubs/player/events/bingo-submission.event';
 import {PlayerHub} from '../../../shared/hubs/player/player.hub';
@@ -60,13 +60,21 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
    * Emits false if the user canceled their submission request
    */
   @Output()
-  public workflowEnd: EventEmitter<UserSubmissionStatus> = new EventEmitter<UserSubmissionStatus>();
+  public readonly workflowEnd: EventEmitter<UserSubmissionStatus> = new EventEmitter<UserSubmissionStatus>();
+
+  /**
+   * Event emitter signaling to the parent that the user has
+   * requested a screenshot of the board they are submitting
+   */
+  @Output()
+  public readonly screenshotRequest: EventEmitter<void> = new EventEmitter<void>();
 
   /**
    * Fontawesome icons used in the template
    */
   public readonly icons: { [icon: string]: IconDefinition; } = {
     'faUserCircle': faUserCircle,
+    'faExternalLinkAlt': faExternalLinkAlt
   };
 
   /**
@@ -174,6 +182,13 @@ export class LeaderboardSubmissionFlowComponent implements OnInit, OnDestroy {
     this._modalInstance.close();
     this.workflowEnd.emit(UserSubmissionStatus.CanSubmitBingo);
     this._resetModalState();
+  }
+
+  /**
+   * Event handler for the screenshot button in the template
+   */
+  public _onScreenshotRequest(): void {
+    this.screenshotRequest.emit();
   }
 
   /**
