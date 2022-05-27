@@ -51,6 +51,9 @@
       Reset All Players' Boards
       <fa-icon [icon]="icons.faRadiationAlt"></fa-icon>
     </button>
+    <label *ngIf="_lastResetEventDateTime" class="form-label text-center mt-2">
+      Last Reset: {{_lastResetEventDateTime | date:'short'}}
+    </label>
   </div>
 </div>
 

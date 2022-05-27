@@ -42,6 +42,11 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
   public _editingActiveBoard: boolean = false;
 
   /**
+   * The last time a reset event occurred
+   */
+  public _lastResetEventDateTime: Date;
+
+  /**
    * Fontawesome icons used in the template
    */
   public readonly icons: { [icon: string]: IconDefinition; } = {
@@ -198,7 +203,11 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
     await this._adminHub.connect();
     this._adminHub.registerOnStartSetActiveBoardCooldown(this._onStartSetActiveBoardCooldown);
     this._adminHub.registerOnLatestActiveBoardIDHandler(this._onEmitLatestActiveBoardID);
-    this._adminHub.registerOnStartResetAllBoardsCooldown(this._onStartResetAllBoardsCooldown);
+    const knowLastReset: boolean =
+      this._adminHub.registerOnStartResetAllBoardsCooldown(this._onStartResetAllBoardsCooldown);
+    if(!knowLastReset) {
+      this._lastResetEventDateTime = await this._adminApi.getLastResetDatetime();
+    }
   }
 
   private _onEmitLatestActiveBoardID = (activeBoardID: number) => {
@@ -211,7 +220,8 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
     this._latestBoardCooldownSource.next(timeRemaining);
   };
 
-  private _onStartResetAllBoardsCooldown = (timeRemaining: number = null) => {
+  private _onStartResetAllBoardsCooldown = (evtDateTime: Date, timeRemaining: number = null) => {
+    this._lastResetEventDateTime = evtDateTime;
     this._resetBoardsCooldownSource.next(timeRemaining);
   };
 

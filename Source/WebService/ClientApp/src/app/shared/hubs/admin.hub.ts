@@ -15,17 +15,20 @@ export class AdminHub {
   private _resetAllBoardsEvtCaptureDT: Date;
   private _hubConn: HubConnection;
 
-  private static _handleInProgressCooldownEvent(lastEvtDateTime: Date, evtHandler: (timeRemaining?: number) => void): void {
+  private static _tryGetTimeRemainingForInProgressEventCooldown(lastEvtDateTime: Date): number {
     if (lastEvtDateTime) {
       const currentDatetime: Date = new Date();
       const cooldownExpireTime: Date =
         new Date(new Date(lastEvtDateTime).setSeconds(lastEvtDateTime.getSeconds() + 30));
       if (cooldownExpireTime > currentDatetime) {
-        const timeRemaining: number =
-          Math.round(Math.abs(cooldownExpireTime.getTime() - currentDatetime.getTime()) / 1000);
-        evtHandler(timeRemaining);
+        return Math.round(Math.abs(cooldownExpireTime.getTime() - currentDatetime.getTime()) / 1000);
       }
     }
+    return null;
+  }
+
+  private static _convertDateStringsToDates(date: string): Date {
+    return new Date((date).endsWith('Z') ? date : date + 'Z');
   }
 
   /**
@@ -63,7 +66,10 @@ export class AdminHub {
    */
   public registerOnStartSetActiveBoardCooldown(handler: (timeRemaining?: number) => void): void {
     this._hubConn.off(AdminEvents.StartSetActiveBoardCooldown);
-    AdminHub._handleInProgressCooldownEvent(this._latestBoardIDEvtCaptureDT, handler);
+    const timeRemaining: number =
+      AdminHub._tryGetTimeRemainingForInProgressEventCooldown(this._latestBoardIDEvtCaptureDT);
+    if (timeRemaining)
+      handler(timeRemaining);
     this._hubConn.on(AdminEvents.StartSetActiveBoardCooldown, () => {
       this._latestBoardIDEvtCaptureDT = new Date();
       handler();
@@ -74,15 +80,24 @@ export class AdminHub {
    * Register a callback function to act as handler for the
    * EmitLatestActiveBoardID event which broadcast a activeBoardID
    * representhing the latest active board that has been chosen by an admin
+   *
+   * Returns true or false to indicate if the hub is
+   * aware of the last time a reset board event was emitted
+   *
+   * If false is returned last event DateTime can be fetched from the server
    * @param handler
    */
-  public registerOnStartResetAllBoardsCooldown(handler: (timeRemaining?: number) => void): void {
+  public registerOnStartResetAllBoardsCooldown(handler: (evtDateTime: Date, timeRemaining?: number) => void): boolean {
     this._hubConn.off(AdminEvents.StartResetAllBoardsCooldown);
-    AdminHub._handleInProgressCooldownEvent(this._resetAllBoardsEvtCaptureDT, handler);
-    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, () => {
-      this._resetAllBoardsEvtCaptureDT = new Date();
-      handler();
+    const timeRemaining: number =
+      AdminHub._tryGetTimeRemainingForInProgressEventCooldown(this._resetAllBoardsEvtCaptureDT);
+    if (timeRemaining)
+      handler(this._resetAllBoardsEvtCaptureDT, timeRemaining);
+    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, (eventStartDateTime: string) => {
+      this._resetAllBoardsEvtCaptureDT = AdminHub._convertDateStringsToDates(eventStartDateTime);
+      handler(this._resetAllBoardsEvtCaptureDT);
     });
+    return !!this._resetAllBoardsEvtCaptureDT;
   }
 
   public unregisterAllHandlers(): void {
@@ -94,6 +109,7 @@ export class AdminHub {
 
   private _registerInternalCooldownHandler(): void {
     this._hubConn.on(AdminEvents.StartSetActiveBoardCooldown, () => this._latestBoardIDEvtCaptureDT = new Date());
-    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, () => this._resetAllBoardsEvtCaptureDT = new Date());
+    this._hubConn.on(AdminEvents.StartResetAllBoardsCooldown, (eventStartDateTime: string) =>
+      this._resetAllBoardsEvtCaptureDT = AdminHub._convertDateStringsToDates(eventStartDateTime));
   }
 }

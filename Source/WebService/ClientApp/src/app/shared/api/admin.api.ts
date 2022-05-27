@@ -151,6 +151,18 @@ export class AdminApi {
   }
 
   /**
+   * Get the date of the last time the server emitted a reset board event
+   *
+   * Returns null if a reset event has not been performed yet
+   */
+  public async getLastResetDatetime(): Promise<Date> {
+    const lastResetDateTime: string =
+      await this._http.get<string>('Admin/Live/LastResetEventDateTime').toPromise();
+    if (!lastResetDateTime) return null;
+    return new Date(lastResetDateTime.endsWith('Z') ? lastResetDateTime : lastResetDateTime + 'Z');
+  }
+
+  /**
    * Resets the bingo boards of all players connected to the platform
    */
   public async resetAllBoards(): Promise<void> {
