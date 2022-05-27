@@ -50,49 +50,44 @@ namespace Pepp.Web.Apps.Bingo.Adapters
 
     public class LiveAdapter : ILiveAdapter
     {
-        private readonly IActiveBoardCache _activeBoardCache;
-        private readonly IUserCanSubmitCache _userCanSubmitCache;
+        private readonly ILiveDataCache _liveDataCache;
         private readonly IAdminHub _adminHub;
         private readonly IPlayerHub _playerHub;
 
         public LiveAdapter(
-            IActiveBoardCache activeBoardCache,
-            IUserCanSubmitCache userCanSubmitCache,
+            ILiveDataCache liveDataCache,
             IAdminHub adminHub,
             IPlayerHub playerHub
         )
         {
-            _activeBoardCache = activeBoardCache;
-            _userCanSubmitCache = userCanSubmitCache;
+            _liveDataCache = liveDataCache;
             _adminHub = adminHub;
             _playerHub = playerHub;
         }
 
         public async Task SetActiveBoardID(int activeBoardID)
         {
-            _activeBoardCache.SetActiveBoardID(activeBoardID);
-            // Clear list of users who cannot submit for bingo
-            _userCanSubmitCache.ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource.BoardChange);
+            _liveDataCache.SetActiveBoardID(activeBoardID);
             // Trigger cooldown on setting new active board
             await _adminHub.StartSetActiveBoardCooldown();
             // Trigger cooldown on resetting players' board, as they've just been reset by switching
-            await _adminHub.StartResetAllBoardsCooldown(_userCanSubmitCache.GetLastResetDateTime()!.Value);
+            await _adminHub.StartResetAllBoardsCooldown(_liveDataCache.GetLastResetDateTime()!.Value);
             // For any admins on the live control page broadcast the newest activeBoardID
-            await _adminHub.LatestActiveBoardID(activeBoardID);
+            await _adminHub.EmitLatestActiveBoardID(activeBoardID);
             // For any players on the play page broadcast the newest activeBoardID
             await _playerHub.EmitLatestActiveBoardID(activeBoardID);
         }
 
-        public DateTime? GetResetBoardDateTime() => _userCanSubmitCache.GetLastResetDateTime();
+        public DateTime? GetResetBoardDateTime() => _liveDataCache.GetLastResetDateTime();
 
         public async Task ResetAllBoards()
         {
             // Clear list of users who cannot submit for bingo
-            _userCanSubmitCache.ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource.BoardReset);
+            _liveDataCache.ResetUserCanSubmitCache(LiveDataCache.ResetSource.BoardReset);
             // Start 30s cooldown for admins on client so Reset btn cannot be mashed
-            await _adminHub.StartResetAllBoardsCooldown(_userCanSubmitCache.GetLastResetDateTime()!.Value);
+            await _adminHub.StartResetAllBoardsCooldown(_liveDataCache.GetLastResetDateTime()!.Value);
             // Reset all player's boards
-            await _playerHub.ResetBoard(_userCanSubmitCache.GetResetEventID());
+            await _playerHub.ResetBoard(_liveDataCache.GetResetEventID());
         }
     }
 }

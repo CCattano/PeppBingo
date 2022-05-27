@@ -19,7 +19,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         /// selected board on the LiveControls page
         /// </summary>
         /// <returns></returns>
-        Task LatestActiveBoardID(int activeBoardID);
+        Task EmitLatestActiveBoardID(int activeBoardID);
 
         /// <summary>
         /// Emits an event that causes the UI to deactivate the
@@ -39,7 +39,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         public async Task StartSetActiveBoardCooldown() =>
             await _adminHub.Clients.All.StartSetActiveBoardCooldown();
 
-        public async Task LatestActiveBoardID(int activeBoardID) =>
+        public async Task EmitLatestActiveBoardID(int activeBoardID) =>
             await _adminHub.Clients.All.LatestActiveBoardID(activeBoardID);
 
         public async Task StartResetAllBoardsCooldown(DateTime resetDateTime) =>

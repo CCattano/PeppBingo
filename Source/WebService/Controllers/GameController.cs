@@ -16,24 +16,21 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
     [Route("[controller]/[action]")]
     public class GameController : BaseController<IMapper, IGameAdapter>
     {
-        private readonly IActiveBoardCache _activeBoardCache;
-        private readonly IUserCanSubmitCache _userCanSubmitCache;
+        private readonly ILiveDataCache _liveDataCache;
 
         public GameController(
             IMapper mapper,
             IGameAdapter adapter,
-            IActiveBoardCache activeBoardCache,
-            IUserCanSubmitCache userCanSubmitCache
+            ILiveDataCache liveDataCache
         ) : base(mapper, adapter)
         {
-            _activeBoardCache = activeBoardCache;
-            _userCanSubmitCache = userCanSubmitCache;
+            _liveDataCache = liveDataCache;
         }
 
         [HttpGet]
         public ActionResult<int?> GetActiveBoardID()
         {
-            int? activeBoardID = _activeBoardCache.GetActiveBoardID();
+            int? activeBoardID = _liveDataCache.GetActiveBoardID();
             return Ok(activeBoardID);
         }
 
@@ -58,7 +55,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
         [HttpGet]
         public ActionResult<string> GetCurrentResetID()
         {
-            string resetEventID = _userCanSubmitCache.GetResetEventID();
+            string resetEventID = _liveDataCache.GetResetEventID();
             return Ok(JsonSerializer.Serialize(resetEventID));
         }
     }

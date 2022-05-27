@@ -84,12 +84,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
     public class UserAdapter : IUserAdapter
     {
         private readonly IUserFacade _facade;
-        private readonly IUserCanSubmitCache _userCanSubmitCache;
+        private readonly ILiveDataCache _liveDataCache;
 
-        public UserAdapter(IUserFacade facade, IUserCanSubmitCache userCanSubmitCache)
+        public UserAdapter(IUserFacade facade, ILiveDataCache liveDataCache)
         {
             _facade = facade;
-            _userCanSubmitCache = userCanSubmitCache;
+            _liveDataCache = liveDataCache;
         }
 
         public async Task<UserBE> GetUser(string jwt)
@@ -127,12 +127,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         }
 
         public void LogSuspiciousUserBehaviour(int userID) =>
-            _userCanSubmitCache.LogSuspiciousBehaviourForUser(userID);
+            _liveDataCache.LogSuspiciousBehaviourForUser(userID);
 
         public void MarkUserAsBingoSubmitted(int userID) =>
-            _userCanSubmitCache.MarkUserAsBingoSubmitted(userID);
+            _liveDataCache.MarkUserAsBingoSubmitted(userID);
         
         public UserSubmissionStatus GetUserSubmissionStatus(int userID) =>
-            _userCanSubmitCache.GetUserSubmissionStatus(userID);
+            _liveDataCache.GetUserSubmissionStatus(userID);
     }
 }

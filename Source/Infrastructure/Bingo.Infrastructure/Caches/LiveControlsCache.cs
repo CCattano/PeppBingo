@@ -1,12 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Threading;
 using Pepp.Web.Apps.Bingo.Infrastructure.Enums;
+using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 {
-    public interface IUserCanSubmitCache
+    public interface ILiveDataCache
     {
+        #region BoardChangeEvent Tracking Methods
+
+        /// <summary>
+        /// Get the ID of the board that
+        /// all users should be playing
+        /// </summary>
+        /// <returns></returns>
+        int? GetActiveBoardID();
+
+        /// <summary>
+        /// Update the ID of the board
+        /// that all users should be playing
+        /// </summary>
+        /// <param name="activeBoardID"></param>
+        void SetActiveBoardID(int activeBoardID);
+
+        #endregion
+
+        #region BoardResetEvent Tracking Methods
+
         /// <summary>
         /// Get the unique guid-format string that
         /// represents the latest reset event that
@@ -20,6 +42,10 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// </summary>
         /// <returns></returns>
         DateTime? GetLastResetDateTime();
+
+        #endregion
+
+        #region UserCanSubmit Methods
 
         /// <summary>
         /// Add userID to list of Users who cannot submit
@@ -36,7 +62,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// <summary>
         /// Clear list of users that could no longer submit 
         /// </summary>
-        void ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource resetSource);
+        void ResetUserCanSubmitCache(LiveDataCache.ResetSource resetSource);
 
         /// <summary>
         /// Logs that a user performed a
@@ -44,32 +70,96 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// </summary>
         /// <param name="userID"></param>
         void LogSuspiciousBehaviourForUser(int userID);
+
+        #endregion
     }
 
-    public class UserCanSubmitCache : IUserCanSubmitCache
+    public class LiveDataCache : ILiveDataCache
     {
+        #region Variables
+
+        #region BoardChangeEvent Tracking Variables
+
+        private int? _activeBoardID;
+        private DateTime _lockBoardChangeUntil = DateTime.Now;
+        private readonly object _boardChangeLock = new();
+
+        #endregion
+
+        #region BoardResetEvent Tracking Variables
+
         public enum ResetSource
         {
             BoardChange,
             BoardReset
         }
 
-        private string _resetEventID = Guid.NewGuid().ToString();
-        private DateTime? _lastResetDateTime;
+        private string _boardResetEventID = Guid.NewGuid().ToString();
+        private DateTime? _lastBoardResetDateTime;
+
+        #endregion
+
+        #region UserCanSubmit Variables
+
         private readonly Dictionary<int, UserSubmissionStatus> _usersThatCannotSubmit = new();
-        private DateTime _lockCacheResetForBoardResetUntil = DateTime.Now;
-        private DateTime _lockCacheResetForBoardChangeUntil = DateTime.Now;
+        private DateTime _lockCanSubmitCacheResetForBoardResetUntil = DateTime.Now;
+        private DateTime _lockCanSubmitCacheResetForBoardChangeUntil = DateTime.Now;
         private readonly object _canSubmitLock = new();
 
         private readonly Dictionary<int, List<DateTime>> _suspiciousBehaviourByUserID = new();
         private readonly object _suspiciousBehaviourLock = new();
+
+        #endregion
+
+        #endregion
+
+        #region Methods
+
+        #region BoardChangeEvent Tracking Methods
+
+        public int? GetActiveBoardID()
+        {
+            int? activeBoardID;
+            lock (_boardChangeLock)
+            {
+                activeBoardID = _activeBoardID;
+            }
+
+            return activeBoardID;
+        }
+
+        public void SetActiveBoardID(int activeBoardID)
+        {
+            bool throwEx = false;
+            lock (_boardChangeLock)
+            {
+                if (DateTime.Now >= _lockBoardChangeUntil)
+                {
+                    _lockBoardChangeUntil = DateTime.Now.AddSeconds(30);
+                    _activeBoardID = activeBoardID;
+                    ResetUserCanSubmitCache(ResetSource.BoardChange);
+                }
+                else
+                {
+                    throwEx = true;
+                }
+            }
+
+            if (throwEx)
+                throw new WebException(HttpStatusCode.Locked,
+                    "Active Board cannot be modified at this time");
+        }
+
+        #endregion
+
+        #region BoardResetEvent Tracking Methods
 
         public string GetResetEventID()
         {
             string eventResetID;
             lock (_canSubmitLock)
             {
-                eventResetID = _resetEventID;
+                eventResetID = _boardResetEventID;
             }
 
             return eventResetID;
@@ -80,11 +170,15 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
             DateTime? lastResetDateTime;
             lock (_canSubmitLock)
             {
-                lastResetDateTime = _lastResetDateTime;
+                lastResetDateTime = _lastBoardResetDateTime;
             }
 
             return lastResetDateTime;
         }
+
+        #endregion
+
+        #region UserCanSubmit Methods
 
         public void LogSuspiciousBehaviourForUser(int userID)
         {
@@ -111,7 +205,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
                     suspiciousActivityDateTimes.Add(DateTime.UtcNow);
 
                     int minutesSinceLastReset =
-                        (int)Math.Round((DateTime.UtcNow - _lastResetDateTime!.Value).TotalMinutes);
+                        (int)Math.Round((DateTime.UtcNow - _lastBoardResetDateTime!.Value).TotalMinutes);
 
                     /*
                      * Our arbitrary thresholds for suspicious behaviour are as follows
@@ -212,32 +306,49 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 
         public void ResetUserCanSubmitCache(ResetSource resetSource)
         {
+            bool throwEx = false;
             lock (_suspiciousBehaviourLock)
             {
                 lock (_canSubmitLock)
                 {
                     bool canReset = resetSource switch
                     {
-                        ResetSource.BoardChange => DateTime.UtcNow > _lockCacheResetForBoardChangeUntil,
-                        ResetSource.BoardReset => DateTime.UtcNow > _lockCacheResetForBoardResetUntil,
+                        ResetSource.BoardChange => DateTime.UtcNow > _lockCanSubmitCacheResetForBoardChangeUntil,
+                        ResetSource.BoardReset => DateTime.UtcNow > _lockCanSubmitCacheResetForBoardResetUntil,
                         _ => false
                     };
-                    if (!canReset) return;
-                    // Inducing a brief hold on this lock for 1s for anyone who just
-                    // finished using it so the code that runs as a result of
-                    // fetching the data this lock protects can finish running
-                    // Once the lock is released here new code is going to run
-                    // and ideally the 1s delay will make sure everyone is in
-                    // a settled state before that happens
-                    Thread.Sleep(1000);
-                    _lockCacheResetForBoardChangeUntil = DateTime.UtcNow.AddSeconds(30);
-                    _lockCacheResetForBoardResetUntil = DateTime.UtcNow.AddSeconds(30);
-                    _usersThatCannotSubmit.Clear();
-                    _suspiciousBehaviourByUserID.Clear();
-                    _lastResetDateTime = DateTime.UtcNow;
-                    _resetEventID = Guid.NewGuid().ToString();
+                    switch (canReset)
+                    {
+                        case false when resetSource == ResetSource.BoardChange:
+                            return;
+                        case false when resetSource == ResetSource.BoardReset:
+                            throwEx = true;
+                            break;
+                        default:
+                            // Inducing a brief hold on this lock for 1s for anyone who just
+                            // finished using it so the code that runs as a result of
+                            // fetching the data this lock protects can finish running
+                            // Once the lock is released here new code is going to run
+                            // and ideally the 1s delay will make sure everyone is in
+                            // a settled state before that happens
+                            Thread.Sleep(1000);
+                            _lockCanSubmitCacheResetForBoardChangeUntil = DateTime.UtcNow.AddSeconds(30);
+                            _lockCanSubmitCacheResetForBoardResetUntil = DateTime.UtcNow.AddSeconds(30);
+                            _usersThatCannotSubmit.Clear();
+                            _suspiciousBehaviourByUserID.Clear();
+                            _lastBoardResetDateTime = DateTime.UtcNow;
+                            _boardResetEventID = Guid.NewGuid().ToString();
+                            break;
+                    }
                 }
             }
+            if (throwEx)
+                throw new WebException(HttpStatusCode.Locked,
+                    "Player boards cannot be reset at this time");
         }
+
+        #endregion
+
+        #endregion
     }
 }
