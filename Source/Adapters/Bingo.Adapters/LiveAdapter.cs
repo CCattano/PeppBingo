@@ -72,9 +72,11 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         {
             _activeBoardCache.SetActiveBoardID(activeBoardID);
             // Clear list of users who cannot submit for bingo
-            _userCanSubmitCache.ResetUserCanSubmitCache();
+            _userCanSubmitCache.ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource.BoardChange);
             // Trigger cooldown on setting new active board
             await _adminHub.StartSetActiveBoardCooldown();
+            // Trigger cooldown on resetting players' board, as they've just been reset by switching
+            await _adminHub.StartResetAllBoardsCooldown(_userCanSubmitCache.GetLastResetDateTime()!.Value);
             // For any admins on the live control page broadcast the newest activeBoardID
             await _adminHub.LatestActiveBoardID(activeBoardID);
             // For any players on the play page broadcast the newest activeBoardID
@@ -86,7 +88,7 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         public async Task ResetAllBoards()
         {
             // Clear list of users who cannot submit for bingo
-            _userCanSubmitCache.ResetUserCanSubmitCache();
+            _userCanSubmitCache.ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource.BoardReset);
             // Start 30s cooldown for admins on client so Reset btn cannot be mashed
             await _adminHub.StartResetAllBoardsCooldown(_userCanSubmitCache.GetLastResetDateTime()!.Value);
             // Reset all player's boards

@@ -14,7 +14,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// </summary>
         /// <returns></returns>
         string GetResetEventID();
-        
+
         /// <summary>
         /// Get the DateTime of the last reset that occurred
         /// </summary>
@@ -36,7 +36,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// <summary>
         /// Clear list of users that could no longer submit 
         /// </summary>
-        void ResetUserCanSubmitCache();
+        void ResetUserCanSubmitCache(UserCanSubmitCache.ResetSource resetSource);
 
         /// <summary>
         /// Logs that a user performed a
@@ -48,10 +48,17 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 
     public class UserCanSubmitCache : IUserCanSubmitCache
     {
+        public enum ResetSource
+        {
+            BoardChange,
+            BoardReset
+        }
+
         private string _resetEventID = Guid.NewGuid().ToString();
         private DateTime? _lastResetDateTime;
         private readonly Dictionary<int, UserSubmissionStatus> _usersThatCannotSubmit = new();
-        private DateTime _lockCacheResetUntil = DateTime.Now;
+        private DateTime _lockCacheResetForBoardResetUntil = DateTime.Now;
+        private DateTime _lockCacheResetForBoardChangeUntil = DateTime.Now;
         private readonly object _canSubmitLock = new();
 
         private readonly Dictionary<int, List<DateTime>> _suspiciousBehaviourByUserID = new();
@@ -78,7 +85,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
 
             return lastResetDateTime;
         }
-        
+
         public void LogSuspiciousBehaviourForUser(int userID)
         {
             lock (_suspiciousBehaviourLock)
@@ -203,13 +210,19 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
             return userSubmissionStatus;
         }
 
-        public void ResetUserCanSubmitCache()
+        public void ResetUserCanSubmitCache(ResetSource resetSource)
         {
             lock (_suspiciousBehaviourLock)
             {
                 lock (_canSubmitLock)
                 {
-                    if (DateTime.UtcNow <= _lockCacheResetUntil) return;
+                    bool canReset = resetSource switch
+                    {
+                        ResetSource.BoardChange => DateTime.UtcNow > _lockCacheResetForBoardChangeUntil,
+                        ResetSource.BoardReset => DateTime.UtcNow > _lockCacheResetForBoardResetUntil,
+                        _ => false
+                    };
+                    if (!canReset) return;
                     // Inducing a brief hold on this lock for 1s for anyone who just
                     // finished using it so the code that runs as a result of
                     // fetching the data this lock protects can finish running
@@ -217,7 +230,8 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
                     // and ideally the 1s delay will make sure everyone is in
                     // a settled state before that happens
                     Thread.Sleep(1000);
-                    _lockCacheResetUntil = DateTime.UtcNow.AddSeconds(30);
+                    _lockCacheResetForBoardChangeUntil = DateTime.UtcNow.AddSeconds(30);
+                    _lockCacheResetForBoardResetUntil = DateTime.UtcNow.AddSeconds(30);
                     _usersThatCannotSubmit.Clear();
                     _suspiciousBehaviourByUserID.Clear();
                     _lastResetDateTime = DateTime.UtcNow;

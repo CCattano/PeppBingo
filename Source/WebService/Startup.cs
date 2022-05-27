@@ -175,10 +175,10 @@ namespace Pepp.Web.Apps.Bingo.WebService
             app.UseTokenValidationMiddleware();
             app.UseCacheHydrationMiddleware();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            // if (env.IsDevelopment())
+            // {
+            //     app.UseDeveloperExceptionPage();
+            // }
 
             app.UseStaticFiles();
 
