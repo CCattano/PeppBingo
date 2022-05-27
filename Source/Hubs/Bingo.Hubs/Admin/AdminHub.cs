@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Pepp.Web.Apps.Bingo.Hubs.Admin
@@ -25,7 +26,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         /// ability to reset all player's boards for 30 seconds
         /// </summary>
         /// <returns></returns>
-        Task StartResetAllBoardsCooldown();
+        Task StartResetAllBoardsCooldown(DateTime resetDateTime);
     }
 
     public class AdminHub : IAdminHub
@@ -41,7 +42,7 @@ namespace Pepp.Web.Apps.Bingo.Hubs.Admin
         public async Task LatestActiveBoardID(int activeBoardID) =>
             await _adminHub.Clients.All.LatestActiveBoardID(activeBoardID);
 
-        public async Task StartResetAllBoardsCooldown() =>
-            await _adminHub.Clients.All.StartResetAllBoardsCooldown();
+        public async Task StartResetAllBoardsCooldown(DateTime resetDateTime) =>
+            await _adminHub.Clients.All.StartResetAllBoardsCooldown(resetDateTime);
     }
 }

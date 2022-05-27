@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Net;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Pepp.Web.Apps.Bingo.Adapters;
 using Pepp.Web.Apps.Bingo.BusinessEntities.User;
 using Pepp.Web.Apps.Bingo.WebService.Middleware.TokenValidation.TokenValidationResources;
-using System.Net;
-using System.Threading.Tasks;
 using WebException = Pepp.Web.Apps.Bingo.Infrastructure.Exceptions.WebException;
 
 namespace Pepp.Web.Apps.Bingo.WebService.Controllers
@@ -30,6 +31,14 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             await ConfirmIsAdmin("Non-Administrators cannot access live controls");
             await _liveAdapter.SetActiveBoardID(activeBoardID);
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<DateTime>> LastResetEventDateTime()
+        {
+            await ConfirmIsAdmin("Non-Administrators cannot access live controls"); 
+            DateTime? lastResetDateTime = _liveAdapter.GetResetBoardDateTime();
+            return Ok(lastResetDateTime);
         }
         
         [HttpPut]

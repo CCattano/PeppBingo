@@ -14,6 +14,12 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
         /// </summary>
         /// <returns></returns>
         string GetResetEventID();
+        
+        /// <summary>
+        /// Get the DateTime of the last reset that occurred
+        /// </summary>
+        /// <returns></returns>
+        DateTime? GetLastResetDateTime();
 
         /// <summary>
         /// Add userID to list of Users who cannot submit
@@ -43,7 +49,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
     public class UserCanSubmitCache : IUserCanSubmitCache
     {
         private string _resetEventID = Guid.NewGuid().ToString();
-        private DateTime _lastResetDateTime = DateTime.UtcNow;
+        private DateTime? _lastResetDateTime;
         private readonly Dictionary<int, UserSubmissionStatus> _usersThatCannotSubmit = new();
         private DateTime _lockCacheResetUntil = DateTime.Now;
         private readonly object _canSubmitLock = new();
@@ -62,6 +68,17 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
             return eventResetID;
         }
 
+        public DateTime? GetLastResetDateTime()
+        {
+            DateTime? lastResetDateTime;
+            lock (_canSubmitLock)
+            {
+                lastResetDateTime = _lastResetDateTime;
+            }
+
+            return lastResetDateTime;
+        }
+        
         public void LogSuspiciousBehaviourForUser(int userID)
         {
             lock (_suspiciousBehaviourLock)
@@ -87,7 +104,7 @@ namespace Pepp.Web.Apps.Bingo.Infrastructure.Caches
                     suspiciousActivityDateTimes.Add(DateTime.UtcNow);
 
                     int minutesSinceLastReset =
-                        (int)Math.Round((DateTime.UtcNow - _lastResetDateTime).TotalMinutes);
+                        (int)Math.Round((DateTime.UtcNow - _lastResetDateTime!.Value).TotalMinutes);
 
                     /*
                      * Our arbitrary thresholds for suspicious behaviour are as follows

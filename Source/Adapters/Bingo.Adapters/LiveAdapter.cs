@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Pepp.Web.Apps.Bingo.Hubs.Admin;
 using Pepp.Web.Apps.Bingo.Hubs.Player;
 using Pepp.Web.Apps.Bingo.Infrastructure.Caches;
@@ -23,6 +24,12 @@ namespace Pepp.Web.Apps.Bingo.Adapters
         /// <param name="activeBoardID"></param>
         Task SetActiveBoardID(int activeBoardID);
 
+        /// <summary>
+        /// Get the last known DateTime a reset event occurred.
+        /// </summary>
+        /// <returns></returns>
+        DateTime? GetResetBoardDateTime();
+        
         /// <summary>
         /// Resets all boards for all players
         /// </summary>
@@ -74,12 +81,14 @@ namespace Pepp.Web.Apps.Bingo.Adapters
             await _playerHub.EmitLatestActiveBoardID(activeBoardID);
         }
 
+        public DateTime? GetResetBoardDateTime() => _userCanSubmitCache.GetLastResetDateTime();
+
         public async Task ResetAllBoards()
         {
             // Clear list of users who cannot submit for bingo
             _userCanSubmitCache.ResetUserCanSubmitCache();
             // Start 30s cooldown for admins on client so Reset btn cannot be mashed
-            await _adminHub.StartResetAllBoardsCooldown();
+            await _adminHub.StartResetAllBoardsCooldown(_userCanSubmitCache.GetLastResetDateTime()!.Value);
             // Reset all player's boards
             await _playerHub.ResetBoard(_userCanSubmitCache.GetResetEventID());
         }
