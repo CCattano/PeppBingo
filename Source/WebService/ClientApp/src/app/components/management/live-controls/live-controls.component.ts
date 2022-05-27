@@ -158,7 +158,12 @@ export class LiveControlsComponent implements OnInit, OnDestroy {
    * connected players to reset their boards
    */
   public async _onConfirmResetClick(): Promise<void> {
-    await this._adminApi.resetAllBoards();
+    await this._adminApi.resetAllBoards()
+      .catch((response: HttpErrorResponse) => this._toastService.showDangerToast({
+        header: 'An Error Occurred',
+        body: response.error,
+        ttlMs: 5000
+      }));
     this._activeModalRef.close();
   }
 
