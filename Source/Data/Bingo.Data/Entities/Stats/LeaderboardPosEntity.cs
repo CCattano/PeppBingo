@@ -1,3 +1,5 @@
+using System;
+
 namespace Pepp.Web.Apps.Bingo.Data.Entities.Stats
 {
     /// <summary>
@@ -24,5 +26,10 @@ namespace Pepp.Web.Apps.Bingo.Data.Entities.Stats
         /// The number of bingos this user has for this bingo board
         /// </summary>
         public int BingoQty;
+
+        /// <summary>
+        /// The last DateTime in UTC that this leaderboard member got a bingo
+        /// </summary>
+        public DateTime LastBingoDateTime;
     }
 }

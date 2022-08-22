@@ -132,10 +132,10 @@ namespace Pepp.Web.Apps.Bingo.Facades
 
         public async Task<List<LeaderboardPosBE>> GetLeaderboardPositions(int leaderboardID)
         {
-            List<LeaderboardPosEntity> leaderboardPositionEntity =
+            List<LeaderboardPosEntity> leaderboardPositionEntities =
                 await _dataSvc.Stats.LeaderboardPosRepo.GetLeaderboardPositions(leaderboardID);
             List<LeaderboardPosBE> leaderboardPosBEs =
-                leaderboardPositionEntity?.Select(entity => _mapper.Map<LeaderboardPosBE>(entity)).ToList();
+                leaderboardPositionEntities?.Select(entity => _mapper.Map<LeaderboardPosBE>(entity)).ToList();
             return leaderboardPosBEs;
         }
         

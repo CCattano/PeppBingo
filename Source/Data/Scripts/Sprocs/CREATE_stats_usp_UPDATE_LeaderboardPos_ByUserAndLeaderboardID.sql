@@ -18,7 +18,8 @@ BEGIN
 		UPDATE
 			[stats].[LeaderboardPos]
 		SET
-			BingoQty = BingoQty + 1
+			BingoQty = BingoQty + 1,
+			LastBingoDateTime = GETUTCDATE()
 		WHERE
 			UserID = @UserID
 			AND LeaderboardID = @LeaderboardID
