@@ -66,17 +66,24 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
 
             if (positions == null) return NoContent();
 
-            Dictionary<int, LeaderboardPosBE> positionsByUserID = positions.ToDictionary(k => k.UserID);
-
+            positions = positions
+                .GroupBy(pos => pos.BingoQty)
+                .OrderByDescending(grp => grp.Key)
+                .SelectMany(grp => grp.OrderBy(pos => pos.LeaderboardPosID))
+                .ToList();
+            
             List<int> userIDs = positions.Select(p => p.UserID).Distinct().ToList();
             List<UserBE> users = await _userAdapter.GetUsers(userIDs);
 
-            List<LeaderboardPosBM> result = users.Select(u => new LeaderboardPosBM()
+            Dictionary<int, LeaderboardPosBE> positionsByUserID = positions.ToDictionary(k => k.UserID);
+            Dictionary<int, UserBE> usersByLeaderboardPos =
+                users.ToDictionary(k => positionsByUserID[k.UserID].LeaderboardPosID, v => v);
+            List<LeaderboardPosBM> result = positions.Select(p => new LeaderboardPosBM()
             {
                 LeaderboardID = leaderboardID,
-                DisplayName = u.DisplayName,
-                ProfileImageUri = u.ProfileImageUri,
-                BingoQty = positionsByUserID[u.UserID].BingoQty
+                DisplayName = usersByLeaderboardPos[p.LeaderboardPosID].DisplayName,
+                ProfileImageUri = usersByLeaderboardPos[p.LeaderboardPosID].ProfileImageUri,
+                BingoQty = p.BingoQty
             }).ToList();
 
             return result;
