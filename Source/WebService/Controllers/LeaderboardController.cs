@@ -69,7 +69,7 @@ namespace Pepp.Web.Apps.Bingo.WebService.Controllers
             positions = positions
                 .GroupBy(pos => pos.BingoQty)
                 .OrderByDescending(grp => grp.Key)
-                .SelectMany(grp => grp.OrderByDescending(pos => pos.LastBingoDateTime))
+                .SelectMany(grp => grp.OrderBy(pos => pos.LastBingoDateTime))
                 .ToList();
             
             List<int> userIDs = positions.Select(p => p.UserID).Distinct().ToList();
